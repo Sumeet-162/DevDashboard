@@ -127,7 +127,7 @@ interface TestimonialsSectionProps {
 
 const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
   title = "❤️ Loved by Developers",
-  subtitle = "See what others are saying about DevPulse",
+  subtitle = "See what others are saying about DevDash",
   testimonials = [
     {
       id: 1,
@@ -379,8 +379,8 @@ const Toggle: React.FC<ToggleProps> = ({
   )
 }
 
-// Main DevPulse Landing Page Component
-const DevPulseLandingPage: React.FC = () => {
+// Main DevDash Landing Page Component
+const DevDashLandingPage: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Default to dark mode unless localStorage says otherwise
     if (typeof window !== 'undefined') {
@@ -459,7 +459,7 @@ const DevPulseLandingPage: React.FC = () => {
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center space-x-2">
             <BarChart3 className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">DevPulse</span>
+            <span className="font-bold text-xl">DevDash</span>
           </div>
           
           <nav className="hidden md:flex items-center space-x-6">
@@ -674,7 +674,7 @@ const DevPulseLandingPage: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <BarChart3 className="h-6 w-6 text-primary" />
-                  <span className="font-bold text-xl">DevPulse</span>
+                  <span className="font-bold text-xl">DevDash</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Built with React, Tailwind, and 💖 by devs, for devs.
@@ -708,7 +708,7 @@ const DevPulseLandingPage: React.FC = () => {
             </div>
 
             <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-              © 2025 DevPulse. Built with React, Tailwind, and 💖 by devs, for devs.
+              © 2025 DevDash. Built with React, Tailwind, and 💖 by devs, for devs.
             </div>
           </div>
         </footer>
@@ -717,4 +717,4 @@ const DevPulseLandingPage: React.FC = () => {
   )
 }
 
-export default DevPulseLandingPage
+export default DevDashLandingPage

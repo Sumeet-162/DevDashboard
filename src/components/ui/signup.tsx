@@ -8,7 +8,7 @@ import { Separator } from "./login-2";
 import { useNavigate } from "./useNavigate";
 import { Moon, Sun } from "lucide-react";
 
-export default function SignupDevPulse() {
+export default function SignupDevDash() {
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = React.useState(() => {
     if (typeof window !== 'undefined') {
@@ -56,7 +56,7 @@ export default function SignupDevPulse() {
       <div className="flex flex-1 flex-col justify-center px-4 py-10 lg:px-6">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="flex items-center space-x-2">
-            {/* DevPulse Logo/Icon */}
+            {/* DevDash Logo/Icon */}
             <svg
               fill="currentColor"
               height="40"
@@ -77,9 +77,9 @@ export default function SignupDevPulse() {
                 <path d="m13.9956 29.8973c-.9518-1.019-1.6451-2.2826-1.9751-3.6862l-10.95836 2.9363 1.05385 3.933z" />
               </g>
             </svg>
-            <span className="font-bold text-2xl text-primary">DevPulse</span>
+            <span className="font-bold text-2xl text-primary">DevDash</span>
           </div>
-          <h3 className="mt-6 text-2xl font-bold text-foreground">Create your DevPulse account</h3>
+          <h3 className="mt-6 text-2xl font-bold text-foreground">Create your DevDash account</h3>
           <p className="mt-2 text-base text-muted-foreground">
             Sign up to track your <span className="font-semibold text-primary">GitHub</span> and <span className="font-semibold text-primary">LeetCode</span> progress, and stay updated with the latest <span className="font-semibold text-primary">tech news</span>.
           </p>
@@ -109,39 +109,39 @@ export default function SignupDevPulse() {
 
           <form action="#" method="post" className="mt-6 space-y-4" onSubmit={handleSubmit}>
             <div>
-              <Label htmlFor="name-signup-devpulse" className="text-sm font-medium text-foreground">
+              <Label htmlFor="name-signup-devdash" className="text-sm font-medium text-foreground">
                 Name
               </Label>
               <Input
                 type="text"
-                id="name-signup-devpulse"
-                name="name-signup-devpulse"
+                id="name-signup-devdash"
+                name="name-signup-devdash"
                 autoComplete="name"
                 placeholder="Your Name"
                 className="mt-2"
               />
             </div>
             <div>
-              <Label htmlFor="email-signup-devpulse" className="text-sm font-medium text-foreground">
+              <Label htmlFor="email-signup-devdash" className="text-sm font-medium text-foreground">
                 Email
               </Label>
               <Input
                 type="email"
-                id="email-signup-devpulse"
-                name="email-signup-devpulse"
+                id="email-signup-devdash"
+                name="email-signup-devdash"
                 autoComplete="email"
-                placeholder="you@devpulse.app"
+                placeholder="you@devdash.app"
                 className="mt-2"
               />
             </div>
             <div>
-              <Label htmlFor="password-signup-devpulse" className="text-sm font-medium text-foreground">
+              <Label htmlFor="password-signup-devdash" className="text-sm font-medium text-foreground">
                 Password
               </Label>
               <Input
                 type="password"
-                id="password-signup-devpulse"
-                name="password-signup-devpulse"
+                id="password-signup-devdash"
+                name="password-signup-devdash"
                 autoComplete="new-password"
                 placeholder="********"
                 className="mt-2"

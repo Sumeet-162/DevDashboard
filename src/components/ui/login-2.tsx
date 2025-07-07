@@ -144,7 +144,7 @@ const GoogleIcon = (
   </svg>
 );
 
-export default function LoginDevPulse() {
+export default function LoginDevDash() {
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = React.useState(() => {
     if (typeof window !== 'undefined') {
@@ -192,7 +192,7 @@ export default function LoginDevPulse() {
       <div className="flex flex-1 flex-col justify-center px-4 py-10 lg:px-6">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="flex items-center space-x-2">
-            {/* DevPulse Logo/Icon */}
+            {/* DevDash Logo/Icon */}
             <svg
               fill="currentColor"
               height="40"
@@ -213,10 +213,10 @@ export default function LoginDevPulse() {
                 <path d="m13.9956 29.8973c-.9518-1.019-1.6451-2.2826-1.9751-3.6862l-10.95836 2.9363 1.05385 3.933z" />
               </g>
             </svg>
-            <span className="font-bold text-2xl text-primary">DevPulse</span>
+            <span className="font-bold text-2xl text-primary">DevDash</span>
           </div>
           <h3 className="mt-6 text-2xl font-bold text-foreground">
-            Sign in to DevPulse
+            Sign in to DevDash
           </h3>
           <p className="mt-2 text-base text-muted-foreground">
             Your all-in-one dashboard to track your{" "}
@@ -259,31 +259,31 @@ export default function LoginDevPulse() {
           <form action="#" method="post" className="mt-6 space-y-4" onSubmit={handleSubmit}>
             <div>
               <Label
-                htmlFor="email-login-devpulse"
+                htmlFor="email-login-devdash"
                 className="text-sm font-medium text-foreground"
               >
                 Email
               </Label>
               <Input
                 type="email"
-                id="email-login-devpulse"
-                name="email-login-devpulse"
+                id="email-login-devdash"
+                name="email-login-devdash"
                 autoComplete="email"
-                placeholder="you@devpulse.app"
+                placeholder="you@devdash.app"
                 className="mt-2"
               />
             </div>
             <div>
               <Label
-                htmlFor="password-login-devpulse"
+                htmlFor="password-login-devdash"
                 className="text-sm font-medium text-foreground"
               >
                 Password
               </Label>
               <Input
                 type="password"
-                id="password-login-devpulse"
-                name="password-login-devpulse"
+                id="password-login-devdash"
+                name="password-login-devdash"
                 autoComplete="current-password"
                 placeholder="********"
                 className="mt-2"
