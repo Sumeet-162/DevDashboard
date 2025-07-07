@@ -33,6 +33,7 @@ interface HeroProps {
     dark: string;
     alt: string;
   };
+  children?: React.ReactNode; // Added children prop
 }
 
 export function HeroSection({
@@ -41,6 +42,7 @@ export function HeroSection({
   description,
   actions,
   image,
+  children, // Destructure children
 }: HeroProps) {
   // For theme, fallback to light for now. You can integrate a theme hook if needed.
   const isDark = document.documentElement.classList.contains('dark');
@@ -90,6 +92,9 @@ export function HeroSection({
               ))}
             </div>
           </div>
+
+          {/* Custom children (e.g., custom Get Started button) */}
+          {children}
 
           {/* Image with Glow */}
           <div className="relative pt-12">

@@ -6,9 +6,29 @@ import { Input } from "./login-2";
 import { Label } from "./login-2";
 import { Separator } from "./login-2";
 import { useNavigate } from "./useNavigate";
+import { Moon, Sun } from "lucide-react";
 
 export default function SignupDevPulse() {
   const navigate = useNavigate();
+  const [isDarkMode, setIsDarkMode] = React.useState(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'light') return false;
+    }
+    return true;
+  });
+  const hasMounted = React.useRef(false);
+  React.useEffect(() => {
+    if (!hasMounted.current) {
+      document.documentElement.classList.toggle('dark', isDarkMode);
+      hasMounted.current = true;
+    } else {
+      document.documentElement.classList.toggle('dark', isDarkMode);
+    }
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+  const toggleDarkMode = () => setIsDarkMode((prev) => !prev);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Here you would handle sign up logic
@@ -16,6 +36,23 @@ export default function SignupDevPulse() {
   };
   return (
     <div className="flex items-center justify-center min-h-screen bg-background text-foreground">
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4">
+        <label className="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={isDarkMode}
+            onChange={toggleDarkMode}
+            className="hidden"
+          />
+          <span className="inline-flex items-center justify-center w-10 h-6 rounded-full bg-muted border border-border transition-colors">
+            <span
+              className={`inline-block w-5 h-5 rounded-full bg-primary shadow transform transition-transform ${isDarkMode ? 'translate-x-4' : 'translate-x-0'}`}
+            >{isDarkMode ? <Moon className="w-4 h-4 mx-auto text-primary-foreground" /> : <Sun className="w-4 h-4 mx-auto text-primary-foreground" />}</span>
+          </span>
+        </label>
+      </div>
+
       <div className="flex flex-1 flex-col justify-center px-4 py-10 lg:px-6">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="flex items-center space-x-2">

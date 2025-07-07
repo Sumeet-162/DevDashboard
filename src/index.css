@@ -1,3 +1,4 @@
+@import "./custom-scrollbar-hide.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

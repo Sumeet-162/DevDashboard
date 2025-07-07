@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation, useInView, easeOut } from 'framer-motion'
 import { 
   Github, 
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { HeroSection } from "@/components/ui/hero-section";
 import { Icons } from "@/components/ui/icons";
+import { GetStartedButton } from "@/components/ui/get-started-button";
 
 // Utility function
 function cn(...classes: (string | undefined | null | boolean)[]): string {
@@ -99,20 +100,6 @@ const GradientText: React.FC<GradientTextProps> = ({ className, children, ...pro
         <span className="pointer-events-none absolute -bottom-1/2 right-0 h-[30vw] w-[30vw] animate-pulse bg-pink-500 mix-blend-overlay blur-[1rem]"></span>
       </span>
     </span>
-  )
-}
-
-// Get Started Button Component
-const GetStartedButton: React.FC = () => {
-  return (
-    <Button className="group relative overflow-hidden" size="lg">
-      <span className="mr-8 transition-opacity duration-500 group-hover:opacity-0">
-        Launch Dashboard
-      </span>
-      <i className="absolute right-1 top-1 bottom-1 rounded-sm z-10 grid w-1/4 place-items-center transition-all duration-500 bg-primary-foreground/15 group-hover:w-[calc(100%-0.5rem)] group-active:scale-95 text-black-500">
-        <ChevronRight size={16} strokeWidth={2} aria-hidden="true" />
-      </i>
-    </Button>
   )
 }
 
@@ -394,13 +381,30 @@ const Toggle: React.FC<ToggleProps> = ({
 
 // Main DevPulse Landing Page Component
 const DevPulseLandingPage: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Default to dark mode unless localStorage says otherwise
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'light') return false;
+    }
+    return true;
+  });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const hasMounted = useRef(false);
+
+  useEffect(() => {
+    if (!hasMounted.current) {
+      document.documentElement.classList.toggle('dark', isDarkMode);
+      hasMounted.current = true;
+    } else {
+      document.documentElement.classList.toggle('dark', isDarkMode);
+    }
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode)
-    document.documentElement.classList.toggle('dark')
-  }
+    setIsDarkMode((prev) => !prev);
+  };
 
   const features = [
     {
@@ -504,20 +508,21 @@ const DevPulseLandingPage: React.FC = () => {
         <div className="mt-0 pt-0">
           <HeroSection
             title="Track your coding journey. Visualize your progress."
-            description="DevPulse brings your GitHub and LeetCode stats together in one beautiful dashboard. Stay motivated, monitor your growth, and celebrate your achievements—all in one place."
-            actions={[
-              {
-                text: "Get Started",
-                href: "/login",
-                variant: "default",
-              },
-            ]}
+            description="DevDash brings your GitHub and LeetCode stats together in one beautiful dashboard. Stay motivated, monitor your growth, and celebrate your achievements—all in one place."
+            actions={[]}
             image={{
-              light: "https://raw.githubusercontent.com/Sumeet-162/website-images/refs/heads/main/Screenshot%202025-07-07%20124513.jpg",
+              light: "https://raw.githubusercontent.com/Sumeet-162/website-images/refs/heads/main/Screenshot%202025-07-07%20165707.jpg",
               dark: "https://raw.githubusercontent.com/Sumeet-162/website-images/refs/heads/main/Screenshot%202025-07-07%20124513.jpg",
-              alt: "DevPulse Dashboard Preview",
+              alt: "DevDash Dashboard Preview",
             }}
-          />
+            
+          >
+            <div className="flex justify-center mt-8">
+              <a href="/login">
+                <GetStartedButton />
+              </a>
+            </div>
+          </HeroSection>
         </div>
 
         {/* Features Section */}
