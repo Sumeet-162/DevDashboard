@@ -513,8 +513,8 @@ const DevPulseLandingPage: React.FC = () => {
               },
             ]}
             image={{
-              light: "https://www.launchuicomponents.com/app-light.png",
-              dark: "https://www.launchuicomponents.com/app-dark.png",
+              light: "https://raw.githubusercontent.com/Sumeet-162/website-images/refs/heads/main/Screenshot%202025-07-07%20124513.jpg",
+              dark: "https://raw.githubusercontent.com/Sumeet-162/website-images/refs/heads/main/Screenshot%202025-07-07%20124513.jpg",
               alt: "DevPulse Dashboard Preview",
             }}
           />
