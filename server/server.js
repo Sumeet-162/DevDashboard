@@ -13,23 +13,51 @@ const PORT = process.env.SERVER_PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8082',
-  credentials: true
+  origin: [
+    'https://dev-dashboard-eight.vercel.app',
+    'http://localhost:8082',
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
 app.use(express.json());
 
 // GitHub OAuth configuration
-const GITHUB_CLIENT_ID = process.env.VITE_GITHUB_CLIENT_ID;
-const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8082';
+const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID || 'Ov23lipKSR37cO0HXzxv';
+const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || '456284e2860027e46caff42bcc08d7e402e58a4e';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://dev-dashboard-eight.vercel.app';
+
+// Log configuration for debugging
+console.log('🔧 Server Configuration:');
+console.log('GITHUB_CLIENT_ID:', GITHUB_CLIENT_ID ? 'Set' : 'Missing');
+console.log('GITHUB_CLIENT_SECRET:', GITHUB_CLIENT_SECRET ? 'Set' : 'Missing');
+console.log('FRONTEND_URL:', FRONTEND_URL);
+console.log('PORT:', PORT);
 
 if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
-  console.error('Missing GitHub OAuth credentials in environment variables');
-  process.exit(1);
+  console.warn('⚠️ GitHub OAuth credentials missing, but server will continue with fallbacks');
 }
 
 // Store for OAuth states (in production, use Redis or database)
 const oauthStates = new Map();
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    environment: {
+      hasGitHubClientId: !!GITHUB_CLIENT_ID,
+      hasGitHubClientSecret: !!GITHUB_CLIENT_SECRET,
+      frontendUrl: FRONTEND_URL,
+      port: PORT
+    }
+  });
+});
 
 // Clean up expired states every 10 minutes
 setInterval(() => {

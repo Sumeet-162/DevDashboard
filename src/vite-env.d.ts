@@ -4,7 +4,7 @@ interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL: string
   readonly VITE_SUPABASE_ANON_KEY: string
   readonly VITE_GITHUB_CLIENT_ID: string
-  readonly VITE_GITHUB_CLIENT_SECRET: string
+  // Note: VITE_GITHUB_CLIENT_SECRET removed for security - should only be on backend
   readonly VITE_SERVER_URL: string
 }
 
