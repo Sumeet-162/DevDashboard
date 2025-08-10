@@ -246,45 +246,7 @@ const Index = () => {
                   )}
                   Refresh Data
                 </Button>
-                {/* Debug button to check GitHub username and test API */}
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={async () => {
-                    try {
-                      const { data } = await supabase
-                        .from('profiles')
-                        .select('github_username')
-                        .eq('id', user?.id)
-                        .single();
-                      
-                      console.log('Profile lookup result:', data);
-                      const username = data?.github_username;
-                      
-                      if (!username) {
-                        alert('❌ No GitHub username set in profile!\n\nGo to Settings → Profile to set your GitHub username.');
-                        return;
-                      }
-                      
-                      console.log('Testing GitHub API for:', username);
-                      
-                      // Test the API directly
-                      try {
-                        const stats = await githubService.getUserStats(username);
-                        console.log('API test result:', stats);
-                        alert(`✅ GitHub API working!\n\nUsername: ${username}\nRepos: ${stats.totalRepos}\nStars: ${stats.totalStars || stats.stars}`);
-                      } catch (apiError) {
-                        console.error('API test failed:', apiError);
-                        alert(`❌ GitHub API failed for ${username}\n\nError: ${apiError}\n\nUsing fallback data.`);
-                      }
-                    } catch (error) {
-                      console.error('Profile lookup failed:', error);
-                      alert('❌ Failed to check profile data');
-                    }
-                  }}
-                >
-                  🔍 Debug GitHub
-                </Button>
+
                 <div className="flex-shrink-0">
                   <UserInfoCard />
                 </div>
