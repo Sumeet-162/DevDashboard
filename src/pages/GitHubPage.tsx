@@ -455,7 +455,7 @@ const GitHubPage = () => {
               <CardTitle className="text-lg">Statistics</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="text-center">
                   <p className="text-xl sm:text-2xl font-bold">{stats.totalRepos}</p>
                   <p className="text-xs sm:text-sm text-muted-foreground">Repositories</p>
@@ -463,14 +463,6 @@ const GitHubPage = () => {
                 <div className="text-center">
                   <p className="text-xl sm:text-2xl font-bold">{stats.totalStars}</p>
                   <p className="text-xs sm:text-sm text-muted-foreground">Stars Received</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xl sm:text-2xl font-bold">{user.followers}</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Followers</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-xl sm:text-2xl font-bold">{user.following}</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Following</p>
                 </div>
               </div>
               
