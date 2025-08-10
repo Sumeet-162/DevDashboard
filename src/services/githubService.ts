@@ -63,19 +63,30 @@ class GitHubService {
   }
 
   async getUserProfile(username: string) {
+    console.log(`🔍 Getting user profile for: ${username}`);
+    
     try {
       const url = `${this.baseURL}/users/${username}`;
+      console.log(`📡 Fetching user profile from: ${url}`);
+      
       const response = await fetch(url);
       
       if (!response.ok) {
         if (response.status === 404) {
-          console.warn(`GitHub user '${username}' not found`);
-          return this.getFallbackUserData(username);
+          console.warn(`❌ GitHub user '${username}' not found (404)`);
+          console.log('📦 Using fallback user data for non-existent user');
+          return { ...this.getFallbackUserData(username), isRealData: false };
         }
         throw new Error(`GitHub API error: ${response.status}`);
       }
       
       const data = await response.json();
+      
+      console.log(`✅ Successfully fetched REAL user profile for ${username}:`, {
+        followers: data.followers,
+        following: data.following,
+        public_repos: data.public_repos
+      });
       
       // Cache the result
       this.cache.set(`user_${username}`, {
@@ -83,10 +94,11 @@ class GitHubService {
         timestamp: Date.now()
       });
       
-      return data;
+      return { ...data, isRealData: true };
     } catch (error) {
-      console.error('Error fetching user profile:', error);
-      return this.getFallbackUserData(username);
+      console.error('💥 Error fetching user profile:', error);
+      console.log('📦 Using fallback user data due to API error');
+      return { ...this.getFallbackUserData(username), isRealData: false };
     }
   }
 
@@ -350,16 +362,19 @@ class GitHubService {
 
   // Fallback data for when API fails
   private getFallbackUserData(username: string) {
+    console.log('🔄 Using FALLBACK user data (not real profile data)');
     return {
       login: username,
-      name: 'GitHub User',
-      bio: 'Passionate developer building amazing things',
-      location: 'Somewhere on Earth',
+      name: 'Demo User',
+      bio: 'This is demo data - authenticate or check your username',
+      location: 'Demo Location',
       avatar_url: `https://github.com/${username}.png`,
-      public_repos: 12,
-      followers: 50,
-      following: 25,
-      created_at: '2020-01-01T00:00:00Z'
+      html_url: `https://github.com/${username}`, // Ensure the profile link works
+      public_repos: 0, // Don't show fake repo count
+      followers: 0, // Don't show fake followers
+      following: 0, // Don't show fake following
+      created_at: '2020-01-01T00:00:00Z',
+      isRealData: false
     };
   }
 
