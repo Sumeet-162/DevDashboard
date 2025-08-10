@@ -1,10 +1,23 @@
 // GitHub OAuth Service for real contribution data
 /// <reference types="vite/client" />
-class GitHubAuthService {
-  private readonly serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:3001';
+import { simpleFrontendGitHubAuth } from './simpleFrontendGitHubAuth';
 
-  // Generate OAuth authorization URL using backend
+class GitHubAuthService {
+  private readonly serverUrl = import.meta.env.VITE_SERVER_URL?.replace(/\/$/, '') || 'http://localhost:3001';
+  private readonly useBackend = !!import.meta.env.VITE_SERVER_URL;
+
+  // Generate OAuth authorization URL
   async generateAuthUrl(): Promise<string> {
+    // If no backend server URL is configured, use frontend-only approach
+    if (!this.useBackend) {
+      try {
+        return simpleFrontendGitHubAuth.generateAuthUrl();
+      } catch (error) {
+        throw new Error('OAuth server is not available. Please use a Personal Access Token instead.');
+      }
+    }
+
+    // Original backend approach
     try {
       const response = await fetch(`${this.serverUrl}/api/oauth/github/url`);
       
@@ -24,7 +37,15 @@ class GitHubAuthService {
       return data.authUrl;
     } catch (error) {
       console.error('Failed to generate OAuth URL:', error);
-      throw new Error('OAuth server is not available. Please try using a Personal Access Token instead.');
+      // If backend fails, try frontend-only approach as fallback
+      if (this.useBackend) {
+        try {
+          return simpleFrontendGitHubAuth.generateAuthUrl();
+        } catch (frontendError) {
+          throw new Error('OAuth server is not available. Please use a Personal Access Token instead.');
+        }
+      }
+      throw new Error('OAuth server is not available. Please use a Personal Access Token instead.');
     }
   }
 
