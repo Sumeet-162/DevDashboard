@@ -1,24 +1,17 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock } from "lucide-react";
-
-interface Submission {
-  problemId: number;
-  title: string;
-  difficulty: string;
-  status: string;
-  runtime: string;
-  memory: string;
-  language: string;
-  date: string;
-}
+import { Badge } from "@/components/ui/badge";
+import { Clock, User, ExternalLink } from "lucide-react";
+import { Submission } from "@/services/leetcodeService";
 
 interface RecentSubmissionsProps {
   submissions: Submission[];
+  username?: string;
+  isRealData?: boolean;
 }
 
-const RecentSubmissions = ({ submissions }: RecentSubmissionsProps) => {
+const RecentSubmissions = ({ submissions, username, isRealData }: RecentSubmissionsProps) => {
   return (
     <Card className="card-hover">
       <CardHeader className="pb-2">
@@ -39,7 +32,6 @@ const RecentSubmissions = ({ submissions }: RecentSubmissionsProps) => {
                     }`}>
                       {submission.difficulty}
                     </span>
-                    <span>#{submission.problemId}</span>
                     <span>{submission.language}</span>
                   </div>
                 </div>
@@ -55,7 +47,7 @@ const RecentSubmissions = ({ submissions }: RecentSubmissionsProps) => {
                 </div>
               </div>
               
-              {submission.status === 'Accepted' && (
+              {submission.status === 'Accepted' && submission.runtime && submission.memory && (
                 <div className="flex justify-between mt-2 text-xs text-muted-foreground">
                   <span>Runtime: {submission.runtime}</span>
                   <span>Memory: {submission.memory}</span>
@@ -65,7 +57,20 @@ const RecentSubmissions = ({ submissions }: RecentSubmissionsProps) => {
           ))}
         </div>
         
-        <Button variant="outline" className="w-full mt-4">View All Submissions</Button>
+        <Button 
+          variant="outline" 
+          className="w-full mt-4"
+          onClick={() => {
+            if (username && username !== 'demo-user' && username !== 'developer_coder') {
+              window.open(`https://leetcode.com/${username}/`, '_blank');
+            } else {
+              window.open('https://leetcode.com/problemset/all/', '_blank');
+            }
+          }}
+        >
+          <ExternalLink className="h-4 w-4 mr-2" />
+          View All Submissions
+        </Button>
       </CardContent>
     </Card>
   );

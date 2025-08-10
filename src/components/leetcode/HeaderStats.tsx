@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Code, Trophy, Flame, TrendingUp } from "lucide-react";
+import { Code2, Trophy, Flame, TrendingUp, User } from "lucide-react";
 
 interface HeaderStatsProps {
   totalSolved: number;
@@ -8,11 +8,15 @@ interface HeaderStatsProps {
   ranking: number;
   streak: number;
   acceptanceRate: number;
+  username: string;
+  isRealData?: boolean;
 }
 
-const HeaderStats = ({ totalSolved, solvedPercentage, ranking, streak, acceptanceRate }: HeaderStatsProps) => {
+const HeaderStats = ({ totalSolved, solvedPercentage, ranking, streak, acceptanceRate, username, isRealData }: HeaderStatsProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-4">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card className="card-hover">
         <CardContent className="pt-6">
           <div className="flex justify-between items-start">
@@ -21,7 +25,7 @@ const HeaderStats = ({ totalSolved, solvedPercentage, ranking, streak, acceptanc
               <p className="text-2xl font-bold">{totalSolved}</p>
             </div>
             <div className="p-2 bg-primary/10 rounded-full text-primary">
-              <Code size={20} />
+              <Code2 size={20} />
             </div>
           </div>
           <div className="mt-2 text-xs text-muted-foreground">
@@ -59,7 +63,7 @@ const HeaderStats = ({ totalSolved, solvedPercentage, ranking, streak, acceptanc
             </div>
           </div>
           <div className="mt-2 text-xs text-muted-foreground">
-            Keep it going!
+            {isRealData && streak === 0 ? 'Set your streak in Configure panel' : 'Keep it going!'}
           </div>
         </CardContent>
       </Card>
@@ -80,6 +84,7 @@ const HeaderStats = ({ totalSolved, solvedPercentage, ranking, streak, acceptanc
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

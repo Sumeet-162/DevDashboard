@@ -1,186 +1,339 @@
 
-import { useState } from "react";
-import Layout from "@/components/layout/Layout";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookmarkPlus, Search, Share2, ThumbsUp, MessageSquare, ExternalLink } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import Layout from '@/components/layout/Layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Search, Heart, MessageCircle, ExternalLink, Clock, TrendingUp, Bookmark, Loader2, RefreshCw, Globe, Star } from 'lucide-react';
+import { NewsService, NewsArticle } from '@/services/newsService';
 
-// Mock data for news
-const mockNews = [
-  {
-    id: 1,
-    title: "TypeScript 5.3 Released with New Features",
-    content: "The TypeScript team has announced the release of TypeScript 5.3, featuring improved type inference, new utility types, and performance optimizations.",
-    author: "TypeScript Team",
-    authorAvatar: "/placeholder.svg",
-    source: "TypeScript Blog",
-    publishedAt: "2 hours ago",
-    likes: 42,
-    comments: 8,
-    tags: ["typescript", "javascript", "webdev"],
-    category: "programming"
-  },
-  {
-    id: 2,
-    title: "React Server Components: A Complete Guide",
-    content: "Learn how to leverage React Server Components to improve your application's performance by reducing bundle size and enabling streaming rendering.",
-    author: "React Team",
-    authorAvatar: "/placeholder.svg",
-    source: "React Documentation",
-    publishedAt: "5 hours ago",
-    likes: 127,
-    comments: 24,
-    tags: ["react", "javascript", "webdev"],
-    category: "programming"
-  },
-  {
-    id: 3,
-    title: "AI Training Costs Drop 10x as New Methods Emerge",
-    content: "Recent breakthroughs in AI training techniques have led to a 10x reduction in the costs associated with training large language models.",
-    author: "AI Research Group",
-    authorAvatar: "/placeholder.svg",
-    source: "AI Journal",
-    publishedAt: "1 day ago",
-    likes: 89,
-    comments: 15,
-    tags: ["ai", "machinelearning", "technology"],
-    category: "ai"
-  },
-  {
-    id: 4,
-    title: "The Future of Next.js: What's Coming in Version 14",
-    content: "Vercel has announced the roadmap for Next.js 14, highlighting improved server components, faster builds, and enhanced image optimization.",
-    author: "Vercel Team",
-    authorAvatar: "/placeholder.svg",
-    source: "Vercel Blog",
-    publishedAt: "8 hours ago",
-    likes: 72,
-    comments: 11,
-    tags: ["nextjs", "react", "webdev"],
-    category: "programming"
-  },
-  {
-    id: 5,
-    title: "Google Releases New AI Tools for Developers",
-    content: "Google has unveiled a suite of new AI-powered tools designed to help developers build more intelligent applications with less code.",
-    author: "Google Developers",
-    authorAvatar: "/placeholder.svg",
-    source: "Google Developer Blog",
-    publishedAt: "1 day ago",
-    likes: 103,
-    comments: 27,
-    tags: ["google", "ai", "developertools"],
-    category: "ai"
-  },
+const categories = [
+  { id: 'all', label: 'All', count: 0 },
+  { id: 'frontend', label: 'Frontend', count: 0 },
+  { id: 'backend', label: 'Backend', count: 0 },
+  { id: 'ai', label: 'AI & ML', count: 0 },
+  { id: 'mobile', label: 'Mobile', count: 0 },
+  { id: 'open-source', label: 'Open Source', count: 0 },
+  { id: 'general', label: 'General', count: 0 },
 ];
 
-const NewsPage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
-  
-  const filteredNews = mockNews.filter(news => {
-    const matchesSearch = news.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         news.content.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = activeTab === "all" || news.category === activeTab;
+export default function NewsPage() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [cacheInfo, setCacheInfo] = useState<{ lastUpdated: string; nextUpdate: string } | null>(null);
+
+  const loadNews = async (isRefresh = false) => {
+    try {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+      setError(null);
+      
+      const articles = await NewsService.fetchAllNews(isRefresh);
+      setNews(articles);
+      
+      // Update cache info
+      const cache = NewsService.getCacheInfo();
+      setCacheInfo(cache);
+    } catch (err) {
+      setError('Failed to load news. Please try again.');
+      console.error('Error loading news:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadNews();
+    
+    // Start auto-refresh
+    NewsService.startAutoRefresh(async () => {
+      console.log('Auto-refreshing news...');
+      const articles = await NewsService.fetchAllNews(true);
+      setNews(articles);
+      
+      // Update cache info
+      const cache = NewsService.getCacheInfo();
+      setCacheInfo(cache);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      NewsService.stopAutoRefresh();
+    };
+  }, []);
+
+  // Update category counts
+  const updatedCategories = categories.map(category => ({
+    ...category,
+    count: category.id === 'all' 
+      ? news.length 
+      : news.filter(article => article.category === category.id).length
+  }));
+
+  const filteredNews = news.filter(article => {
+    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         article.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         article.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
+    
     return matchesSearch && matchesCategory;
   });
+
+  const handleRefresh = () => {
+    loadNews(true);
+  };
+
+  const getSourceIcon = (source: string) => {
+    if (source.includes('GitHub')) return <Star className="h-4 w-4" />;
+    if (source.includes('Dev.to')) return <Globe className="h-4 w-4" />;
+    return <TrendingUp className="h-4 w-4" />;
+  };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+            <p className="text-muted-foreground">Loading latest tech news...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex flex-col md:flex-row justify-between gap-4 items-center">
-          <h1 className="text-3xl font-bold">Tech News</h1>
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            <div className="relative w-full md:w-80">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Tech News</h1>
+            <div className="flex items-center gap-4 mt-2">
+              <p className="text-muted-foreground">
+                Stay updated with the latest in technology and development
+              </p>
+              {cacheInfo && (
+                <div className="hidden lg:flex items-center gap-2 text-xs text-muted-foreground">
+                  <Clock className="h-3 w-3" />
+                  <span>Updated: {cacheInfo.lastUpdated}</span>
+                  <span>•</span>
+                  <span>Next: {cacheInfo.nextUpdate}</span>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Search news..." 
-                className="w-full pl-9" 
+                placeholder="Search articles..." 
+                className="w-full lg:w-80 pl-9" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button>Search</Button>
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              title={cacheInfo ? `Last updated: ${cacheInfo.lastUpdated}` : 'Refresh news'}
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
           </div>
         </div>
-        
-        <Tabs defaultValue="all" onValueChange={setActiveTab}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="programming">Programming</TabsTrigger>
-            <TabsTrigger value="ai">AI & ML</TabsTrigger>
-            <TabsTrigger value="technology">Technology</TabsTrigger>
+
+        {/* Mobile Cache Info */}
+        {cacheInfo && (
+          <div className="lg:hidden flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg p-2">
+            <Clock className="h-3 w-3" />
+            <span>Updated: {cacheInfo.lastUpdated}</span>
+            <span>•</span>
+            <span>Next update: {cacheInfo.nextUpdate}</span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <Card className="border-destructive/50 bg-destructive/5">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-destructive">{error}</p>
+                <Button variant="outline" size="sm" onClick={() => loadNews()}>
+                  Try Again
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Category Tabs */}
+        <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
+            {updatedCategories.map((category) => (
+              <TabsTrigger 
+                key={category.id} 
+                value={category.id}
+                className="flex items-center gap-1"
+              >
+                {category.label}
+                {category.count > 0 && (
+                  <Badge variant="secondary" className="text-xs">
+                    {category.count}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            ))}
           </TabsList>
-          
-          <TabsContent value={activeTab} className="space-y-4">
+
+          <TabsContent value={selectedCategory} className="mt-6">
+            {/* Stats */}
+            <div className="mb-6 text-sm text-muted-foreground">
+              Showing {filteredNews.length} articles
+              {selectedCategory !== 'all' && ` in ${updatedCategories.find(c => c.id === selectedCategory)?.label}`}
+            </div>
+
+            {/* Articles Grid */}
             {filteredNews.length > 0 ? (
-              filteredNews.map((news) => (
-                <Card key={news.id} className="overflow-hidden card-hover">
-                  <CardHeader className="p-4 pb-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
-                        <Avatar>
-                          <AvatarImage src={news.authorAvatar} alt={news.author} />
-                          <AvatarFallback>{news.author[0]}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h3 className="text-lg font-bold">{news.title}</h3>
-                          <div className="text-sm text-muted-foreground">
-                            <span>{news.author}</span> • <span>{news.source}</span> • <span>{news.publishedAt}</span>
+              <div className="grid gap-6">
+                {filteredNews.map((article) => (
+                  <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <CardContent className="p-0">
+                      <div className="flex flex-col lg:flex-row">
+                        {/* Article Image */}
+                        {article.imageUrl && (
+                          <div className="lg:w-64 lg:flex-shrink-0">
+                            <img 
+                              src={article.imageUrl} 
+                              alt={article.title}
+                              className="w-full h-48 lg:h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        )}
+                        
+                        {/* Article Content */}
+                        <div className="flex-1 p-6">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={article.authorAvatar} alt={article.author} />
+                                <AvatarFallback>{article.author[0]}</AvatarFallback>
+                              </Avatar>
+                              <div className="text-sm text-muted-foreground">
+                                <div className="font-medium">{article.author}</div>
+                                <div className="flex items-center gap-2">
+                                  {getSourceIcon(article.source)}
+                                  <span>{article.source}</span>
+                                  <span>•</span>
+                                  <Clock className="h-3 w-3" />
+                                  <span>{article.publishedAt}</span>
+                                  {article.readTime && (
+                                    <>
+                                      <span>•</span>
+                                      <span>{article.readTime}</span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <Button variant="ghost" size="icon">
+                              <Bookmark className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <h2 className="text-xl font-bold mb-2 line-clamp-2">
+                            {article.title}
+                          </h2>
+                          
+                          <p className="text-muted-foreground mb-4 line-clamp-3">
+                            {article.summary}
+                          </p>
+
+                          {/* Tags */}
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {article.tags.slice(0, 4).map((tag) => (
+                              <Badge key={tag} variant="secondary" className="text-xs">
+                                #{tag}
+                              </Badge>
+                            ))}
+                            {article.tags.length > 4 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{article.tags.length - 4} more
+                              </Badge>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <Button variant="ghost" size="sm" className="gap-1">
+                                <Heart className="h-4 w-4" />
+                                {article.likes}
+                              </Button>
+                              <Button variant="ghost" size="sm" className="gap-1">
+                                <MessageCircle className="h-4 w-4" />
+                                {article.comments}
+                              </Button>
+                            </div>
+                            
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="gap-1"
+                              onClick={() => window.open(article.sourceUrl, '_blank')}
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              Read More
+                            </Button>
                           </div>
                         </div>
                       </div>
-                      <Button variant="ghost" size="icon">
-                        <BookmarkPlus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-4">
-                    <p className="text-sm">{news.content}</p>
-                    <div className="flex flex-wrap gap-2 mt-3">
-                      {news.tags.map((tag) => (
-                        <span 
-                          key={tag} 
-                          className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-xs"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="flex gap-4">
-                        <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground">
-                          <ThumbsUp className="h-4 w-4" /> {news.likes}
-                        </Button>
-                        <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground">
-                          <MessageSquare className="h-4 w-4" /> {news.comments}
-                        </Button>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <Share2 className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <ExternalLink className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-lg text-muted-foreground">No news articles found matching your criteria</p>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
+            ) : (
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <div className="space-y-3">
+                    <Search className="h-12 w-12 mx-auto text-muted-foreground" />
+                    <h3 className="text-lg font-semibold">No articles found</h3>
+                    <p className="text-muted-foreground">
+                      {searchTerm 
+                        ? `No articles match "${searchTerm}"`
+                        : 'No articles available in this category'
+                      }
+                    </p>
+                    {searchTerm && (
+                      <Button variant="outline" onClick={() => setSearchTerm('')}>
+                        Clear Search
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </TabsContent>
         </Tabs>
       </div>
     </Layout>
   );
-};
-
-export default NewsPage;
+}

@@ -1,7 +1,9 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { User } from "lucide-react";
 
 interface DifficultyBreakdownProps {
   easySolved: number;
@@ -10,6 +12,8 @@ interface DifficultyBreakdownProps {
   mediumTotal: number;
   hardSolved: number;
   hardTotal: number;
+  username?: string;
+  isRealData?: boolean;
 }
 
 const DifficultyBreakdown = ({ 
@@ -18,7 +22,9 @@ const DifficultyBreakdown = ({
   mediumSolved, 
   mediumTotal, 
   hardSolved, 
-  hardTotal 
+  hardTotal,
+  username,
+  isRealData
 }: DifficultyBreakdownProps) => {
   // Colors for the pie chart
   const COLORS = ["#22c55e", "#eab308", "#ef4444"];

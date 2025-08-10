@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Environment Variables - NEVER COMMIT THESE!
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
 # Ignore Next.js build/cache folders
 .next/
 out/

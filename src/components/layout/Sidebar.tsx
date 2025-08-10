@@ -5,9 +5,9 @@ import {
   LayoutDashboard, 
   Newspaper, 
   Github, 
-  Code, 
-  MessageSquare, 
-  Settings,
+  Code2, 
+  Users, 
+  Settings2,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
@@ -18,7 +18,7 @@ const navItems = [
   { 
     title: "Dashboard", 
     icon: LayoutDashboard, 
-    href: "/" 
+    href: "/dashboard" 
   },
   { 
     title: "Tech News", 
@@ -32,17 +32,17 @@ const navItems = [
   },
   { 
     title: "LeetCode", 
-    icon: Code, 
+    icon: Code2, 
     href: "/leetcode" 
   },
   { 
     title: "Community", 
-    icon: MessageSquare, 
+    icon: Users, 
     href: "/community" 
   },
   { 
     title: "Settings", 
-    icon: Settings, 
+    icon: Settings2, 
     href: "/settings" 
   }
 ];
@@ -75,7 +75,7 @@ const Sidebar = () => {
       "flex flex-col h-screen border-r bg-background transition-all duration-300",
       collapsed ? "w-16" : "w-64"
     )}>
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b h-16">
         {!collapsed && <h2 className="font-bold">DevDash</h2>}
         {!isMobile && (
           <Button 

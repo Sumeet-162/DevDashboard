@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code } from "lucide-react";
+import { Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ const LeetCodeCard = () => {
     <Card className="card-hover">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-bold flex items-center">
-          <Code className="mr-2" size={18} /> LeetCode Progress
+          <Code2 className="mr-2" size={18} /> LeetCode Progress
         </CardTitle>
         <Button variant="outline" size="sm">View Profile</Button>
       </CardHeader>

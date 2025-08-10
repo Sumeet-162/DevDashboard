@@ -4,10 +4,10 @@ import React, { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation, useInView, easeOut } from 'framer-motion'
 import { 
   Github, 
-  Code, 
+  Code2, 
   BarChart3, 
   Newspaper, 
-  Settings, 
+  Settings2, 
   Star, 
   Users, 
   Calendar,
@@ -22,6 +22,9 @@ import {
 import { HeroSection } from "@/components/ui/hero-section";
 import { Icons } from "@/components/ui/icons";
 import { GetStartedButton } from "@/components/ui/get-started-button";
+import { ThemeToggleSwitch } from "@/components/ui/theme-toggle-switch";
+import { useTheme } from "@/hooks/use-theme";
+import DevDashLogo from "@/components/ui/DevDashLogo";
 
 // Utility function
 function cn(...classes: (string | undefined | null | boolean)[]): string {
@@ -381,29 +384,13 @@ const Toggle: React.FC<ToggleProps> = ({
 
 // Main DevDash Landing Page Component
 const DevDashLandingPage: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Default to dark mode unless localStorage says otherwise
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('theme');
-      if (stored === 'light') return false;
-    }
-    return true;
-  });
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const hasMounted = useRef(false);
-
-  useEffect(() => {
-    if (!hasMounted.current) {
-      document.documentElement.classList.toggle('dark', isDarkMode);
-      hasMounted.current = true;
-    } else {
-      document.documentElement.classList.toggle('dark', isDarkMode);
-    }
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
-
+  const { theme, setTheme } = useTheme();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const isDarkMode = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  
   const toggleDarkMode = () => {
-    setIsDarkMode((prev) => !prev);
+    setTheme(isDarkMode ? 'light' : 'dark');
   };
 
   const features = [
@@ -413,7 +400,7 @@ const DevDashLandingPage: React.FC = () => {
       description: "Track your commits, contributions, and top repositories visually."
     },
     {
-      icon: <Code className="h-8 w-8 text-primary" />,
+      icon: <Code2 className="h-8 w-8 text-primary" />,
       title: "📊 LeetCode Tracker",
       description: "View your solved problems, difficulty breakdown, and recent activity."
     },
@@ -423,7 +410,7 @@ const DevDashLandingPage: React.FC = () => {
       description: "Stay updated with top programming articles and community trends."
     },
     {
-      icon: <Settings className="h-8 w-8 text-primary" />,
+      icon: <Settings2 className="h-8 w-8 text-primary" />,
       title: "🎛️ Modular Dashboard",
       description: "Add, remove, and rearrange widgets to suit your coding goals."
     }
@@ -438,7 +425,7 @@ const DevDashLandingPage: React.FC = () => {
     {
       title: "Customize Widgets",
       description: "Choose what to see on your dashboard — from stats to articles.",
-      icon: <Settings className="h-6 w-6" />
+      icon: <Settings2 className="h-6 w-6" />
     },
     {
       title: "Track & Improve",
@@ -448,7 +435,7 @@ const DevDashLandingPage: React.FC = () => {
   ]
 
   return (
-    <div className={`min-h-screen bg-background text-foreground ${isDarkMode ? 'dark' : ''}`}>
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <motion.header 
         initial={{ y: -100 }}
@@ -458,8 +445,7 @@ const DevDashLandingPage: React.FC = () => {
       >
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center space-x-2">
-            <BarChart3 className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">DevDash</span>
+            <DevDashLogo size="md" showText={true} />
           </div>
           
           <nav className="hidden md:flex items-center space-x-6">
@@ -470,9 +456,7 @@ const DevDashLandingPage: React.FC = () => {
           </nav>
 
           <div className="flex items-center space-x-4">
-            <Toggle checked={isDarkMode} onChange={toggleDarkMode}>
-              {isDarkMode ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            </Toggle>
+            <ThemeToggleSwitch />
             
             <Button
               variant="ghost"
@@ -673,8 +657,7 @@ const DevDashLandingPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
-                  <BarChart3 className="h-6 w-6 text-primary" />
-                  <span className="font-bold text-xl">DevDash</span>
+                  <DevDashLogo size="md" showText={true} />
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Built with React, Tailwind, and 💖 by devs, for devs.
@@ -701,9 +684,11 @@ const DevDashLandingPage: React.FC = () => {
 
               <div>
                 <h3 className="font-semibold mb-4">Theme</h3>
-                <Toggle checked={isDarkMode} onChange={toggleDarkMode}>
-                  {isDarkMode ? '🌙 Dark Mode' : '☀️ Light Mode'}
-                </Toggle>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">Light</span>
+                  <ThemeToggleSwitch />
+                  <span className="text-sm">Dark</span>
+                </div>
               </div>
             </div>
 

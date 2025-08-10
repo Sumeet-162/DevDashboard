@@ -86,6 +86,22 @@
   .card-hover {
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
   }
+  
+  .project-card {
+    @apply flex flex-col h-full min-h-[400px];
+  }
+  
+  .project-card-content {
+    @apply flex flex-col flex-1;
+  }
+  
+  .project-description {
+    @apply flex-1 text-sm text-muted-foreground leading-relaxed;
+  }
+  
+  .featured-badge {
+    @apply absolute top-3 right-3 bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 px-2 py-1 rounded-full text-xs font-medium shadow-lg;
+  }
 }
 
 @layer utilities {

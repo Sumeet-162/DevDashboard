@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, Link } from "lucide-react";
+import { Users, Link } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const PostCard = () => {
@@ -33,7 +33,7 @@ const PostCard = () => {
     <Card className="card-hover">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-bold flex items-center">
-          <MessageSquare className="mr-2" size={18} /> Share with Community
+          <Users className="mr-2" size={18} /> Share with Community
         </CardTitle>
       </CardHeader>
       <CardContent>
