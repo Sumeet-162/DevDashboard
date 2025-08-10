@@ -288,9 +288,27 @@ const CommunityPage = () => {
             <p className="text-muted-foreground">Connect with fellow developers and share knowledge</p>
           </div>
           
-          {user && (
-            <CreatePostDialog onPostCreated={handlePostCreated} />
-          )}
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={async () => {
+                try {
+                  await CommunityService.refreshAllCounts();
+                  // Reload posts to see updated counts
+                  await loadPosts(true);
+                  console.log('✅ Counts refreshed and posts reloaded');
+                } catch (error) {
+                  console.error('❌ Error refreshing counts:', error);
+                }
+              }}
+            >
+              🔄 Refresh Counts
+            </Button>
+            {user && (
+              <CreatePostDialog onPostCreated={handlePostCreated} />
+            )}
+          </div>
         </div>
 
         {/* Community Stats */}

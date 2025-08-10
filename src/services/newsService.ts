@@ -109,6 +109,396 @@ const dynamicArticlesPool: Omit<NewsArticle, 'id' | 'publishedAt' | 'likes' | 'c
     category: "mobile",
     imageUrl: "https://storage.googleapis.com/flutter-website/shared/brand/flutter/logo/flutter-lockup.png",
     readTime: "5 min read"
+  },
+  {
+    title: "Rust 1.76: Enhanced Error Messages and Performance",
+    content: "Rust 1.76 delivers the most readable error messages yet, with contextual hints and suggested fixes. The release also includes significant compile-time improvements and new features for systems programming, making Rust more approachable for newcomers.",
+    summary: "Rust 1.76 features enhanced error messages and compile-time improvements.",
+    author: "Rust Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/5430905?v=4",
+    source: "Rust Blog",
+    sourceUrl: "https://blog.rust-lang.org",
+    tags: ["rust", "systems", "performance", "errors"],
+    category: "backend",
+    imageUrl: "https://www.rust-lang.org/logos/rust-logo-512x512.png",
+    readTime: "7 min read"
+  },
+  {
+    title: "Vue 3.4: Improved Reactivity and Better DevTools",
+    content: "Vue 3.4 introduces refined reactivity system with better memory efficiency and improved developer tools integration. The update includes better TypeScript support, enhanced SSR capabilities, and new composition API features for better code organization.",
+    summary: "Vue 3.4 brings improved reactivity and enhanced developer experience.",
+    author: "Vue Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/499550?v=4",
+    source: "Vue Blog",
+    sourceUrl: "https://blog.vuejs.org",
+    tags: ["vue", "reactivity", "devtools", "frontend"],
+    category: "frontend",
+    imageUrl: "https://vuejs.org/logo.svg",
+    readTime: "6 min read"
+  },
+  {
+    title: "Docker 25.0: Enhanced Security and Faster Builds",
+    content: "Docker 25.0 introduces enhanced security features including improved secrets management and container scanning. The release also features faster build times with better layer caching and new development workflow improvements for better container-based development.",
+    summary: "Docker 25.0 enhances security and accelerates build performance.",
+    author: "Docker Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/5429470?v=4",
+    source: "Docker Blog",
+    sourceUrl: "https://www.docker.com/blog",
+    tags: ["docker", "containers", "security", "devops"],
+    category: "backend",
+    imageUrl: "https://www.docker.com/wp-content/uploads/2022/03/Moby-logo.png",
+    readTime: "5 min read"
+  },
+  {
+    title: "Solid.js 1.8: Fine-Grained Reactivity Revolution",
+    content: "Solid.js 1.8 pushes fine-grained reactivity to new limits with even better performance and smaller bundle sizes. The update includes improved JSX compilation, better hydration strategies, and new patterns for building highly performant web applications.",
+    summary: "Solid.js 1.8 advances fine-grained reactivity with superior performance.",
+    author: "Ryan Carniato",
+    authorAvatar: "https://avatars.githubusercontent.com/u/142854?v=4",
+    source: "Solid Blog",
+    sourceUrl: "https://www.solidjs.com/blog",
+    tags: ["solidjs", "reactivity", "performance", "jsx"],
+    category: "frontend",
+    imageUrl: "https://www.solidjs.com/img/logo/without-wordmark/logo.png",
+    readTime: "8 min read"
+  },
+  {
+    title: "Kubernetes 1.29: AI Workloads and Enhanced Networking",
+    content: "Kubernetes 1.29 introduces native support for AI workloads with GPU scheduling improvements and ML pipeline integrations. The release also features enhanced networking capabilities, better security policies, and improved observability for large-scale deployments.",
+    summary: "Kubernetes 1.29 adds AI workload support and networking enhancements.",
+    author: "CNCF Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/13455738?v=4",
+    source: "Kubernetes Blog",
+    sourceUrl: "https://kubernetes.io/blog",
+    tags: ["kubernetes", "ai", "networking", "devops"],
+    category: "backend",
+    imageUrl: "https://kubernetes.io/images/nav_logo2.svg",
+    readTime: "9 min read"
+  },
+  {
+    title: "Go 1.22: Enhanced Performance and Security Features",
+    content: "Go 1.22 delivers significant performance improvements across the board, with better garbage collection and optimized runtime. The release includes enhanced security features, improved tooling, and new standard library additions that make Go development more efficient.",
+    summary: "Go 1.22 brings major performance gains and security enhancements.",
+    author: "Go Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/4314092?v=4",
+    source: "Go Blog",
+    sourceUrl: "https://go.dev/blog",
+    tags: ["golang", "performance", "security", "runtime"],
+    category: "backend",
+    imageUrl: "https://go.dev/blog/go-brand/Go-Logo_Blue.png",
+    readTime: "6 min read"
+  },
+  {
+    title: "Angular 17: Control Flow and SSR Improvements",
+    content: "Angular 17 introduces new control flow syntax, eliminating the need for structural directives in many cases. The release also features significant SSR improvements, better hydration strategies, and new developer experience enhancements that streamline Angular development.",
+    summary: "Angular 17 features new control flow syntax and improved SSR capabilities.",
+    author: "Angular Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/139426?v=4",
+    source: "Angular Blog",
+    sourceUrl: "https://blog.angular.io",
+    tags: ["angular", "ssr", "control-flow", "frontend"],
+    category: "frontend",
+    imageUrl: "https://angular.io/assets/images/logos/angular/angular.png",
+    readTime: "7 min read"
+  },
+  {
+    title: "PostgreSQL 16: Advanced Monitoring and Performance",
+    content: "PostgreSQL 16 introduces advanced monitoring capabilities with detailed query analytics and performance insights. The release includes improved parallel processing, better JSON handling, and enhanced security features that make PostgreSQL even more powerful for modern applications.",
+    summary: "PostgreSQL 16 adds advanced monitoring and performance improvements.",
+    author: "PostgreSQL Team",
+    authorAvatar: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=150&h=150&fit=crop&crop=face",
+    source: "PostgreSQL News",
+    sourceUrl: "https://www.postgresql.org/about/news",
+    tags: ["postgresql", "database", "monitoring", "performance"],
+    category: "backend",
+    imageUrl: "https://www.postgresql.org/media/img/about/press/elephant.png",
+    readTime: "8 min read"
+  },
+  {
+    title: "React Native 0.73: Bridgeless Architecture and Performance",
+    content: "React Native 0.73 introduces the new bridgeless architecture, delivering significantly better performance and reduced memory usage. The update also includes improved debugging tools, better Metro bundler integration, and enhanced support for modern React features.",
+    summary: "React Native 0.73 launches bridgeless architecture for better performance.",
+    author: "React Native Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/6412038?v=4",
+    source: "React Native Blog",
+    sourceUrl: "https://reactnative.dev/blog",
+    tags: ["react-native", "mobile", "performance", "architecture"],
+    category: "mobile",
+    imageUrl: "https://reactnative.dev/img/header_logo.svg",
+    readTime: "7 min read"
+  },
+  {
+    title: "Node.js 21: Built-in Test Runner and ESM Improvements",
+    content: "Node.js 21 ships with a built-in test runner that eliminates the need for external testing frameworks. The release also includes significant ESM improvements, better performance monitoring, and enhanced security features for server-side JavaScript development.",
+    summary: "Node.js 21 includes built-in test runner and enhanced ESM support.",
+    author: "Node.js Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/9950313?v=4",
+    source: "Node.js Blog",
+    sourceUrl: "https://nodejs.org/en/blog",
+    tags: ["nodejs", "testing", "esm", "javascript"],
+    category: "backend",
+    imageUrl: "https://nodejs.org/static/images/logo.svg",
+    readTime: "6 min read"
+  },
+  {
+    title: "Expo SDK 50: Universal Renderer and Enhanced Development",
+    content: "Expo SDK 50 introduces a universal renderer that works seamlessly across web, iOS, and Android. The update includes improved development tools, better performance optimizations, and new APIs that make cross-platform development more powerful and efficient.",
+    summary: "Expo SDK 50 features universal renderer and enhanced development tools.",
+    author: "Expo Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/12504344?v=4",
+    source: "Expo Blog",
+    sourceUrl: "https://blog.expo.dev",
+    tags: ["expo", "react-native", "cross-platform", "mobile"],
+    category: "mobile",
+    imageUrl: "https://docs.expo.dev/static/images/expo-icon.png",
+    readTime: "5 min read"
+  },
+  {
+    title: "Python 3.12: Enhanced Error Messages and Performance",
+    content: "Python 3.12 delivers the most helpful error messages yet, with precise location indicators and suggestions for fixes. The release also includes significant performance improvements, better debugging tools, and new language features that enhance developer productivity.",
+    summary: "Python 3.12 features enhanced error messages and performance gains.",
+    author: "Python Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/1525981?v=4",
+    source: "Python Blog",
+    sourceUrl: "https://blog.python.org",
+    tags: ["python", "performance", "debugging", "errors"],
+    category: "backend",
+    imageUrl: "https://www.python.org/static/img/python-logo.png",
+    readTime: "7 min read"
+  },
+  {
+    title: "TensorFlow 2.15: Advanced AI Model Optimization",
+    content: "TensorFlow 2.15 introduces advanced model optimization techniques that reduce inference time by up to 40%. The release includes improved AutoML capabilities, better hardware acceleration support, and new tools for deploying AI models at scale.",
+    summary: "TensorFlow 2.15 brings advanced optimization and 40% faster inference.",
+    author: "TensorFlow Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/15658638?v=4",
+    source: "TensorFlow Blog",
+    sourceUrl: "https://blog.tensorflow.org",
+    tags: ["tensorflow", "ai", "optimization", "ml"],
+    category: "ai",
+    imageUrl: "https://www.tensorflow.org/images/tf_logo_social.png",
+    readTime: "9 min read"
+  },
+  {
+    title: "GitHub Copilot X: Multi-Model AI and Context Awareness",
+    content: "GitHub Copilot X leverages multiple AI models for better code suggestions and enhanced context awareness. The update includes improved debugging assistance, better documentation generation, and new features that make AI-assisted development more powerful and accurate.",
+    summary: "GitHub Copilot X uses multi-model AI for enhanced code assistance.",
+    author: "GitHub Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/9919?v=4",
+    source: "GitHub Blog",
+    sourceUrl: "https://github.blog",
+    tags: ["github", "copilot", "ai", "coding"],
+    category: "ai",
+    imageUrl: "https://github.githubassets.com/images/modules/site/copilot/copilot-logo.png",
+    readTime: "6 min read"
+  },
+  {
+    title: "Nuxt 3.9: Enhanced DevTools and Performance Monitoring",
+    content: "Nuxt 3.9 introduces enhanced developer tools with real-time performance monitoring and advanced debugging capabilities. The release includes improved SSR performance, better hydration strategies, and new features that make Vue.js development more efficient.",
+    summary: "Nuxt 3.9 features enhanced DevTools and performance monitoring.",
+    author: "Nuxt Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/23360933?v=4",
+    source: "Nuxt Blog",
+    sourceUrl: "https://nuxt.com/blog",
+    tags: ["nuxt", "vue", "devtools", "ssr"],
+    category: "frontend",
+    imageUrl: "https://nuxt.com/assets/design-kit/icon-green.png",
+    readTime: "5 min read"
+  },
+  {
+    title: "Figma Dev Mode: Bridging Design and Development",
+    content: "Figma's new Dev Mode creates a seamless bridge between design and development workflows. The feature includes code generation, design token extraction, and enhanced collaboration tools that reduce the gap between designers and developers.",
+    summary: "Figma Dev Mode bridges design and development with code generation.",
+    author: "Figma Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/5155369?v=4",
+    source: "Figma Blog",
+    sourceUrl: "https://www.figma.com/blog",
+    tags: ["figma", "design", "development", "collaboration"],
+    category: "general",
+    imageUrl: "https://cdn.sanity.io/images/599r6htc/localized/46a76c802176eb17b04e12108de7e7e0f3736dc6-1024x1024.png",
+    readTime: "4 min read"
+  },
+  {
+    title: "Shopify Hydrogen 2024: E-commerce Development Revolution",
+    content: "Shopify Hydrogen 2024 transforms e-commerce development with new headless commerce tools and enhanced performance optimizations. The platform includes improved checkout experiences, better SEO capabilities, and new features for building scalable online stores.",
+    summary: "Shopify Hydrogen 2024 revolutionizes headless e-commerce development.",
+    author: "Shopify Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/8085?v=4",
+    source: "Shopify Engineering",
+    sourceUrl: "https://shopify.engineering",
+    tags: ["shopify", "ecommerce", "hydrogen", "headless"],
+    category: "frontend",
+    imageUrl: "https://cdn.shopify.com/s/files/1/0533/2089/files/shopify_logo.png",
+    readTime: "6 min read"
+  },
+  {
+    title: "Swift 5.10: Enhanced Concurrency and Safety Features",
+    content: "Swift 5.10 introduces enhanced concurrency features with better async/await support and improved memory safety. The release includes new language features, better performance optimizations, and enhanced tooling that makes iOS and macOS development more efficient.",
+    summary: "Swift 5.10 brings enhanced concurrency and improved memory safety.",
+    author: "Swift Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/10639145?v=4",
+    source: "Swift Blog",
+    sourceUrl: "https://swift.org/blog",
+    tags: ["swift", "ios", "concurrency", "safety"],
+    category: "mobile",
+    imageUrl: "https://developer.apple.com/swift/images/swift-og.png",
+    readTime: "7 min read"
+  },
+  {
+    title: "WebGPU: Native Graphics Performance in Browsers",
+    content: "WebGPU brings native graphics performance to web browsers, enabling complex 3D applications and compute shaders to run efficiently. This new API opens possibilities for high-performance gaming, AI inference, and scientific computing directly in web browsers.",
+    summary: "WebGPU enables native graphics performance for web applications.",
+    author: "Web Standards Team",
+    authorAvatar: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=150&h=150&fit=crop&crop=face",
+    source: "Web Platform News",
+    sourceUrl: "https://web.dev",
+    tags: ["webgpu", "graphics", "performance", "3d"],
+    category: "general",
+    imageUrl: "https://web.dev/images/webgpu.svg",
+    readTime: "8 min read"
+  },
+  {
+    title: "Cloudflare Workers AI: Edge Computing Meets Machine Learning",
+    content: "Cloudflare Workers AI brings machine learning capabilities to edge computing, enabling AI inference with sub-100ms latency worldwide. The platform supports popular ML models and provides simple APIs for integrating AI features into web applications.",
+    summary: "Cloudflare Workers AI enables sub-100ms ML inference at the edge.",
+    author: "Cloudflare Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/314135?v=4",
+    source: "Cloudflare Blog",
+    sourceUrl: "https://blog.cloudflare.com",
+    tags: ["cloudflare", "ai", "edge", "workers"],
+    category: "ai",
+    imageUrl: "https://www.cloudflare.com/img/logo-web-badges/cf-logo-on-white-bg.svg",
+    readTime: "6 min read"
+  },
+  {
+    title: "Electron 28: Better Performance and Security Sandbox",
+    content: "Electron 28 introduces significant performance improvements and enhanced security sandbox capabilities. The release includes better memory management, improved startup times, and new security features that make desktop applications more secure and efficient.",
+    summary: "Electron 28 delivers better performance and enhanced security sandbox.",
+    author: "Electron Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/13409222?v=4",
+    source: "Electron Blog",
+    sourceUrl: "https://www.electronjs.org/blog",
+    tags: ["electron", "desktop", "security", "performance"],
+    category: "general",
+    imageUrl: "https://www.electronjs.org/assets/img/logo.svg",
+    readTime: "5 min read"
+  },
+  {
+    title: "Remix 2.5: Enhanced Full-Stack React Development",
+    content: "Remix 2.5 enhances full-stack React development with improved data loading patterns and better server-side capabilities. The release includes new developer tools, enhanced performance optimizations, and features that simplify building modern web applications.",
+    summary: "Remix 2.5 improves full-stack React with better data loading patterns.",
+    author: "Remix Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/64235328?v=4",
+    source: "Remix Blog",
+    sourceUrl: "https://remix.run/blog",
+    tags: ["remix", "react", "fullstack", "ssr"],
+    category: "frontend",
+    imageUrl: "https://remix.run/remix-dark.svg",
+    readTime: "7 min read"
+  },
+  {
+    title: "Tauri 2.0: Rust-Powered Desktop Applications",
+    content: "Tauri 2.0 revolutionizes desktop application development with Rust-powered backends and web frontend technologies. The framework offers smaller bundle sizes, better security, and native performance while maintaining familiar web development patterns.",
+    summary: "Tauri 2.0 combines Rust backends with web frontends for desktop apps.",
+    author: "Tauri Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/54536011?v=4",
+    source: "Tauri Blog",
+    sourceUrl: "https://tauri.app/blog",
+    tags: ["tauri", "rust", "desktop", "security"],
+    category: "general",
+    imageUrl: "https://tauri.app/meta/favicon-194x194.png",
+    readTime: "6 min read"
+  },
+  {
+    title: "MongoDB 7.0: Vector Search and Enhanced Analytics",
+    content: "MongoDB 7.0 introduces native vector search capabilities for AI applications and enhanced analytics features. The release includes improved performance, better data governance tools, and new features that make MongoDB ideal for modern AI-powered applications.",
+    summary: "MongoDB 7.0 adds vector search and enhanced analytics capabilities.",
+    author: "MongoDB Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/45120?v=4",
+    source: "MongoDB Blog",
+    sourceUrl: "https://www.mongodb.com/blog",
+    tags: ["mongodb", "database", "vector-search", "ai"],
+    category: "backend",
+    imageUrl: "https://www.mongodb.com/assets/images/global/leaf.svg",
+    readTime: "8 min read"
+  },
+  {
+    title: "Llama 3: Open Source AI Model Breakthrough",
+    content: "Meta's Llama 3 represents a breakthrough in open-source AI models, offering performance competitive with proprietary models. The release includes multiple model sizes, better fine-tuning capabilities, and enhanced support for various AI applications and research.",
+    summary: "Llama 3 delivers breakthrough performance in open-source AI models.",
+    author: "Meta AI Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/69631?v=4",
+    source: "Meta AI Blog",
+    sourceUrl: "https://ai.meta.com/blog",
+    tags: ["llama", "ai", "open-source", "meta"],
+    category: "ai",
+    imageUrl: "https://about.meta.com/media/ztt4k4om/meta-logo_primary_rgb-1.png",
+    readTime: "9 min read"
+  },
+  {
+    title: "CSS Container Queries: Responsive Design Revolution",
+    content: "CSS Container Queries revolutionize responsive design by allowing elements to respond to their container's size rather than viewport. This feature enables more flexible, component-based responsive designs and better encapsulation in modern web development.",
+    summary: "CSS Container Queries enable component-based responsive design.",
+    author: "CSS Working Group",
+    authorAvatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face",
+    source: "Web Standards Update",
+    sourceUrl: "https://web.dev",
+    tags: ["css", "responsive", "containers", "web-standards"],
+    category: "frontend",
+    imageUrl: "https://web.dev/images/css-container-queries.svg",
+    readTime: "5 min read"
+  },
+  {
+    title: "Bun vs Node.js: Performance Benchmark 2024",
+    content: "A comprehensive performance comparison between Bun and Node.js reveals significant differences in startup time, memory usage, and execution speed. Bun shows impressive gains in specific scenarios while Node.js maintains advantages in ecosystem maturity.",
+    summary: "2024 performance benchmarks compare Bun and Node.js across metrics.",
+    author: "Performance Research Lab",
+    authorAvatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
+    source: "JavaScript Performance",
+    sourceUrl: "https://jsperf.app",
+    tags: ["bun", "nodejs", "performance", "benchmarks"],
+    category: "backend",
+    imageUrl: "https://bun.sh/logo@2x.png",
+    readTime: "10 min read"
+  },
+  {
+    title: "GitHub Codespaces: Cloud Development Environments",
+    content: "GitHub Codespaces transforms development workflows with fully configured cloud development environments. The service offers instant setup, powerful machine configurations, and seamless integration with VS Code, making development accessible from anywhere.",
+    summary: "GitHub Codespaces provides instant cloud development environments.",
+    author: "GitHub Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/9919?v=4",
+    source: "GitHub Blog",
+    sourceUrl: "https://github.blog",
+    tags: ["github", "codespaces", "cloud", "development"],
+    category: "general",
+    imageUrl: "https://github.githubassets.com/images/modules/site/codespaces/codespaces-icon.png",
+    readTime: "6 min read"
+  },
+  {
+    title: "Zod 3.22: Enhanced TypeScript Schema Validation",
+    content: "Zod 3.22 brings enhanced TypeScript schema validation with better error messages, improved performance, and new validation patterns. The library continues to be essential for runtime type checking and API validation in TypeScript applications.",
+    summary: "Zod 3.22 enhances TypeScript schema validation and error reporting.",
+    author: "Colin McDonnell",
+    authorAvatar: "https://avatars.githubusercontent.com/u/3084745?v=4",
+    source: "Zod Documentation",
+    sourceUrl: "https://zod.dev",
+    tags: ["zod", "typescript", "validation", "schemas"],
+    category: "backend",
+    imageUrl: "https://zod.dev/logo.svg",
+    readTime: "4 min read"
+  },
+  {
+    title: "Linear: The Future of Issue Tracking and Project Management",
+    content: "Linear's approach to issue tracking combines speed, simplicity, and powerful features that enhance developer productivity. With its focus on performance and user experience, Linear is reshaping how development teams manage projects and track progress.",
+    summary: "Linear revolutionizes issue tracking with speed and simplicity.",
+    author: "Linear Team",
+    authorAvatar: "https://avatars.githubusercontent.com/u/26460306?v=4",
+    source: "Linear Blog",
+    sourceUrl: "https://linear.app/blog",
+    tags: ["linear", "project-management", "productivity", "tools"],
+    category: "general",
+    imageUrl: "https://linear.app/favicon.ico",
+    readTime: "5 min read"
   }
 ];
 
@@ -492,9 +882,9 @@ export class NewsService {
   private static simulateFreshSeededData(): NewsArticle[] {
     const now = new Date();
     
-    // Randomly select articles from both pools
+    // Randomly select articles from both pools - more from dynamic pool now
     const selectedFromPool = this.shuffleArray([...dynamicArticlesPool])
-      .slice(0, 3)
+      .slice(0, 12) // Increased from 3 to 12
       .map((article, index) => ({
         ...article,
         id: `dynamic-${Date.now()}-${index}`,
@@ -504,13 +894,13 @@ export class NewsService {
       }));
     
     const selectedFromSeeded = this.shuffleArray([...seededNews])
-      .slice(0, 8);
+      .slice(0, 15); // Increased from 8 to 15
     
     // Combine and assign fresh timestamps
     const allArticles = [...selectedFromPool, ...selectedFromSeeded].map((article, index) => ({
       ...article,
       publishedAt: this.formatDate(
-        new Date(now.getTime() - (index * 25 * 60 * 1000)).toISOString() // 25 minutes apart
+        new Date(now.getTime() - (index * 15 * 60 * 1000)).toISOString() // 15 minutes apart (faster refresh)
       ),
       likes: article.likes + Math.floor(Math.random() * 15), // Simulate engagement growth
       comments: article.comments + Math.floor(Math.random() * 8),
@@ -518,12 +908,12 @@ export class NewsService {
       id: article.id.startsWith('dynamic-') ? article.id : `${article.id}-${Date.now()}`
     }));
     
-    // Sort by most recent and return
+    // Sort by most recent and return more articles
     return allArticles.sort((a, b) => {
       const timeA = this.parseTimeToMinutes(a.publishedAt);
       const timeB = this.parseTimeToMinutes(b.publishedAt);
       return timeA - timeB; // Most recent first
-    }).slice(0, 12); // Limit to 12 articles
+    }).slice(0, 25); // Increased from 12 to 25 articles
   }
   
   // Utility function to shuffle array

@@ -86,7 +86,7 @@ CREATE TRIGGER trigger_update_post_comments_count
 -- INITIALIZE EXISTING COUNTS
 -- ===========================
 
--- Update all existing post like counts
+-- First, let's ensure all posts have the correct likes_count
 UPDATE community_posts 
 SET likes_count = (
   SELECT COUNT(*) 
@@ -109,6 +109,41 @@ SET comments_count = (
   FROM post_comments 
   WHERE post_comments.post_id = community_posts.id
 );
+
+-- Add a function to manually refresh counts (can be called if triggers fail)
+CREATE OR REPLACE FUNCTION refresh_all_counts()
+RETURNS void AS $$
+BEGIN
+  -- Update post likes counts
+  UPDATE community_posts 
+  SET likes_count = (
+    SELECT COUNT(*) 
+    FROM post_likes 
+    WHERE post_likes.post_id = community_posts.id
+  );
+  
+  -- Update comment likes counts
+  UPDATE post_comments 
+  SET likes_count = (
+    SELECT COUNT(*) 
+    FROM comment_likes 
+    WHERE comment_likes.comment_id = post_comments.id
+  );
+  
+  -- Update post comments counts
+  UPDATE community_posts 
+  SET comments_count = (
+    SELECT COUNT(*) 
+    FROM post_comments 
+    WHERE post_comments.post_id = community_posts.id
+  );
+  
+  RAISE NOTICE 'All counts refreshed successfully';
+END;
+$$ LANGUAGE plpgsql;
+
+-- Grant execute permission
+GRANT EXECUTE ON FUNCTION refresh_all_counts TO authenticated;
 
 -- Add indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_post_likes_post_id ON post_likes(post_id);

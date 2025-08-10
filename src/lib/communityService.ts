@@ -265,9 +265,26 @@ export class CommunityService {
         };
       }
 
+      // Always verify the count is correct
+      const { count: actualCount } = await supabase
+        .from('post_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_id', postId);
+
+      const dbCount = post?.likes_count || 0;
+      
+      // If counts don't match, update manually
+      if (dbCount !== actualCount) {
+        console.log('Count mismatch detected! DB:', dbCount, 'Actual:', actualCount);
+        await supabase
+          .from('community_posts')
+          .update({ likes_count: actualCount || 0 })
+          .eq('id', postId);
+      }
+
       const result = {
         isLiked: !existingLike,
-        likesCount: post?.likes_count || 0
+        likesCount: actualCount || 0
       };
 
       console.log('Final result:', result);
@@ -850,6 +867,26 @@ export class CommunityService {
         totalLikes: 0,
         totalComments: 0
       };
+    }
+  }
+
+  // Manual function to refresh all counts
+  static async refreshAllCounts() {
+    try {
+      console.log('🔄 Refreshing all like counts...');
+      
+      // Call the database function
+      const { error } = await supabase.rpc('refresh_all_counts');
+      
+      if (error) {
+        console.error('Error calling refresh function:', error);
+        throw error;
+      }
+      
+      console.log('✅ All counts refreshed successfully');
+    } catch (error) {
+      console.error('Error refreshing counts:', error);
+      throw error;
     }
   }
 }
