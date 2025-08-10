@@ -139,7 +139,7 @@ const GitHubPage = () => {
       window.location.href = authUrl;
     } catch (error) {
       console.error('OAuth initiation failed:', error);
-      setError(error instanceof Error ? error.message : 'Failed to initiate OAuth');
+      setError('OAuth server is not available. Please use a Personal Access Token instead.');
       setShowTokenInput(true); // Show token input as fallback
     }
   };
