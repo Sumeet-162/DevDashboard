@@ -174,7 +174,7 @@ const CommunityPage = () => {
     try {
       const page = reset ? 1 : profilesPage;
       const offset = (page - 1) * 12;
-      const { members: newProfiles, total } = await CommunityService.getMembers({
+      const { profiles: newProfiles, total } = await CommunityService.getMembers({
         offset,
         limit: 12,
         search: profileSearchTerm,

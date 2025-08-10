@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { X, ImagePlus, Hash, Send, Plus } from "lucide-react";
 import { CommunityService, CommunityPost } from "@/lib/communityService";
-import { useAuthSimple } from "@/hooks/useAuth";
+import { useAuthSimple } from "@/hooks/useAuth.tsx";
 import { getProfileDisplayName } from "@/lib/utils";
 
 interface CreatePostDialogProps {

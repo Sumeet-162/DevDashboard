@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CommunityPost, CommunityService } from "@/lib/communityService";
-import { useAuthSimple } from "@/hooks/useAuth";
+import { useAuthSimple } from "@/hooks/useAuth.tsx";
 import { getProfileDisplayName } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import CommentsSection from "./CommentsSection";

@@ -14,7 +14,7 @@ import {
   MessageSquare
 } from "lucide-react";
 import { CommunityMember, CommunityService } from "@/lib/communityService";
-import { useAuthSimple } from "@/hooks/useAuth";
+import { useAuthSimple } from "@/hooks/useAuth.tsx";
 import { getProfileDisplayName } from "@/lib/utils";
 
 interface CommunityMemberCardProps {
