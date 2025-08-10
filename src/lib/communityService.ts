@@ -475,30 +475,44 @@ export class CommunityService {
 
         if (deleteError) throw deleteError;
 
-        // Manually update follower count (decrement)
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ 
-            followers_count: supabase.raw('GREATEST(followers_count - 1, 0)'),
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', userId);
+        // Manually update follower count (decrement) - use simple approach
+        try {
+          // First get current count
+          const { data: currentProfile } = await supabase
+            .from('profiles')
+            .select('followers_count')
+            .eq('id', userId)
+            .single();
 
-        if (updateError) {
-          console.error('Error updating follower count:', updateError);
-        }
+          const newFollowersCount = Math.max((currentProfile?.followers_count || 0) - 1, 0);
+          
+          // Update with new count
+          await supabase
+            .from('profiles')
+            .update({ 
+              followers_count: newFollowersCount,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId);
 
-        // Also update following count for current user
-        const { error: followingUpdateError } = await supabase
-          .from('profiles')
-          .update({ 
-            following_count: supabase.raw('GREATEST(following_count - 1, 0)'),
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id);
+          // Also update following count for current user
+          const { data: currentUserProfile } = await supabase
+            .from('profiles')
+            .select('following_count')
+            .eq('id', user.id)
+            .single();
 
-        if (followingUpdateError) {
-          console.error('Error updating following count:', followingUpdateError);
+          const newFollowingCount = Math.max((currentUserProfile?.following_count || 0) - 1, 0);
+          
+          await supabase
+            .from('profiles')
+            .update({ 
+              following_count: newFollowingCount,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+        } catch (updateError) {
+          console.error('Error updating counts:', updateError);
         }
 
         // Get updated followers count
@@ -525,30 +539,44 @@ export class CommunityService {
 
         if (insertError) throw insertError;
 
-        // Manually update follower count (increment)
-        const { error: updateError } = await supabase
-          .from('profiles')
-          .update({ 
-            followers_count: supabase.raw('followers_count + 1'),
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', userId);
+        // Manually update follower count (increment) - use simple approach
+        try {
+          // First get current count
+          const { data: currentProfile } = await supabase
+            .from('profiles')
+            .select('followers_count')
+            .eq('id', userId)
+            .single();
 
-        if (updateError) {
-          console.error('Error updating follower count:', updateError);
-        }
+          const newFollowersCount = (currentProfile?.followers_count || 0) + 1;
+          
+          // Update with new count
+          await supabase
+            .from('profiles')
+            .update({ 
+              followers_count: newFollowersCount,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', userId);
 
-        // Also update following count for current user
-        const { error: followingUpdateError } = await supabase
-          .from('profiles')
-          .update({ 
-            following_count: supabase.raw('following_count + 1'),
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', user.id);
+          // Also update following count for current user
+          const { data: currentUserProfile } = await supabase
+            .from('profiles')
+            .select('following_count')
+            .eq('id', user.id)
+            .single();
 
-        if (followingUpdateError) {
-          console.error('Error updating following count:', followingUpdateError);
+          const newFollowingCount = (currentUserProfile?.following_count || 0) + 1;
+          
+          await supabase
+            .from('profiles')
+            .update({ 
+              following_count: newFollowingCount,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+        } catch (updateError) {
+          console.error('Error updating counts:', updateError);
         }
 
         // Get updated followers count
