@@ -25,12 +25,10 @@ const DevDashLogo: React.FC<DevDashLogoProps> = ({
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      {/* DevDash Logo Image */}
-      <img
-        src="https://raw.githubusercontent.com/Sumeet-162/letterlink-images/refs/heads/main/coding%20(1).png"
-        alt="DevDash Logo"
-        className={`${sizeClasses[size]} object-contain dark:invert dark:brightness-0 dark:contrast-100`}
-      />
+      {/* DevDash Logo - Code Symbol */}
+      <div className={`${sizeClasses[size]} flex items-center justify-center font-bold text-primary`}>
+        <span className="text-xl font-mono">&lt;/&gt;</span>
+      </div>
       
       {showText && (
         <span className={`font-bold ${textSizeClasses[size]} font-mono tracking-tight text-primary`}>
