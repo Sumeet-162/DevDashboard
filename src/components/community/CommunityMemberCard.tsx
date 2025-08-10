@@ -13,12 +13,12 @@ import {
   Heart,
   MessageSquare
 } from "lucide-react";
-import { CommunityProfile, CommunityService } from "@/services/communityService";
+import { CommunityMember, CommunityService } from "@/lib/communityService";
 import { useAuthSimple } from "@/hooks/useAuth";
 import { getProfileDisplayName } from "@/lib/utils";
 
 interface CommunityMemberCardProps {
-  profile: CommunityProfile;
+  profile: CommunityMember;
   onFollowChange?: (profileId: string, isFollowing: boolean, followersCount: number) => void;
   variant?: 'default' | 'compact';
 }
@@ -50,12 +50,11 @@ const CommunityMemberCard = ({
 
     setIsActionLoading(true);
     try {
-      const { isFollowing: newIsFollowing, followersCount: newCount } = 
-        await CommunityService.toggleFollow(profile.id);
+      const result = await CommunityService.toggleFollow(profile.id);
       
-      setIsFollowing(newIsFollowing);
-      setFollowersCount(newCount);
-      onFollowChange?.(profile.id, newIsFollowing, newCount);
+      setIsFollowing(result.isFollowing);
+      setFollowersCount(result.followersCount);
+      onFollowChange?.(profile.id, result.isFollowing, result.followersCount);
     } catch (error) {
       console.error('Error toggling follow:', error);
     } finally {
@@ -171,18 +170,10 @@ const CommunityMemberCard = ({
 
           {/* Compact Info */}
           <div className="text-center space-y-1">
-            {profile.job_title && (
+            {profile.bio && (
               <p className="text-xs text-muted-foreground truncate max-w-full">
-                {profile.job_title}
-                {profile.company && ` at ${profile.company}`}
+                {profile.bio}
               </p>
-            )}
-            
-            {profile.location && (
-              <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3" />
-                <span className="truncate">{profile.location}</span>
-              </div>
             )}
           </div>
 

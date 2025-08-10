@@ -20,7 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CommunityPost, CommunityService } from "@/services/communityService";
+import { CommunityPost, CommunityService } from "@/lib/communityService";
 import { useAuthSimple } from "@/hooks/useAuth";
 import { getProfileDisplayName } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -68,10 +68,11 @@ const PostCard = ({
 
     setIsLiking(true);
     try {
-      const { isLiked: newIsLiked, likesCount } = await CommunityService.togglePostLike(post.id);
+      const newIsLiked = await CommunityService.togglePostLike(post.id);
       setIsLiked(newIsLiked);
-      setCurrentLikesCount(likesCount);
-      onLike?.(post.id, newIsLiked, likesCount);
+      const newLikesCount = newIsLiked ? currentLikesCount + 1 : Math.max(0, currentLikesCount - 1);
+      setCurrentLikesCount(newLikesCount);
+      onLike?.(post.id, newIsLiked, newLikesCount);
     } catch (error) {
       console.error('Error liking post:', error);
     } finally {
@@ -132,9 +133,6 @@ const PostCard = ({
                       @{post.author.username}
                     </span>
                   )}
-                  {post.is_featured && (
-                    <Badge variant="secondary" className="text-xs">Featured</Badge>
-                  )}
                 </div>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />
@@ -179,31 +177,6 @@ const PostCard = ({
               </p>
             </div>
           </div>
-
-          {post.image_url && (
-            <div className="rounded-lg overflow-hidden border">
-              <img 
-                src={post.image_url} 
-                alt="Post image" 
-                className="w-full h-48 object-cover"
-              />
-            </div>
-          )}
-
-          {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {post.tags.slice(0, 5).map((tag, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
-                  #{tag}
-                </Badge>
-              ))}
-              {post.tags.length > 5 && (
-                <Badge variant="outline" className="text-xs">
-                  +{post.tags.length - 5} more
-                </Badge>
-              )}
-            </div>
-          )}
         </CardContent>
 
         {showActions && (
@@ -238,7 +211,6 @@ const PostCard = ({
                   className="gap-1"
                 >
                   <Share2 className="h-4 w-4" />
-                  {post.shares_count > 0 && <span>{post.shares_count}</span>}
                 </Button>
               </div>
 

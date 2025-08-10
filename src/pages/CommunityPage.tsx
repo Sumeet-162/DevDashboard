@@ -21,7 +21,7 @@ import {
   Zap
 } from "lucide-react";
 import { useAuthSimple } from "@/hooks/useAuth.tsx";
-import CommunityService, { CommunityPost, CommunityProfile } from "@/services/communityService";
+import CommunityService, { CommunityPost, CommunityMember } from "@/lib/communityService";
 import PostCard from "@/components/community/PostCard";
 import CreatePostDialog from "@/components/community/CreatePostDialog";
 import CommunityMemberCard from "@/components/community/CommunityMemberCard";
@@ -29,7 +29,7 @@ import CommunityMemberCard from "@/components/community/CommunityMemberCard";
 const CommunityPage = () => {
   const { user } = useAuthSimple();
   const [posts, setPosts] = useState<CommunityPost[]>([]);
-  const [profiles, setProfiles] = useState<CommunityProfile[]>([]);
+  const [profiles, setProfiles] = useState<CommunityMember[]>([]);
   const [communityStats, setCommunityStats] = useState({
     totalMembers: 0,
     totalPosts: 0,
@@ -44,7 +44,7 @@ const CommunityPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [profileSearchTerm, setProfileSearchTerm] = useState('');
   const [postsSortBy, setPostsSortBy] = useState<'recent' | 'popular' | 'featured'>('recent');
-  const [profilesSortBy, setProfilesSortBy] = useState<'recent' | 'popular' | 'most_followers'>('recent');
+  const [profilesSortBy, setProfilesSortBy] = useState<'newest' | 'popular' | 'active'>('newest');
   const [selectedTab, setSelectedTab] = useState('popular');
 
   // Pagination states
@@ -88,8 +88,9 @@ const CommunityPage = () => {
     setPostsLoading(true);
     try {
       const page = reset ? 1 : postsPage;
+      const offset = (page - 1) * 10;
       const options: any = {
-        page,
+        offset,
         limit: 10,
         sortBy: postsSortBy
       };
@@ -98,7 +99,7 @@ const CommunityPage = () => {
         options.followingOnly = true;
       }
 
-      const { posts: newPosts, hasMore } = await CommunityService.getPosts(options);
+      const { posts: newPosts, total } = await CommunityService.getPosts(options);
       
       if (reset) {
         setPosts(newPosts);
@@ -107,7 +108,9 @@ const CommunityPage = () => {
         setPosts(prev => [...prev, ...newPosts]);
       }
       
-      setHasMorePosts(hasMore);
+      // Calculate if there are more posts based on total and current length
+      const currentTotal = reset ? newPosts.length : posts.length + newPosts.length;
+      setHasMorePosts(currentTotal < total);
       if (!reset) {
         setPostsPage(prev => prev + 1);
       }
@@ -122,11 +125,12 @@ const CommunityPage = () => {
     setProfilesLoading(true);
     try {
       const page = reset ? 1 : profilesPage;
-      const { profiles: newProfiles, hasMore } = await CommunityService.getCommunityProfiles({
-        page,
+      const offset = (page - 1) * 12;
+      const { members: newProfiles, total } = await CommunityService.getMembers({
+        offset,
         limit: 12,
         search: profileSearchTerm,
-        sortBy: profilesSortBy
+        sortBy: profilesSortBy as 'active' | 'popular' | 'newest'
       });
       
       if (reset) {
@@ -136,7 +140,9 @@ const CommunityPage = () => {
         setProfiles(prev => [...prev, ...newProfiles]);
       }
       
-      setHasMoreProfiles(hasMore);
+      // Calculate if there are more profiles based on total and current length
+      const currentTotal = reset ? newProfiles.length : profiles.length + newProfiles.length;
+      setHasMoreProfiles(currentTotal < total);
       if (!reset) {
         setProfilesPage(prev => prev + 1);
       }

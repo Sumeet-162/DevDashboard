@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { X, ImagePlus, Hash, Send, Plus } from "lucide-react";
-import { CommunityService, CommunityPost } from "@/services/communityService";
+import { CommunityService, CommunityPost } from "@/lib/communityService";
 import { useAuthSimple } from "@/hooks/useAuth";
 import { getProfileDisplayName } from "@/lib/utils";
 
@@ -47,12 +47,10 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
 
     setIsSubmitting(true);
     try {
-      const post = await CommunityService.createPost({
-        title: formData.title.trim(),
-        content: formData.content.trim(),
-        tags: formData.tags,
-        image_url: formData.image_url.trim() || undefined
-      });
+      const post = await CommunityService.createPost(
+        formData.title.trim(),
+        formData.content.trim()
+      );
 
       onPostCreated?.(post);
       

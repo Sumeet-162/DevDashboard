@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CommunityService, PostComment } from "@/services/communityService";
+import { CommunityService, CommunityComment } from "@/lib/communityService";
 import { useAuthSimple } from "@/hooks/useAuth";
 import { getProfileDisplayName } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
@@ -34,7 +34,7 @@ interface CommentsSectionProps {
 
 const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
   const { user } = useAuthSimple();
-  const [comments, setComments] = useState<PostComment[]>([]);
+  const [comments, setComments] = useState<CommunityComment[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [newComment, setNewComment] = useState('');
@@ -65,11 +65,11 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
 
     setSubmitting(true);
     try {
-      const comment = await CommunityService.createComment({
-        post_id: postId,
-        content: newComment.trim(),
-        parent_comment_id: parentCommentId
-      });
+      const comment = await CommunityService.createComment(
+        postId,
+        newComment.trim(),
+        parentCommentId
+      );
 
       if (parentCommentId) {
         // Add reply to parent comment
@@ -96,13 +96,16 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
     if (!user) return;
 
     try {
-      const { isLiked, likesCount } = await CommunityService.toggleCommentLike(commentId);
+      const isLiked = await CommunityService.toggleCommentLike(commentId);
       
-      // Update comment likes in state
-      const updateComment = (comments: PostComment[]): PostComment[] => {
+      // Update comment likes in state - calculate likes count manually
+      const updateComment = (comments: CommunityComment[]): CommunityComment[] => {
         return comments.map(comment => {
           if (comment.id === commentId) {
-            return { ...comment, is_liked: isLiked, likes_count: likesCount };
+            const newLikesCount = isLiked 
+              ? comment.likes_count + 1 
+              : Math.max(0, comment.likes_count - 1);
+            return { ...comment, is_liked: isLiked, likes_count: newLikesCount };
           }
           if (comment.replies) {
             return { ...comment, replies: updateComment(comment.replies) };
@@ -124,7 +127,7 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
     try {
       const updatedComment = await CommunityService.updateComment(commentId, editContent.trim());
       
-      const updateComment = (comments: PostComment[]): PostComment[] => {
+      const updateComment = (comments: CommunityComment[]): CommunityComment[] => {
         return comments.map(comment => {
           if (comment.id === commentId) {
             return { ...comment, content: updatedComment.content, updated_at: updatedComment.updated_at };
@@ -150,7 +153,7 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
     try {
       await CommunityService.deleteComment(commentId);
       
-      const removeComment = (comments: PostComment[]): PostComment[] => {
+      const removeComment = (comments: CommunityComment[]): CommunityComment[] => {
         return comments.filter(comment => {
           if (comment.id === commentId) return false;
           if (comment.replies) {
@@ -166,8 +169,8 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
     }
   };
 
-  const CommentItem = ({ comment, isReply = false, depth = 0 }: { comment: PostComment; isReply?: boolean; depth?: number }) => {
-    const isAuthor = user?.id === comment.user_id;
+  const CommentItem = ({ comment, isReply = false, depth = 0 }: { comment: CommunityComment; isReply?: boolean; depth?: number }) => {
+    const isAuthor = user?.id === comment.author_id;
     const authorName = comment.author ? getProfileDisplayName(comment.author) : 'Unknown User';
     const isEditing = editingComment === comment.id;
     const maxDepth = 3; // Limit nesting depth for UI readability
