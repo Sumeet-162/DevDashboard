@@ -64,6 +64,43 @@ const CommunityPage = () => {
       getCurrentUser: async () => {
         const { data: { user } } = await supabase.auth.getUser();
         return user;
+      },
+      checkUser: async (userId: string) => {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('id, full_name, followers_count, following_count')
+          .eq('id', userId)
+          .single();
+        
+        const { count: actualFollowers } = await supabase
+          .from('user_follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('following_id', userId);
+          
+        const { count: actualFollowing } = await supabase
+          .from('user_follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('follower_id', userId);
+          
+        return {
+          profile,
+          actualFollowers,
+          actualFollowing,
+          error
+        };
+      },
+      checkFollowRelation: async (targetUserId: string) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return null;
+        
+        const { data: relation, error } = await supabase
+          .from('user_follows')
+          .select('*')
+          .eq('follower_id', user.id)
+          .eq('following_id', targetUserId)
+          .single();
+          
+        return { relation, error };
       }
     };
   }, []);
@@ -181,6 +218,8 @@ const CommunityPage = () => {
   };
 
   const handleFollowChange = (profileId: string, isFollowing: boolean, followersCount: number) => {
+    console.log('handleFollowChange called:', { profileId, isFollowing, followersCount });
+    
     setProfiles(prev => prev.map(profile => 
       profile.id === profileId 
         ? { ...profile, is_following: isFollowing, followers_count: followersCount }
@@ -189,8 +228,9 @@ const CommunityPage = () => {
     
     // Refresh the profiles to get accurate data from server
     setTimeout(() => {
+      console.log('Refreshing profiles after follow change...');
       loadProfiles(true);
-    }, 500);
+    }, 1000);
   };
 
   const StatCard = ({ icon: Icon, title, value, subtitle }: any) => (

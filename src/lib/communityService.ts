@@ -441,12 +441,19 @@ export class CommunityService {
         data.forEach(member => {
           member.is_following = followingIds.has(member.id);
         });
+        
+        console.log('Loaded members with follow status:', data.map(m => ({
+          id: m.id,
+          name: m.full_name,
+          followers_count: m.followers_count,
+          is_following: m.is_following
+        })));
       }
 
-      return { members: data || [], total: count || 0 };
+      return { profiles: data || [], total: count || 0 };
     } catch (error) {
       console.error('Error fetching members:', error);
-      return { members: [], total: 0 };
+      return { profiles: [], total: 0 };
     }
   }
 
@@ -496,9 +503,11 @@ export class CommunityService {
         const actualFollowingCount = followingCountResult.count || 0;
 
         console.log('Actual counts after unfollow - followers:', actualFollowersCount, 'following:', actualFollowingCount);
+        console.log('Updating target user (followers):', userId, 'count:', actualFollowersCount);
+        console.log('Updating current user (following):', user.id, 'count:', actualFollowingCount);
 
         // Update both profiles with actual counts
-        await Promise.all([
+        const [targetUpdateResult, currentUserUpdateResult] = await Promise.all([
           supabase
             .from('profiles')
             .update({ 
@@ -514,6 +523,16 @@ export class CommunityService {
             })
             .eq('id', user.id)
         ]);
+
+        console.log('Target user update result:', targetUpdateResult);
+        console.log('Current user update result:', currentUserUpdateResult);
+
+        if (targetUpdateResult.error) {
+          console.error('Error updating target user followers count:', targetUpdateResult.error);
+        }
+        if (currentUserUpdateResult.error) {
+          console.error('Error updating current user following count:', currentUserUpdateResult.error);
+        }
 
         console.log('Unfollow complete, new followers count:', actualFollowersCount);
 
@@ -549,9 +568,11 @@ export class CommunityService {
         const actualFollowingCount = followingCountResult.count || 0;
 
         console.log('Actual counts after follow - followers:', actualFollowersCount, 'following:', actualFollowingCount);
+        console.log('Updating target user (followers):', userId, 'count:', actualFollowersCount);
+        console.log('Updating current user (following):', user.id, 'count:', actualFollowingCount);
 
         // Update both profiles with actual counts
-        await Promise.all([
+        const [targetUpdateResult, currentUserUpdateResult] = await Promise.all([
           supabase
             .from('profiles')
             .update({ 
@@ -567,6 +588,16 @@ export class CommunityService {
             })
             .eq('id', user.id)
         ]);
+
+        console.log('Target user update result:', targetUpdateResult);
+        console.log('Current user update result:', currentUserUpdateResult);
+
+        if (targetUpdateResult.error) {
+          console.error('Error updating target user followers count:', targetUpdateResult.error);
+        }
+        if (currentUserUpdateResult.error) {
+          console.error('Error updating current user following count:', currentUserUpdateResult.error);
+        }
 
         console.log('Follow complete, new followers count:', actualFollowersCount);
 
