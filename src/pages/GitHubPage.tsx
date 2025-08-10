@@ -101,8 +101,6 @@ const GitHubPage = () => {
     setLoading(true);
     setError(null);
     
-    console.log(`🚀 Starting GitHub data fetch for: ${username}`);
-    
     try {
       const [userData, reposData, statsData, contributionsData, pullRequestsData, issuesData] = await Promise.all([
         githubService.getUserProfile(username),
@@ -113,14 +111,6 @@ const GitHubPage = () => {
         githubService.getUserIssues(username, 20)
       ]);
 
-      console.log('📊 GitHub data fetch results:', {
-        userDataReal: userData.isRealData,
-        statsDataReal: statsData.isRealData,
-        followers: userData.followers,
-        following: userData.following,
-        totalRepos: statsData.totalRepos
-      });
-
       setUser(userData);
       setRepositories(reposData);
       setStats(statsData);
@@ -128,7 +118,6 @@ const GitHubPage = () => {
       setPullRequests(pullRequestsData);
       setIssues(issuesData);
     } catch (err) {
-      console.error('💥 Failed to fetch GitHub data:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch GitHub data');
     } finally {
       setLoading(false);
@@ -464,11 +453,6 @@ const GitHubPage = () => {
           <Card className="w-full lg:w-2/3 card-hover">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">Statistics</CardTitle>
-              {user?.isRealData === false && (
-                <p className="text-xs text-orange-600">
-                  ⚠️ Demo data shown - check username or authenticate for real statistics
-                </p>
-              )}
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
