@@ -21,6 +21,7 @@ import { getProfileDisplayName } from "@/lib/utils";
 interface CreatePostDialogProps {
   onPostCreated?: (post: CommunityPost) => void;
   trigger?: React.ReactNode;
+  //to be triggered
 }
 
 const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => {
