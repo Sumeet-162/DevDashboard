@@ -83,6 +83,14 @@ const Index = () => {
   useEffect(() => {
     if (user) {
       fetchDashboardData();
+      
+      // Auto-refresh every 30 seconds to pick up any follower/following changes
+      const refreshInterval = setInterval(() => {
+        console.log('Auto-refreshing dashboard data...');
+        fetchDashboardData();
+      }, 30000);
+
+      return () => clearInterval(refreshInterval);
     }
   }, [user]);
 
@@ -98,12 +106,22 @@ const Index = () => {
         githubData,
         leetcodeData
       ] = await Promise.allSettled([
-        // Profile data
-        supabase
-          .from('profiles')
-          .select('followers_count, following_count, posts_count, total_likes_received')
-          .eq('id', user?.id)
-          .single(),
+        // Profile data - with updated counts
+        (async () => {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('followers_count, following_count, posts_count, total_likes_received')
+            .eq('id', user?.id)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching profile data:', error);
+            return null;
+          }
+          
+          console.log('Profile data fetched:', data);
+          return data;
+        })(),
         
         // Community stats  
         CommunityService.getCommunityStats(),
@@ -113,15 +131,28 @@ const Index = () => {
         
         // GitHub data (if connected)
         (async () => {
-          const profile = await supabase
-            .from('profiles')
-            .select('github_username')
-            .eq('id', user?.id)
-            .single();
-          
-          const githubUsername = profile.data?.github_username || 'Sumeet-162';
-          return await githubService.getUserStats(githubUsername);
-        })().catch(() => null),
+          try {
+            const profile = await supabase
+              .from('profiles')
+              .select('github_username')
+              .eq('id', user?.id)
+              .single();
+            
+            const githubUsername = profile.data?.github_username;
+            if (!githubUsername) {
+              console.log('No GitHub username found in profile');
+              return null;
+            }
+            
+            console.log('Fetching GitHub stats for username:', githubUsername);
+            const stats = await githubService.getUserStats(githubUsername);
+            console.log('GitHub stats received:', stats);
+            return stats;
+          } catch (error) {
+            console.error('Error fetching GitHub stats:', error);
+            return null;
+          }
+        })(),
         
         // LeetCode data (if connected)
         LeetCodeService.getUserData().then(data => {
@@ -139,7 +170,7 @@ const Index = () => {
       ]);
 
       setStats({
-        profile: profileData.status === 'fulfilled' && profileData.value.data ? profileData.value.data : null,
+        profile: profileData.status === 'fulfilled' && profileData.value ? profileData.value : null,
         community: communityStats.status === 'fulfilled' ? communityStats.value : null,
         recentPosts: recentPosts.status === 'fulfilled' ? recentPosts.value.posts : [],
         github: githubData.status === 'fulfilled' ? githubData.value : null,
@@ -159,6 +190,18 @@ const Index = () => {
     return "Good evening";
   };
 
+  const handleRefreshData = async () => {
+    console.log('Manual refresh triggered');
+    await fetchDashboardData();
+    
+    // Also refresh user counts
+    try {
+      await CommunityService.refreshUserCounts(user?.id || '');
+    } catch (error) {
+      console.error('Error refreshing user counts:', error);
+    }
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -174,8 +217,23 @@ const Index = () => {
                   Ready to code and collaborate today?
                 </p>
               </div>
-              <div className="flex-shrink-0">
-                <UserInfoCard />
+              <div className="flex items-center gap-3">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleRefreshData}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Clock className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Activity className="h-4 w-4 mr-2" />
+                  )}
+                  Refresh Data
+                </Button>
+                <div className="flex-shrink-0">
+                  <UserInfoCard />
+                </div>
               </div>
             </div>
           </CardHeader>

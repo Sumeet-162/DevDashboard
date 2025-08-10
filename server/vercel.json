@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/server.js"
+    }
+  ],
+  "env": {
+    "FRONTEND_URL": "https://dev-dashboard-eight.vercel.app",
+    "GITHUB_CLIENT_ID": "Ov23lipKSR37cO0HXzxv",
+    "GITHUB_CLIENT_SECRET": "456284e2860027e46caff42bcc08d7e402e58a4e"
+  }
+}

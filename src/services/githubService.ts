@@ -131,20 +131,12 @@ class GitHubService {
   }
 
   async getUserStats(username: string) {
-    // Try to get enhanced stats if authenticated
-    if (this.isAuthenticated()) {
-      try {
-        return await githubGraphQLService.getDetailedUserStats(username);
-      } catch (error) {
-        console.error('Failed to fetch detailed stats, falling back to basic stats:', error);
-        // Fall back to basic stats
-      }
-    }
-
-    // Use basic REST API stats
+    // Always try to get real data first, regardless of authentication
     try {
       const userUrl = `${this.baseURL}/users/${username}`;
       const reposUrl = `${this.baseURL}/users/${username}/repos?per_page=100`;
+      
+      console.log(`Fetching GitHub stats for ${username} from API...`);
       
       const [userResponse, reposResponse] = await Promise.all([
         fetch(userUrl),
@@ -156,13 +148,19 @@ class GitHubService {
           console.warn(`GitHub user '${username}' not found`);
           return this.getFallbackStatsData();
         }
-        throw new Error(`GitHub API error`);
+        throw new Error(`GitHub API error: ${userResponse.status}/${reposResponse.status}`);
       }
 
       const [user, repos] = await Promise.all([
         userResponse.json(),
         reposResponse.json()
       ]);
+
+      console.log(`Successfully fetched real GitHub data for ${username}:`, {
+        repos: repos.length,
+        publicRepos: user.public_repos,
+        followers: user.followers
+      });
 
       // Cache the results
       this.cache.set(`user_${username}`, { data: user, timestamp: Date.now() });
@@ -176,18 +174,34 @@ class GitHubService {
         return acc;
       }, {});
 
-      return {
+      const realStats = {
         totalRepos: user.public_repos,
         totalStars,
         followers: user.followers,
         following: user.following,
+        contributions: totalStars + repos.length * 5, // Rough estimate
         languages,
         topLanguage: Object.keys(languages).reduce((a, b) => 
           languages[a] > languages[b] ? a : b, Object.keys(languages)[0]
         )
       };
+
+      console.log('Returning real GitHub stats:', realStats);
+      return realStats;
     } catch (error) {
-      console.error('Error fetching user stats:', error);
+      console.error('Error fetching real GitHub stats:', error);
+      
+      // Try enhanced stats if authenticated (fallback)
+      if (this.isAuthenticated()) {
+        try {
+          console.log('Trying enhanced stats as fallback...');
+          return await githubGraphQLService.getDetailedUserStats(username);
+        } catch (enhancedError) {
+          console.error('Enhanced stats also failed:', enhancedError);
+        }
+      }
+      
+      console.log('Using fallback data for GitHub stats');
       return this.getFallbackStatsData();
     }
   }

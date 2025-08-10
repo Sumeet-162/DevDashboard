@@ -467,13 +467,39 @@ export class CommunityService {
 
       if (existingFollow) {
         // Unfollow
-        const { error } = await supabase
+        const { error: deleteError } = await supabase
           .from('user_follows')
           .delete()
           .eq('follower_id', user.id)
           .eq('following_id', userId);
 
-        if (error) throw error;
+        if (deleteError) throw deleteError;
+
+        // Manually update follower count (decrement)
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            followers_count: supabase.raw('GREATEST(followers_count - 1, 0)'),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+
+        if (updateError) {
+          console.error('Error updating follower count:', updateError);
+        }
+
+        // Also update following count for current user
+        const { error: followingUpdateError } = await supabase
+          .from('profiles')
+          .update({ 
+            following_count: supabase.raw('GREATEST(following_count - 1, 0)'),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+
+        if (followingUpdateError) {
+          console.error('Error updating following count:', followingUpdateError);
+        }
 
         // Get updated followers count
         const { data: profile } = await supabase
@@ -481,6 +507,8 @@ export class CommunityService {
           .select('followers_count')
           .eq('id', userId)
           .single();
+
+        console.log('Unfollowed user, new followers count:', profile?.followers_count);
 
         return {
           isFollowing: false,
@@ -488,14 +516,40 @@ export class CommunityService {
         };
       } else {
         // Follow
-        const { error } = await supabase
+        const { error: insertError } = await supabase
           .from('user_follows')
           .insert({
             follower_id: user.id,
             following_id: userId
           });
 
-        if (error) throw error;
+        if (insertError) throw insertError;
+
+        // Manually update follower count (increment)
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            followers_count: supabase.raw('followers_count + 1'),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+
+        if (updateError) {
+          console.error('Error updating follower count:', updateError);
+        }
+
+        // Also update following count for current user
+        const { error: followingUpdateError } = await supabase
+          .from('profiles')
+          .update({ 
+            following_count: supabase.raw('following_count + 1'),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+
+        if (followingUpdateError) {
+          console.error('Error updating following count:', followingUpdateError);
+        }
 
         // Get updated followers count
         const { data: profile } = await supabase
@@ -503,6 +557,8 @@ export class CommunityService {
           .select('followers_count')
           .eq('id', userId)
           .single();
+
+        console.log('Followed user, new followers count:', profile?.followers_count);
 
         return {
           isFollowing: true,
@@ -511,6 +567,51 @@ export class CommunityService {
       }
     } catch (error) {
       console.error('Error toggling follow:', error);
+      throw error;
+    }
+  }
+
+  // Manually refresh follower/following counts for a user
+  static async refreshUserCounts(userId: string) {
+    try {
+      // Count actual followers
+      const { count: followersCount } = await supabase
+        .from('user_follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('following_id', userId);
+
+      // Count actual following
+      const { count: followingCount } = await supabase
+        .from('user_follows')
+        .select('*', { count: 'exact', head: true })
+        .eq('follower_id', userId);
+
+      // Update the profile with correct counts
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          followers_count: followersCount || 0,
+          following_count: followingCount || 0,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Error refreshing user counts:', error);
+        throw error;
+      }
+
+      console.log(`Refreshed counts for user ${userId}:`, {
+        followers: followersCount,
+        following: followingCount
+      });
+
+      return {
+        followersCount: followersCount || 0,
+        followingCount: followingCount || 0
+      };
+    } catch (error) {
+      console.error('Error refreshing user counts:', error);
       throw error;
     }
   }
