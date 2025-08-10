@@ -356,7 +356,7 @@ const ProfilePage = () => {
 
   const handleLikePost = async (postId: string) => {
     try {
-      const isLiked = await CommunityService.togglePostLike(postId)
+      const { isLiked, likesCount } = await CommunityService.togglePostLike(postId)
       
       // Update the post in the local state
       setUserPosts(prev => prev.map(post => 
@@ -364,7 +364,7 @@ const ProfilePage = () => {
           ? { 
               ...post, 
               is_liked: isLiked,
-              likes_count: isLiked ? post.likes_count + 1 : post.likes_count - 1
+              likes_count: likesCount
             }
           : post
       ))
@@ -1248,8 +1248,7 @@ const ProfilePage = () => {
           </Card>
         )}
 
-        {/* Profile Tabs - Only show for own profile */}
-        {isOwnProfile && (
+        {/* Profile Tabs - Show for all profiles */}
         <Tabs defaultValue="projects" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -1263,12 +1262,16 @@ const ProfilePage = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Featured Projects</CardTitle>
-                    <CardDescription>My top projects and contributions</CardDescription>
+                    <CardDescription>
+                      {isOwnProfile ? 'My top projects and contributions' : `${profile?.full_name || 'User'}'s projects and contributions`}
+                    </CardDescription>
                   </div>
-                  <Button onClick={() => openProjectModal()} size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Project
-                  </Button>
+                  {isOwnProfile && (
+                    <Button onClick={() => openProjectModal()} size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Project
+                    </Button>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
@@ -1307,26 +1310,28 @@ const ProfilePage = () => {
                                 </div>
                               )}
                             </div>
-                            <div className="flex gap-1 ml-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => openProjectModal(project)}
-                                title="Edit project"
-                              >
-                                <Edit3 className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 w-8 p-0 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => deleteProject(project.id)}
-                                title="Delete project"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
+                            {isOwnProfile && (
+                              <div className="flex gap-1 ml-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => openProjectModal(project)}
+                                  title="Edit project"
+                                >
+                                  <Edit3 className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 text-destructive hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                                  onClick={() => deleteProject(project.id)}
+                                  title="Delete project"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            )}
                           </div>
 
                           {project.description && (
@@ -1398,12 +1403,16 @@ const ProfilePage = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Achievements & Certifications</CardTitle>
-                    <CardDescription>Awards, certifications, and recognitions</CardDescription>
+                    <CardDescription>
+                      {isOwnProfile ? 'Awards, certifications, and recognitions' : `${profile?.full_name || 'User'}'s achievements and certifications`}
+                    </CardDescription>
                   </div>
-                  <Button onClick={() => openAchievementModal()} size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Achievement
-                  </Button>
+                  {isOwnProfile && (
+                    <Button onClick={() => openAchievementModal()} size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Achievement
+                    </Button>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
@@ -1429,24 +1438,26 @@ const ProfilePage = () => {
                                 </p>
                               )}
                             </div>
-                            <div className="flex gap-1 ml-4">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0"
-                                onClick={() => openAchievementModal(achievement)}
-                              >
-                                <Edit3 className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0 text-destructive hover:text-destructive"
-                                onClick={() => deleteAchievement(achievement.id)}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
+                            {isOwnProfile && (
+                              <div className="flex gap-1 ml-4">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0"
+                                  onClick={() => openAchievementModal(achievement)}
+                                >
+                                  <Edit3 className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0 text-destructive hover:text-destructive"
+                                  onClick={() => deleteAchievement(achievement.id)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            )}
                           </div>
                           <div className="flex items-center gap-4 mt-2">
                             {achievement.date_achieved && (
@@ -1631,7 +1642,6 @@ const ProfilePage = () => {
             </Card>
           </TabsContent>
         </Tabs>
-        )}
 
         {/* For other users, show their posts */}
         {!isOwnProfile && communityProfile && (

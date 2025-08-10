@@ -99,16 +99,13 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
     if (!user) return;
 
     try {
-      const isLiked = await CommunityService.toggleCommentLike(commentId);
+      const { isLiked, likesCount } = await CommunityService.toggleCommentLike(commentId);
       
-      // Update comment likes in state - calculate likes count manually
+      // Update comment likes in state with the actual like count from database
       const updateComment = (comments: CommunityComment[]): CommunityComment[] => {
         return comments.map(comment => {
           if (comment.id === commentId) {
-            const newLikesCount = isLiked 
-              ? comment.likes_count + 1 
-              : Math.max(0, comment.likes_count - 1);
-            return { ...comment, is_liked: isLiked, likes_count: newLikesCount };
+            return { ...comment, is_liked: isLiked, likes_count: likesCount };
           }
           if (comment.replies) {
             return { ...comment, replies: updateComment(comment.replies) };

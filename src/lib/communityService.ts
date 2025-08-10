@@ -189,10 +189,12 @@ export class CommunityService {
   }
 
   // Likes methods
-  static async togglePostLike(postId: string) {
+  static async togglePostLike(postId: string): Promise<{ isLiked: boolean; likesCount: number }> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
+
+      console.log('Toggle post like for:', postId, 'by user:', user.id);
 
       // Check if already liked
       const { data: existingLike } = await supabase
@@ -202,8 +204,11 @@ export class CommunityService {
         .eq('user_id', user.id)
         .single();
 
+      console.log('Existing like:', existingLike);
+
       if (existingLike) {
         // Unlike
+        console.log('Unliking post...');
         const { error } = await supabase
           .from('post_likes')
           .delete()
@@ -211,9 +216,10 @@ export class CommunityService {
           .eq('user_id', user.id);
 
         if (error) throw error;
-        return false;
+        console.log('Post unliked successfully');
       } else {
         // Like
+        console.log('Liking post...');
         const { error } = await supabase
           .from('post_likes')
           .insert({
@@ -222,15 +228,57 @@ export class CommunityService {
           });
 
         if (error) throw error;
-        return true;
+        console.log('Post liked successfully');
       }
+
+      // Wait a moment for trigger to execute
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Get updated likes count from database (should be updated by trigger)
+      const { data: post, error: postError } = await supabase
+        .from('community_posts')
+        .select('likes_count')
+        .eq('id', postId)
+        .single();
+
+      console.log('Post data after like toggle:', post, postError);
+
+      if (postError) {
+        console.error('Error fetching updated like count:', postError);
+        // Fallback: count manually if trigger failed
+        const { count } = await supabase
+          .from('post_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', postId);
+        
+        console.log('Manual count fallback:', count);
+        
+        // Update the count manually
+        await supabase
+          .from('community_posts')
+          .update({ likes_count: count || 0 })
+          .eq('id', postId);
+
+        return {
+          isLiked: !existingLike,
+          likesCount: count || 0
+        };
+      }
+
+      const result = {
+        isLiked: !existingLike,
+        likesCount: post?.likes_count || 0
+      };
+
+      console.log('Final result:', result);
+      return result;
     } catch (error) {
       console.error('Error toggling post like:', error);
       throw error;
     }
   }
 
-  static async toggleCommentLike(commentId: string) {
+  static async toggleCommentLike(commentId: string): Promise<{ isLiked: boolean; likesCount: number }> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
@@ -252,7 +300,6 @@ export class CommunityService {
           .eq('user_id', user.id);
 
         if (error) throw error;
-        return false;
       } else {
         // Like
         const { error } = await supabase
@@ -263,8 +310,39 @@ export class CommunityService {
           });
 
         if (error) throw error;
-        return true;
       }
+
+      // Get updated likes count from database (should be updated by trigger)
+      const { data: comment, error: commentError } = await supabase
+        .from('post_comments')
+        .select('likes_count')
+        .eq('id', commentId)
+        .single();
+
+      if (commentError) {
+        console.error('Error fetching updated comment like count:', commentError);
+        // Fallback: count manually if trigger failed
+        const { count } = await supabase
+          .from('comment_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('comment_id', commentId);
+        
+        // Update the count manually
+        await supabase
+          .from('post_comments')
+          .update({ likes_count: count || 0 })
+          .eq('id', commentId);
+
+        return {
+          isLiked: !existingLike,
+          likesCount: count || 0
+        };
+      }
+
+      return {
+        isLiked: !existingLike,
+        likesCount: comment?.likes_count || 0
+      };
     } catch (error) {
       console.error('Error toggling comment like:', error);
       throw error;

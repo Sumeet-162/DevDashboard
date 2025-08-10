@@ -68,9 +68,8 @@ const PostCard = ({
 
     setIsLiking(true);
     try {
-      const newIsLiked = await CommunityService.togglePostLike(post.id);
+      const { isLiked: newIsLiked, likesCount: newLikesCount } = await CommunityService.togglePostLike(post.id);
       setIsLiked(newIsLiked);
-      const newLikesCount = newIsLiked ? currentLikesCount + 1 : Math.max(0, currentLikesCount - 1);
       setCurrentLikesCount(newLikesCount);
       onLike?.(post.id, newIsLiked, newLikesCount);
     } catch (error) {
