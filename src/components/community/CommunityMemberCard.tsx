@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ const CommunityMemberCard = ({
   const [followersCount, setFollowersCount] = useState(profile.followers_count);
   const [isActionLoading, setIsActionLoading] = useState(false);
   const [lastActionTime, setLastActionTime] = useState(0);
+  const executingRef = useRef(false);
 
   const isOwnProfile = user?.id === profile.id;
   const displayName = getProfileDisplayName(profile);
@@ -53,18 +54,20 @@ const CommunityMemberCard = ({
   };
 
   const handleFollowToggle = async () => {
-    if (!user || isOwnProfile || isActionLoading) return;
+    if (!user || isOwnProfile || isActionLoading || executingRef.current) return;
 
     // Prevent rapid successive calls
     const now = Date.now();
-    if (now - lastActionTime < 1000) {
-      console.log('Preventing rapid follow toggle');
+    if (now - lastActionTime < 2000) {
+      console.log('Preventing rapid follow toggle - too soon');
       return;
     }
     setLastActionTime(now);
 
     console.log('Follow toggle started for:', profile.id, 'current following:', isFollowing);
     setIsActionLoading(true);
+    executingRef.current = true;
+    
     try {
       const result = await CommunityService.toggleFollow(profile.id);
       console.log('Follow toggle result:', result);
@@ -76,6 +79,7 @@ const CommunityMemberCard = ({
       console.error('Error toggling follow:', error);
     } finally {
       setIsActionLoading(false);
+      executingRef.current = false;
     }
   };
 

@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useAuthSimple } from "@/hooks/useAuth.tsx";
 import CommunityService, { CommunityPost, CommunityMember } from "@/lib/communityService";
+import { supabase } from "@/lib/supabase";
 import PostCard from "@/components/community/PostCard";
 import CreatePostDialog from "@/components/community/CreatePostDialog";
 import CommunityMemberCard from "@/components/community/CommunityMemberCard";
@@ -55,6 +56,16 @@ const CommunityPage = () => {
 
   useEffect(() => {
     loadInitialData();
+    
+    // Add debugging for testing
+    (window as any).testFollow = {
+      fixAllCounts: () => CommunityService.fixAllUserCounts(),
+      refreshCounts: (userId: string) => CommunityService.refreshUserCounts(userId),
+      getCurrentUser: async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        return user;
+      }
+    };
   }, []);
 
   useEffect(() => {
