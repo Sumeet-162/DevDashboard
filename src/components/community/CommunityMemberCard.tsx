@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,9 +33,16 @@ const CommunityMemberCard = ({
   const [isFollowing, setIsFollowing] = useState(profile.is_following || false);
   const [followersCount, setFollowersCount] = useState(profile.followers_count);
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [lastActionTime, setLastActionTime] = useState(0);
 
   const isOwnProfile = user?.id === profile.id;
   const displayName = getProfileDisplayName(profile);
+
+  // Sync state with props when they change
+  useEffect(() => {
+    setIsFollowing(profile.is_following || false);
+    setFollowersCount(profile.followers_count);
+  }, [profile.is_following, profile.followers_count]);
 
   const handleProfileClick = () => {
     if (isOwnProfile) {
@@ -48,9 +55,19 @@ const CommunityMemberCard = ({
   const handleFollowToggle = async () => {
     if (!user || isOwnProfile || isActionLoading) return;
 
+    // Prevent rapid successive calls
+    const now = Date.now();
+    if (now - lastActionTime < 1000) {
+      console.log('Preventing rapid follow toggle');
+      return;
+    }
+    setLastActionTime(now);
+
+    console.log('Follow toggle started for:', profile.id, 'current following:', isFollowing);
     setIsActionLoading(true);
     try {
       const result = await CommunityService.toggleFollow(profile.id);
+      console.log('Follow toggle result:', result);
       
       setIsFollowing(result.isFollowing);
       setFollowersCount(result.followersCount);
@@ -111,7 +128,11 @@ const CommunityMemberCard = ({
               <Button
                 variant={isFollowing ? "outline" : "default"}
                 size="sm"
-                onClick={handleFollowToggle}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleFollowToggle();
+                }}
                 disabled={isActionLoading}
                 className="flex-shrink-0"
               >
@@ -198,7 +219,11 @@ const CommunityMemberCard = ({
             <Button
               variant={isFollowing ? "outline" : "default"}
               size="sm"
-              onClick={handleFollowToggle}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleFollowToggle();
+              }}
               disabled={isActionLoading}
               className="w-full text-xs"
             >

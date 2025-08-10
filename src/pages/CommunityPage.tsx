@@ -175,6 +175,11 @@ const CommunityPage = () => {
         ? { ...profile, is_following: isFollowing, followers_count: followersCount }
         : profile
     ));
+    
+    // Refresh the profiles to get accurate data from server
+    setTimeout(() => {
+      loadProfiles(true);
+    }, 500);
   };
 
   const StatCard = ({ icon: Icon, title, value, subtitle }: any) => (
