@@ -35,6 +35,7 @@ const GitHubCard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [githubUsername, setGithubUsername] = useState<string>('');
+  const [isRealData, setIsRealData] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchGitHubData = async () => {
@@ -82,14 +83,16 @@ const GitHubCard = () => {
           username
         });
 
+        setIsRealData(userStats.isRealData !== false); // Default to true if not specified
+
       } catch (error) {
         console.error('Error fetching GitHub data:', error);
-        // Set fallback data
+        // Set fallback data only if fetch completely fails
         setGithubData(prev => ({
           ...prev,
           contributions: 0,
           streak: 0,
-          repositories: 34, // User mentioned they have 34 repos
+          repositories: 0, // Don't show fake data
           pullRequests: 0,
         }));
       } finally {
@@ -167,6 +170,11 @@ const GitHubCard = () => {
               {githubUsername && (
                 <p className="text-xs text-muted-foreground mt-2">
                   Showing data for: <span className="font-medium">@{githubUsername}</span>
+                  {isRealData ? (
+                    <span className="text-green-600 ml-2">• Real Data</span>
+                  ) : (
+                    <span className="text-orange-600 ml-2">• Demo Data</span>
+                  )}
                 </p>
               )}
             </div>

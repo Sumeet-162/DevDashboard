@@ -152,9 +152,8 @@ class GitHubService {
       if (!userResponse.ok || !reposResponse.ok) {
         if (userResponse.status === 404 || reposResponse.status === 404) {
           console.warn(`❌ GitHub user '${username}' not found (404)`);
-          const fallbackData = this.getFallbackStatsData();
-          console.log('📦 Returning fallback data:', fallbackData);
-          return fallbackData;
+          console.log('📦 Using fallback data for non-existent user');
+          return this.getFallbackStatsData();
         }
         throw new Error(`GitHub API error: ${userResponse.status}/${reposResponse.status}`);
       }
@@ -164,10 +163,11 @@ class GitHubService {
         reposResponse.json()
       ]);
 
-      console.log(`✅ Successfully fetched real GitHub data for ${username}:`, {
+      console.log(`✅ Successfully fetched REAL GitHub data for ${username}:`, {
         repos: repos.length,
         publicRepos: user.public_repos,
-        followers: user.followers
+        followers: user.followers,
+        following: user.following
       });
 
       // Cache the results
@@ -189,12 +189,14 @@ class GitHubService {
         following: user.following,
         contributions: totalStars + repos.length * 5, // Rough estimate
         languages,
-        topLanguage: Object.keys(languages).reduce((a, b) => 
-          languages[a] > languages[b] ? a : b, Object.keys(languages)[0]
-        )
+        topLanguage: Object.keys(languages).length > 0 ? 
+          Object.keys(languages).reduce((a, b) => 
+            languages[a] > languages[b] ? a : b
+          ) : null,
+        isRealData: true // Flag to indicate this is real data
       };
 
-      console.log('🎉 Returning real GitHub stats:', realStats);
+      console.log('🎉 Returning REAL GitHub stats (not fallback):', realStats);
       return realStats;
     } catch (error) {
       console.error('💥 Error fetching real GitHub stats:', error);
@@ -203,14 +205,15 @@ class GitHubService {
       if (this.isAuthenticated()) {
         try {
           console.log('🔄 Trying enhanced stats as fallback...');
-          return await githubGraphQLService.getDetailedUserStats(username);
+          const enhancedStats = await githubGraphQLService.getDetailedUserStats(username);
+          return { ...enhancedStats, isRealData: true };
         } catch (enhancedError) {
           console.error('💥 Enhanced stats also failed:', enhancedError);
         }
       }
       
-      console.log('📦 Using fallback data for GitHub stats');
-      const fallbackData = this.getFallbackStatsData();
+      console.log('📦 Using fallback data for GitHub stats (API failed)');
+      const fallbackData = { ...this.getFallbackStatsData(), isRealData: false };
       console.log('📊 Fallback data:', fallbackData);
       return fallbackData;
     }
@@ -405,13 +408,13 @@ class GitHubService {
   }
 
   private getFallbackStatsData() {
-    console.log('🔄 Using fallback GitHub stats data');
+    console.log('🔄 Using FALLBACK GitHub stats data (not real user data)');
     return {
-      totalRepos: 42, // Updated to show you have repositories
-      totalStars: 150,
-      followers: 25,
-      following: 50,
-      contributions: 245,
+      totalRepos: 42, // Fake data
+      totalStars: 150, // Fake data 
+      followers: 25, // Fake data
+      following: 50, // Fake data
+      contributions: 245, // Fake data
       languages: {
         'TypeScript': 12,
         'JavaScript': 8,
@@ -420,7 +423,8 @@ class GitHubService {
         'CSS': 2,
         'Java': 2
       },
-      topLanguage: 'TypeScript'
+      topLanguage: 'TypeScript',
+      isRealData: false // Flag to indicate this is fake data
     };
   }
 

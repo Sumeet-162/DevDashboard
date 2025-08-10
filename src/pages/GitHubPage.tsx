@@ -319,9 +319,17 @@ const GitHubPage = () => {
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold">GitHub Profile</h1>
-            {isAuthenticated && (
+            {isAuthenticated ? (
               <p className="text-sm text-green-600 mt-1">
                 ✓ Authenticated - Showing real contribution data
+              </p>
+            ) : stats?.isRealData ? (
+              <p className="text-sm text-blue-600 mt-1">
+                ✓ Showing real GitHub data via public API
+              </p>
+            ) : (
+              <p className="text-sm text-orange-600 mt-1">
+                ⚠️ Showing demo data - authenticate for real data
               </p>
             )}
           </div>
