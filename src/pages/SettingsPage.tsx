@@ -29,9 +29,11 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuthSimple } from "@/hooks/useAuth.tsx";
+import { useToast } from "@/hooks/use-toast";
 
 const SettingsPage = () => {
   const { user } = useAuthSimple();
+  const { toast } = useToast();
   
   // Profile state
   const [profile, setProfile] = useState<any>(null);
@@ -123,10 +125,19 @@ const SettingsPage = () => {
       if (error) throw error;
 
       await loadProfile();
-      alert('Profile updated successfully!');
+      toast({
+        title: "🎉 Profile Updated!",
+        description: "Your profile has been successfully updated with all the latest changes.",
+        duration: 4000,
+      });
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Error saving profile. Please try again.');
+      toast({
+        title: "❌ Update Failed",
+        description: "There was an error saving your profile. Please try again.",
+        variant: "destructive",
+        duration: 4000,
+      });
     } finally {
       setSaving(false);
     }
@@ -134,12 +145,22 @@ const SettingsPage = () => {
 
   const handlePasswordChange = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert('New passwords do not match');
+      toast({
+        title: "⚠️ Password Mismatch",
+        description: "The new passwords you entered do not match. Please try again.",
+        variant: "destructive",
+        duration: 4000,
+      });
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      alert('Password must be at least 6 characters long');
+      toast({
+        title: "⚠️ Password Too Short",
+        description: "Your password must be at least 6 characters long for security.",
+        variant: "destructive",
+        duration: 4000,
+      });
       return;
     }
 
@@ -158,10 +179,19 @@ const SettingsPage = () => {
         confirmPassword: ''
       });
       
-      alert('Password updated successfully!');
+      toast({
+        title: "🔐 Password Updated!",
+        description: "Your password has been successfully changed. Your account is now more secure.",
+        duration: 4000,
+      });
     } catch (error) {
       console.error('Error updating password:', error);
-      alert('Error updating password. Please try again.');
+      toast({
+        title: "❌ Password Update Failed",
+        description: "There was an error updating your password. Please check your current password and try again.",
+        variant: "destructive",
+        duration: 4000,
+      });
     } finally {
       setPasswordLoading(false);
     }

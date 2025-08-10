@@ -39,6 +39,7 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState('');
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
 
@@ -61,13 +62,14 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
   };
 
   const handleSubmitComment = async (parentCommentId?: string) => {
-    if (!user || !newComment.trim() || submitting) return;
+    const commentText = parentCommentId ? replyText : newComment;
+    if (!user || !commentText.trim() || submitting) return;
 
     setSubmitting(true);
     try {
       const comment = await CommunityService.createComment(
         postId,
-        newComment.trim(),
+        commentText.trim(),
         parentCommentId
       );
 
@@ -78,12 +80,13 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
             ? { ...c, replies: [...(c.replies || []), comment] }
             : c
         ));
+        setReplyText('');
       } else {
         // Add new top-level comment
         setComments(prev => [comment, ...prev]);
+        setNewComment('');
       }
 
-      setNewComment('');
       setReplyingTo(null);
     } catch (error) {
       console.error('Error creating comment:', error);
@@ -170,7 +173,7 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
   };
 
   const CommentItem = ({ comment, isReply = false, depth = 0 }: { comment: CommunityComment; isReply?: boolean; depth?: number }) => {
-    const isAuthor = user?.id === comment.author_id;
+    const isAuthor = user?.id === comment.user_id;
     const authorName = comment.author ? getProfileDisplayName(comment.author) : 'Unknown User';
     const isEditing = editingComment === comment.id;
     const maxDepth = 3; // Limit nesting depth for UI readability
@@ -291,16 +294,17 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
                   <div className="space-y-2">
                     <Textarea
                       placeholder={`Reply to ${authorName}...`}
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
                       className="min-h-[60px]"
                       maxLength={1000}
+                      autoFocus
                     />
                     <div className="flex gap-2">
                       <Button 
                         size="sm" 
                         onClick={() => handleSubmitComment(comment.id)}
-                        disabled={!newComment.trim() || submitting}
+                        disabled={!replyText.trim() || submitting}
                       >
                         <Send className="h-3 w-3 mr-1" />
                         Reply
@@ -310,7 +314,7 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
                         variant="outline" 
                         onClick={() => {
                           setReplyingTo(null);
-                          setNewComment('');
+                          setReplyText('');
                         }}
                       >
                         Cancel

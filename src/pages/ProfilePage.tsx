@@ -310,18 +310,39 @@ const ProfilePage = () => {
     
     try {
       setFollowing(true)
-      const { isFollowing, followersCount } = await CommunityService.toggleFollow(userId)
+      const { isFollowing, followersCount, followingCount } = await CommunityService.toggleFollow(userId)
       
+      // Update both communityProfile and profile states to ensure consistency
       setCommunityProfile(prev => prev ? {
         ...prev,
         is_following: isFollowing,
         followers_count: followersCount
       } : null)
       
+      // Also update the profile state if it exists
+      setProfile(prev => prev ? {
+        ...prev,
+        followers_count: followersCount
+      } : null)
+      
+      // If viewing own profile, also update following count
+      if (isOwnProfile && profile) {
+        setProfile(prev => prev ? {
+          ...prev,
+          following_count: followingCount
+        } : null)
+      }
+      
       toast({
         title: "Success",
         description: isFollowing ? "User followed successfully" : "User unfollowed successfully"
       })
+      
+      // Refresh the profile data after a short delay to ensure database consistency
+      setTimeout(() => {
+        console.log('Refreshing profile data after follow action...');
+        fetchUserData();
+      }, 500);
     } catch (error: any) {
       toast({
         title: "Error",

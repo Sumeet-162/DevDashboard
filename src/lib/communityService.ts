@@ -21,7 +21,7 @@ export interface CommunityPost {
 export interface CommunityComment {
   id: string;
   content: string;
-  author_id: string;
+  user_id: string;
   post_id: string;
   parent_comment_id: string | null;
   created_at: string;
@@ -274,23 +274,45 @@ export class CommunityService {
   // Comments methods
   static async getPostComments(postId: string): Promise<CommunityComment[]> {
     try {
-      const { data, error } = await supabase
+      // First, get the comments
+      const { data: comments, error } = await supabase
         .from('post_comments')
-        .select(`
-          *,
-          author:profiles!post_comments_author_id_fkey (
-            id, full_name, username, avatar_url
-          )
-        `)
+        .select('*')
         .eq('post_id', postId)
         .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      if (!comments || comments.length === 0) return [];
+
+      // Get unique user IDs
+      const userIds = [...new Set(comments.map(comment => comment.user_id))];
+      
+      // Fetch author details
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of user profiles
+      const profileMap = new Map();
+      profiles?.forEach(profile => {
+        profileMap.set(profile.id, profile);
+      });
+
+      // Combine comments with author data
+      const commentsWithAuthors = comments.map(comment => ({
+        ...comment,
+        author: profileMap.get(comment.user_id)
+      }));
 
       if (error) throw error;
 
       // Check if current user has liked each comment
       const { data: { user } } = await supabase.auth.getUser();
-      if (user && data) {
-        const commentIds = data.map(comment => comment.id);
+      if (user && commentsWithAuthors) {
+        const commentIds = commentsWithAuthors.map(comment => comment.id);
         const { data: likes } = await supabase
           .from('comment_likes')
           .select('comment_id')
@@ -299,7 +321,7 @@ export class CommunityService {
 
         const likedCommentIds = new Set(likes?.map(like => like.comment_id) || []);
         
-        data.forEach(comment => {
+        commentsWithAuthors.forEach(comment => {
           comment.is_liked = likedCommentIds.has(comment.id);
         });
       }
@@ -309,12 +331,12 @@ export class CommunityService {
       const rootComments: CommunityComment[] = [];
 
       // First pass: create all comments
-      data?.forEach(comment => {
+      commentsWithAuthors?.forEach(comment => {
         commentMap.set(comment.id, { ...comment, replies: [] });
       });
 
       // Second pass: build hierarchy
-      data?.forEach(comment => {
+      commentsWithAuthors?.forEach(comment => {
         const commentObj = commentMap.get(comment.id)!;
         if (comment.parent_comment_id) {
           const parent = commentMap.get(comment.parent_comment_id);
@@ -338,25 +360,32 @@ export class CommunityService {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      const { data, error } = await supabase
+      const { data: comment, error } = await supabase
         .from('post_comments')
         .insert({
           post_id: postId,
           content,
-          author_id: user.id,
+          user_id: user.id,
           parent_comment_id: parentCommentId || null
         })
-        .select(`
-          *,
-          author:profiles!post_comments_author_id_fkey (
-            id, full_name, username, avatar_url
-          )
-        `)
+        .select('*')
         .single();
 
       if (error) throw error;
 
-      return data;
+      // Fetch the author details separately
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      return {
+        ...comment,
+        author: profile
+      };
     } catch (error) {
       console.error('Error creating comment:', error);
       throw error;
@@ -458,7 +487,7 @@ export class CommunityService {
   }
 
   // Follow methods
-  static async toggleFollow(userId: string) {
+  static async toggleFollow(userId: string): Promise<{ isFollowing: boolean; followersCount: number; followingCount: number }> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
@@ -506,39 +535,36 @@ export class CommunityService {
         console.log('Updating target user (followers):', userId, 'count:', actualFollowersCount);
         console.log('Updating current user (following):', user.id, 'count:', actualFollowingCount);
 
-        // Update both profiles with actual counts
-        const [targetUpdateResult, currentUserUpdateResult] = await Promise.all([
-          supabase
-            .from('profiles')
-            .update({ 
-              followers_count: actualFollowersCount,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', userId),
-          supabase
-            .from('profiles')
-            .update({ 
-              following_count: actualFollowingCount,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', user.id)
-        ]);
+        // Use database function to update both profiles with elevated privileges
+        const { data: updateResult, error: updateError } = await supabase
+          .rpc('update_follow_counts', {
+            target_user_id: userId,
+            current_user_id: user.id,
+            is_following: false
+          });
 
-        console.log('Target user update result:', targetUpdateResult);
-        console.log('Current user update result:', currentUserUpdateResult);
+        if (updateError) {
+          console.error('Error updating follow counts:', updateError);
+          throw new Error('Failed to update follower/following counts');
+        }
 
-        if (targetUpdateResult.error) {
-          console.error('Error updating target user followers count:', targetUpdateResult.error);
-        }
-        if (currentUserUpdateResult.error) {
-          console.error('Error updating current user following count:', currentUserUpdateResult.error);
-        }
+        console.log('Database function result:', updateResult);
 
         console.log('Unfollow complete, new followers count:', actualFollowersCount);
 
+        // Verify the database was actually updated
+        const { data: verifyProfile } = await supabase
+          .from('profiles')
+          .select('followers_count')
+          .eq('id', userId)
+          .single();
+        
+        console.log('Database verification - actual stored followers_count:', verifyProfile?.followers_count);
+
         return {
           isFollowing: false,
-          followersCount: actualFollowersCount
+          followersCount: actualFollowersCount,
+          followingCount: actualFollowingCount
         };
       } else {
         // Follow - First create the relationship
@@ -571,39 +597,36 @@ export class CommunityService {
         console.log('Updating target user (followers):', userId, 'count:', actualFollowersCount);
         console.log('Updating current user (following):', user.id, 'count:', actualFollowingCount);
 
-        // Update both profiles with actual counts
-        const [targetUpdateResult, currentUserUpdateResult] = await Promise.all([
-          supabase
-            .from('profiles')
-            .update({ 
-              followers_count: actualFollowersCount,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', userId),
-          supabase
-            .from('profiles')
-            .update({ 
-              following_count: actualFollowingCount,
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', user.id)
-        ]);
+        // Use database function to update both profiles with elevated privileges
+        const { data: updateResult, error: updateError } = await supabase
+          .rpc('update_follow_counts', {
+            target_user_id: userId,
+            current_user_id: user.id,
+            is_following: true
+          });
 
-        console.log('Target user update result:', targetUpdateResult);
-        console.log('Current user update result:', currentUserUpdateResult);
+        if (updateError) {
+          console.error('Error updating follow counts:', updateError);
+          throw new Error('Failed to update follower/following counts');
+        }
 
-        if (targetUpdateResult.error) {
-          console.error('Error updating target user followers count:', targetUpdateResult.error);
-        }
-        if (currentUserUpdateResult.error) {
-          console.error('Error updating current user following count:', currentUserUpdateResult.error);
-        }
+        console.log('Database function result:', updateResult);
 
         console.log('Follow complete, new followers count:', actualFollowersCount);
 
+        // Verify the database was actually updated
+        const { data: verifyProfile } = await supabase
+          .from('profiles')
+          .select('followers_count')
+          .eq('id', userId)
+          .single();
+        
+        console.log('Database verification - actual stored followers_count:', verifyProfile?.followers_count);
+
         return {
           isFollowing: true,
-          followersCount: actualFollowersCount
+          followersCount: actualFollowersCount,
+          followingCount: actualFollowingCount
         };
       }
     } catch (error) {
