@@ -17,7 +17,12 @@ import {
   X,
   ArrowRight,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Zap,
+  Cpu,
+  Fingerprint,
+  Pencil,
+  Sparkles
 } from 'lucide-react'
 import { HeroSection } from "@/components/ui/hero-section";
 import { Icons } from "@/components/ui/icons";
@@ -25,6 +30,8 @@ import { GetStartedButton } from "@/components/ui/get-started-button";
 import { ThemeToggleSwitch } from "@/components/ui/theme-toggle-switch";
 import { useTheme } from "@/hooks/use-theme";
 import DevDashLogo from "@/components/ui/DevDashLogo";
+import { FeatureCard } from "@/components/ui/grid-feature-cards";
+import DisplayCards from "@/components/ui/display-cards";
 
 // Utility function
 function cn(...classes: (string | undefined | null | boolean)[]): string {
@@ -395,23 +402,23 @@ const DevDashLandingPage: React.FC = () => {
 
   const features = [
     {
-      icon: <Github className="h-8 w-8 text-primary" />,
-      title: "🧠 GitHub Insights",
+      icon: Github,
+      title: "GitHub Insights",
       description: "Track your commits, contributions, and top repositories visually."
     },
     {
-      icon: <Code2 className="h-8 w-8 text-primary" />,
-      title: "📊 LeetCode Tracker",
+      icon: Code2,
+      title: "LeetCode Tracker",
       description: "View your solved problems, difficulty breakdown, and recent activity."
     },
     {
-      icon: <Newspaper className="h-8 w-8 text-primary" />,
-      title: "📰 Dev News Feed",
+      icon: Newspaper,
+      title: "Dev News Feed",
       description: "Stay updated with top programming articles and community trends."
     },
     {
-      icon: <Settings2 className="h-8 w-8 text-primary" />,
-      title: "🎛️ Modular Dashboard",
+      icon: Settings2,
+      title: "Modular Dashboard",
       description: "Add, remove, and rearrange widgets to suit your coding goals."
     }
   ]
@@ -420,17 +427,35 @@ const DevDashLandingPage: React.FC = () => {
     {
       title: "Connect Accounts",
       description: "Sign in with GitHub and LeetCode securely.",
-      icon: <Users className="h-6 w-6" />
+      icon: <Users className="h-6 w-6" />,
+      cardProps: {
+        icon: <Users className="size-4 text-blue-300" />,
+        title: "Connect",
+        description: "Link your accounts",
+        date: "Step 1"
+      }
     },
     {
-      title: "Customize Widgets",
-      description: "Choose what to see on your dashboard — from stats to articles.",
-      icon: <Settings2 className="h-6 w-6" />
+      title: "Configure Your Profile",
+      description: "Set up your GitHub and LeetCode profiles to sync your coding data.",
+      icon: <Settings2 className="h-6 w-6" />,
+      cardProps: {
+        icon: <Settings2 className="size-4 text-green-300" />,
+        title: "Configure",
+        description: "Set up your profiles",
+        date: "Step 2"
+      }
     },
     {
       title: "Track & Improve",
       description: "Monitor your growth, streaks, and stay on top of your dev game.",
-      icon: <BarChart3 className="h-6 w-6" />
+      icon: <BarChart3 className="h-6 w-6" />,
+      cardProps: {
+        icon: <BarChart3 className="size-4 text-purple-300" />,
+        title: "Track",
+        description: "Monitor your progress",
+        date: "Step 3"
+      }
     }
   ]
 
@@ -526,29 +551,21 @@ const DevDashLandingPage: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="grid grid-cols-1 divide-x divide-y divide-dashed border border-dashed sm:grid-cols-2 md:grid-cols-4 max-w-6xl mx-auto"
+          >
             {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-              >
-                <Card className="p-6 h-full hover:shadow-lg transition-shadow">
-                  <div className="space-y-4">
-                    {feature.icon}
-                    <h3 className="text-xl font-semibold">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
-                  </div>
-                </Card>
-              </motion.div>
+              <FeatureCard key={index} feature={feature} />
             ))}
-          </div>
+          </motion.div>
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="container px-4 py-24 bg-muted/50">
+        <section id="how-it-works" className="container px-4 py-24">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -564,23 +581,26 @@ const DevDashLandingPage: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {steps.map((step, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 text-primary-foreground">
-                  {step.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                <p className="text-muted-foreground">{step.description}</p>
-              </motion.div>
-            ))}
+          <div className="flex justify-center max-w-7xl mx-auto px-4">
+            {/* Display Cards - Centered */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="flex justify-center"
+            >
+              <DisplayCards 
+                cards={steps.map((step, index) => ({
+                  ...step.cardProps,
+                  className: index === 0 
+                    ? "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0"
+                    : index === 1
+                    ? "[grid-area:stack] translate-x-8 sm:translate-x-12 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0"
+                    : "[grid-area:stack] translate-x-16 sm:translate-x-24 translate-y-20 hover:translate-y-10"
+                }))}
+              />
+            </motion.div>
           </div>
         </section>
 
@@ -601,51 +621,117 @@ const DevDashLandingPage: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="relative mx-auto max-w-6xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="relative mx-auto max-w-6xl"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Streak Stats</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Current Streak</span>
-                    <span className="font-bold text-primary">15 days</span>
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                viewport={{ once: true }}
+                className="transform transition-all duration-300 hover:scale-105"
+              >
+                <Card className="p-6 h-full hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/30">
+                  <h3 className="font-semibold mb-4 text-lg">Streak Stats</h3>
+                  <div className="space-y-3">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.5 }}
+                      viewport={{ once: true }}
+                      className="flex justify-between items-center p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="text-muted-foreground">Current Streak</span>
+                      <span className="font-bold text-primary text-xl">15 days</span>
+                    </motion.div>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.6 }}
+                      viewport={{ once: true }}
+                      className="flex justify-between items-center p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="text-muted-foreground">Longest Streak</span>
+                      <span className="font-bold text-xl">42 days</span>
+                    </motion.div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Longest Streak</span>
-                    <span className="font-bold">42 days</span>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </motion.div>
 
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Most Active Repos</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>awesome-project</span>
-                    <span className="text-sm text-muted-foreground">23 commits</span>
+              <motion.div
+                initial={{ opacity: 0, y: -30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                viewport={{ once: true }}
+                className="transform transition-all duration-300 hover:scale-105"
+              >
+                <Card className="p-6 h-full hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/30">
+                  <h3 className="font-semibold mb-4 text-lg">Most Active Repos</h3>
+                  <div className="space-y-3">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.7 }}
+                      viewport={{ once: true }}
+                      className="flex justify-between items-center p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="text-muted-foreground">awesome-project</span>
+                      <span className="text-sm text-primary font-medium">23 commits</span>
+                    </motion.div>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.8 }}
+                      viewport={{ once: true }}
+                      className="flex justify-between items-center p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="text-muted-foreground">web-app</span>
+                      <span className="text-sm text-primary font-medium">18 commits</span>
+                    </motion.div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>web-app</span>
-                    <span className="text-sm text-muted-foreground">18 commits</span>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </motion.div>
 
-              <Card className="p-6">
-                <h3 className="font-semibold mb-4">Recent LeetCode Solves</h3>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Two Sum</span>
-                    <span className="text-green-500 text-sm">Easy</span>
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                viewport={{ once: true }}
+                className="transform transition-all duration-300 hover:scale-105"
+              >
+                <Card className="p-6 h-full hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/30">
+                  <h3 className="font-semibold mb-4 text-lg">Recent LeetCode Solves</h3>
+                  <div className="space-y-3">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 0.9 }}
+                      viewport={{ once: true }}
+                      className="flex justify-between items-center p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="text-muted-foreground">Two Sum</span>
+                      <span className="text-green-500 text-sm font-medium px-2 py-1 bg-green-500/10 rounded-full">Easy</span>
+                    </motion.div>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: 1.0 }}
+                      viewport={{ once: true }}
+                      className="flex justify-between items-center p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="text-muted-foreground">Valid Parentheses</span>
+                      <span className="text-green-500 text-sm font-medium px-2 py-1 bg-green-500/10 rounded-full">Easy</span>
+                    </motion.div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Valid Parentheses</span>
-                    <span className="text-green-500 text-sm">Easy</span>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </section>
 
         {/* Testimonials Section */}
