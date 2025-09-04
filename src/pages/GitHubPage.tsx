@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { ContributionGraph } from "@/components/github/ContributionGraph";
 import { githubService, languageColors } from "@/services/githubService";
 import { githubAuthService } from "@/services/githubAuthService";
+import { ProfileService } from "@/services/profileService";
 
 const GitHubPage = () => {
   const [githubUsername, setGithubUsername] = useState('');
@@ -53,23 +54,103 @@ const GitHubPage = () => {
     totalCount: 0,
     issues: []
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isConfiguring, setIsConfiguring] = useState(false);
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showTokenInput, setShowTokenInput] = useState(false);
   const [personalToken, setPersonalToken] = useState('');
+  const [userIsLoggedIn, setUserIsLoggedIn] = useState(false);
+  const [checkingProfile, setCheckingProfile] = useState(true);
 
   useEffect(() => {
-    const saved = localStorage.getItem('github-username');
-    setIsAuthenticated(githubService.isAuthenticated());
-    
-    if (saved) {
-      setStoredUsername(saved);
-      fetchGitHubData(saved);
-    }
+    checkUserProfileAndCredentials();
   }, []);
+
+  const checkUserProfileAndCredentials = async () => {
+    setCheckingProfile(true);
+    setLoading(true);
+    
+    // Set a timeout to prevent indefinite loading
+    const timeoutId = setTimeout(() => {
+      console.warn('Profile check timed out, falling back to localStorage check');
+      const saved = localStorage.getItem('github-username');
+      if (saved) {
+        setStoredUsername(saved);
+        setGithubUsername(saved);
+        setIsAuthenticated(githubService.isAuthenticated());
+        fetchGitHubData(saved);
+      } else {
+        setCheckingProfile(false);
+        setLoading(false);
+      }
+    }, 10000); // 10 second timeout
+    
+    try {
+      // Check if user is authenticated with our app
+      const authenticated = await ProfileService.isAuthenticated();
+      setUserIsLoggedIn(authenticated);
+      
+      if (!authenticated) {
+        // User not logged in, check localStorage as fallback
+        const saved = localStorage.getItem('github-username');
+        clearTimeout(timeoutId);
+        
+        if (saved) {
+          setStoredUsername(saved);
+          setGithubUsername(saved);
+          setIsAuthenticated(githubService.isAuthenticated());
+          await fetchGitHubData(saved);
+        } else {
+          setCheckingProfile(false);
+          setLoading(false);
+        }
+        return;
+      }
+
+      // Get the current user profile
+      const profile = await ProfileService.getCurrentUserProfile();
+      if (profile?.github_username) {
+        // User has GitHub username in profile, use it
+        setStoredUsername(profile.github_username);
+        setGithubUsername(profile.github_username);
+        setIsAuthenticated(githubService.isAuthenticated());
+        clearTimeout(timeoutId);
+        await fetchGitHubData(profile.github_username);
+      } else {
+        // User is authenticated but no GitHub username, check localStorage as fallback
+        const saved = localStorage.getItem('github-username');
+        clearTimeout(timeoutId);
+        
+        if (saved) {
+          setStoredUsername(saved);
+          setGithubUsername(saved);
+          setIsAuthenticated(githubService.isAuthenticated());
+          await fetchGitHubData(saved);
+        } else {
+          setCheckingProfile(false);
+          setLoading(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking user profile:', error);
+      clearTimeout(timeoutId);
+      
+      // Fallback to localStorage check
+      const saved = localStorage.getItem('github-username');
+      if (saved) {
+        setStoredUsername(saved);
+        setGithubUsername(saved);
+        setIsAuthenticated(githubService.isAuthenticated());
+        await fetchGitHubData(saved);
+      } else {
+        setError('Failed to check profile. Please try again.');
+        setCheckingProfile(false);
+        setLoading(false);
+      }
+    }
+  };
 
   // Add effect to check for authentication changes (e.g., after OAuth callback)
   useEffect(() => {
@@ -118,19 +199,42 @@ const GitHubPage = () => {
       setPullRequests(pullRequestsData);
       setIssues(issuesData);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch GitHub data');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch GitHub data';
+      console.error('GitHub data fetch error:', errorMessage);
+      setError(errorMessage);
     } finally {
       setLoading(false);
+      setCheckingProfile(false);
     }
   };
 
-  const handleSaveUsername = () => {
+  const handleSaveUsername = async () => {
     if (!githubUsername.trim()) return;
     
-    localStorage.setItem('github-username', githubUsername);
-    setStoredUsername(githubUsername);
-    setIsConfiguring(false);
-    fetchGitHubData(githubUsername);
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // If user is logged in, save to profile
+      if (userIsLoggedIn) {
+        const success = await ProfileService.updateGitHubUsername(githubUsername.trim());
+        if (!success) {
+          setError('Failed to save GitHub username to profile');
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Also save to localStorage for the GitHub service
+      localStorage.setItem('github-username', githubUsername.trim());
+      setStoredUsername(githubUsername.trim());
+      setIsConfiguring(false);
+      await fetchGitHubData(githubUsername.trim());
+    } catch (error) {
+      console.error('Error saving username:', error);
+      setError('Failed to save GitHub username');
+      setLoading(false);
+    }
   };
 
   const handleAuthenticateGitHub = async () => {
@@ -200,6 +304,7 @@ const GitHubPage = () => {
   const handleReconfigure = () => {
     setIsConfiguring(true);
     setGithubUsername(storedUsername || '');
+    setError(null);
   };
 
   const formatJoinDate = (dateString: string) => {
@@ -223,7 +328,32 @@ const GitHubPage = () => {
     return `Updated ${Math.ceil(diffDays / 30)} months ago`;
   };
 
-  // Show configuration if no username is saved or user is configuring
+  // Show loading while checking profile
+  if (checkingProfile) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center space-y-4">
+            <Github className="h-8 w-8 animate-pulse mx-auto" />
+            <p className="text-muted-foreground">Checking your GitHub configuration...</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                setCheckingProfile(false);
+                setLoading(false);
+                setError(null);
+              }}
+            >
+              Skip Check
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show configuration if no username is saved, user is not logged in, or user is configuring
   if (!storedUsername || isConfiguring) {
     return (
       <Layout>
@@ -234,6 +364,11 @@ const GitHubPage = () => {
                 <Github className="h-5 w-5" />
                 Configure GitHub Integration
               </CardTitle>
+              {!userIsLoggedIn && (
+                <p className="text-sm text-muted-foreground">
+                  Sign in to save your GitHub username to your profile, or continue without an account.
+                </p>
+              )}
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -247,9 +382,18 @@ const GitHubPage = () => {
                 />
               </div>
               <div className="flex gap-2">
-                <Button onClick={handleSaveUsername} className="flex-1">
-                  <Github className="h-4 w-4 mr-2" />
-                  Connect GitHub
+                <Button onClick={handleSaveUsername} className="flex-1" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Connecting...
+                    </>
+                  ) : (
+                    <>
+                      <Github className="h-4 w-4 mr-2" />
+                      Connect GitHub
+                    </>
+                  )}
                 </Button>
                 {isConfiguring && (
                   <Button variant="outline" onClick={() => setIsConfiguring(false)}>
@@ -290,9 +434,14 @@ const GitHubPage = () => {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="flex justify-between items-center">
             {error}
-            <Button variant="outline" size="sm" onClick={handleReconfigure}>
-              Reconfigure
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={checkUserProfileAndCredentials}>
+                Retry
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleReconfigure}>
+                Configure Manually
+              </Button>
+            </div>
           </AlertDescription>
         </Alert>
       </Layout>

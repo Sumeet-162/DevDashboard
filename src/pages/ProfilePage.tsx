@@ -190,6 +190,11 @@ const ProfilePage = () => {
       })
       
       setUserPosts(posts)
+      
+      // Refresh user counts to ensure accuracy
+      if (isOwnProfile && user?.id) {
+        await CommunityService.refreshUserCounts(user.id);
+      }
     } catch (error) {
       console.error('Error fetching user posts:', error)
       toast({
@@ -973,10 +978,13 @@ const ProfilePage = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-2">
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span>{user?.email}</span>
-                  </div>
+                  {/* Only show email for own profile */}
+                  {isOwnProfile && user?.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <span>{user.email}</span>
+                    </div>
+                  )}
                   {profile?.location && (
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-muted-foreground" />

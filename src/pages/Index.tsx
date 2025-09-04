@@ -34,7 +34,8 @@ import {
   Zap,
   Clock,
   GitBranch,
-  Star
+  Star,
+  RotateCcw
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { getProfileDisplayName } from "@/lib/utils";
@@ -47,6 +48,7 @@ interface DashboardStats {
     posts_count: number;
     total_likes_received: number;
     github_username?: string;
+    leetcode_username?: string;
   } | null;
   github: {
     contributions: number;
@@ -102,7 +104,7 @@ const Index = () => {
       // First fetch profile data to get GitHub username
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('followers_count, following_count, posts_count, total_likes_received, github_username')
+        .select('followers_count, following_count, posts_count, total_likes_received, github_username, leetcode_username')
         .eq('id', user?.id)
         .single();
       
@@ -132,14 +134,10 @@ const Index = () => {
             
             if (!profileData?.github_username) {
               console.log('❌ No GitHub username found in profile. Profile data:', profileData);
-              console.log('🔄 Using fallback GitHub stats');
+              console.log('🔄 Returning null for new user without GitHub credentials');
               
-              // Return fallback data directly from dashboard
-              return {
-                contributions: 245,
-                totalRepos: 42,
-                stars: 150
-              };
+              // Return null to indicate no GitHub data available
+              return null;
             }
             
             console.log('📡 Fetching GitHub stats for username:', profileData.github_username);
@@ -148,9 +146,9 @@ const Index = () => {
             
             // Ensure we return the correct structure with proper mapping
             const formattedStats = {
-              contributions: stats.contributions || 245,
-              totalRepos: stats.totalRepos || 42,
-              stars: stats.totalStars || stats.stars || 150
+              contributions: stats.contributions || 0,
+              totalRepos: stats.totalRepos || 0,
+              stars: stats.totalStars || stats.stars || 0
             };
             
             console.log('✅ Formatted GitHub stats:', formattedStats);
@@ -158,7 +156,12 @@ const Index = () => {
           } catch (error) {
             console.error('💥 Error fetching GitHub stats:', error);
             
-            // Return reliable fallback data
+            // Return null for error cases when user hasn't connected GitHub
+            if (!profileData?.github_username) {
+              return null;
+            }
+            
+            // Only use fallback data if user has GitHub username but API failed
             const fallbackStats = {
               contributions: 245,
               totalRepos: 42,
@@ -170,18 +173,33 @@ const Index = () => {
         })(),
         
         // LeetCode data (if connected)
-        LeetCodeService.getUserData().then(data => {
-          if (data?.user) {
-            return {
-              totalSolved: data.user.totalSolved,
-              easySolved: data.user.easy.solved,
-              mediumSolved: data.user.medium.solved,
-              hardSolved: data.user.hard.solved,
-              ranking: data.user.ranking
-            };
+        (async () => {
+          try {
+            // Check if user has connected their LeetCode account by checking profile
+            if (!profileData?.leetcode_username) {
+              console.log('❌ No LeetCode username found in profile - user has not connected LeetCode');
+              return null;
+            }
+            
+            console.log('📡 Fetching LeetCode data for user with connected account');
+            const data = await LeetCodeService.getUserData();
+            
+            if (data?.user) {
+              return {
+                totalSolved: data.user.totalSolved,
+                easySolved: data.user.easy.solved,
+                mediumSolved: data.user.medium.solved,
+                hardSolved: data.user.hard.solved,
+                ranking: data.user.ranking
+              };
+            }
+            return null;
+          } catch (error) {
+            console.error('Error fetching LeetCode data:', error);
+            // Only return null for new users, don't show fake data
+            return null;
           }
-          return null;
-        }).catch(() => null)
+        })()
       ]);
 
       setStats({
@@ -221,37 +239,39 @@ const Index = () => {
     <Layout>
       <div className="space-y-6">
         {/* Enhanced Welcome Card */}
-        <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700">
-          <CardHeader className="pb-4">
+        <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 relative">
+          <CardHeader className="pb-4 pr-12 md:pr-16"> {/* Responsive right padding */}
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-              <div>
-                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <div className="flex-1 pr-4 md:pr-0"> {/* Add padding on mobile to avoid refresh button */}
+                <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
                   {getGreeting()}, {user?.user_metadata?.full_name || 'Developer'}!
                 </CardTitle>
-                <p className="text-lg text-gray-700 dark:text-gray-300 mt-2">
+                <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 mt-2">
                   Ready to code and collaborate today?
                 </p>
               </div>
-              <div className="flex items-center gap-3">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={handleRefreshData}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <Clock className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Activity className="h-4 w-4 mr-2" />
-                  )}
-                  Refresh Data
-                </Button>
-
-                <div className="flex-shrink-0">
-                  <UserInfoCard />
-                </div>
+              
+              {/* User Info Card - positioned with adequate spacing */}
+              <div className="flex-shrink-0 mt-2 md:mt-0">
+                <UserInfoCard />
               </div>
             </div>
+            
+            {/* Circular Refresh Button - responsive positioning */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRefreshData}
+              disabled={loading}
+              className="absolute top-3 right-3 h-8 w-8 md:h-9 md:w-9 p-0 rounded-full hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-200 shadow-sm hover:shadow-md backdrop-blur-sm z-10"
+              title="Refresh dashboard data"
+            >
+              {loading ? (
+                <Clock className="h-3.5 w-3.5 md:h-4 md:w-4 animate-spin text-gray-600 dark:text-gray-400" />
+              ) : (
+                <RotateCcw className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200" />
+              )}
+            </Button>
           </CardHeader>
         </Card>
         
@@ -273,14 +293,14 @@ const Index = () => {
             <>
               <StatsCard 
                 title="GitHub Repositories" 
-                value={stats.github?.totalRepos || 42}
-                description="Total repos"
+                value={stats.github?.totalRepos || 0}
+                description={stats.profile?.github_username ? "Total repos" : "Connect GitHub to see data"}
                 icon={<Github size={16} />}
               />
               <StatsCard 
                 title="LeetCode Problems" 
                 value={stats.leetcode?.totalSolved || 0}
-                description="Total solved"
+                description={stats.profile?.leetcode_username ? "Total solved" : "Connect LeetCode to see data"}
                 icon={<Code2 size={16} />}
               />
               <StatsCard 

@@ -59,17 +59,25 @@ const LeetCodePage = () => {
   const checkUserProfile = async () => {
     setCheckingProfile(true);
     
+    // Set a timeout to prevent indefinite loading
+    const timeoutId = setTimeout(() => {
+      console.warn('LeetCode profile check timed out, showing welcome');
+      setShowWelcome(true);
+      setLoading(false);
+      setCheckingProfile(false);
+    }, 10000); // 10 second timeout
+    
     try {
       // Check if user is authenticated
       const authenticated = await ProfileService.isAuthenticated();
       setIsAuthenticated(authenticated);
       
       if (!authenticated) {
-        // User not logged in, proceed with fallback/demo data
-        setShowWelcome(false);
-        setUsername('demo-user');
-        setCurrentUserId(undefined); // Use demo mode
-        await loadData();
+        // User not logged in, show welcome to collect username
+        clearTimeout(timeoutId);
+        setShowWelcome(true);
+        setLoading(false);
+        setCheckingProfile(false);
         return;
       }
 
@@ -85,23 +93,28 @@ const LeetCodePage = () => {
           setShowWelcome(false);
           // Store in localStorage for LeetCode service
           localStorage.setItem('leetcode_username', profile.leetcode_username);
+          clearTimeout(timeoutId);
           await loadData();
         } else {
           // User is authenticated but no LeetCode username, show welcome
+          clearTimeout(timeoutId);
           setShowWelcome(true);
-          setLoading(false); // Reset loading state for welcome screen
+          setLoading(false);
+          setCheckingProfile(false);
         }
       } else {
         // Could not get profile, show welcome
+        clearTimeout(timeoutId);
         setShowWelcome(true);
-        setLoading(false); // Reset loading state for welcome screen
+        setLoading(false);
+        setCheckingProfile(false);
       }
     } catch (error) {
       console.error('Error checking user profile:', error);
+      clearTimeout(timeoutId);
       // Fallback to asking for username
       setShowWelcome(true);
-      setLoading(false); // Reset loading state for welcome screen
-    } finally {
+      setLoading(false);
       setCheckingProfile(false);
     }
   };
@@ -165,6 +178,7 @@ const LeetCodePage = () => {
       }
     } finally {
       setLoading(false);
+      setCheckingProfile(false);
     }
   };
 
@@ -207,15 +221,21 @@ const LeetCodePage = () => {
   const handleUsernameChange = async () => {
     if (username.trim()) {
       setLoading(true);
-      setApiStatus('Fetching data...');
+      setApiStatus('Saving username...');
       try {
-        // Update LeetCode service
-        await LeetCodeService.setUsername(username.trim());
-        
         // If user is authenticated, also update their profile
         if (isAuthenticated) {
-          await ProfileService.updateLeetCodeUsername(username.trim());
+          const success = await ProfileService.updateLeetCodeUsername(username.trim());
+          if (!success) {
+            setError('Failed to save LeetCode username to profile');
+            setLoading(false);
+            return;
+          }
         }
+        
+        setApiStatus('Fetching data...');
+        // Update LeetCode service
+        await LeetCodeService.setUsername(username.trim());
         
         setApiStatus('Loading user data...');
         await loadData();
@@ -239,6 +259,17 @@ const LeetCodePage = () => {
           <div className="text-center space-y-4">
             <Code2 className="h-8 w-8 animate-pulse mx-auto" />
             <p className="text-muted-foreground">Checking your profile...</p>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                setCheckingProfile(false);
+                setShowWelcome(true);
+                setLoading(false);
+              }}
+            >
+              Skip Check
+            </Button>
           </div>
         </div>
       </Layout>

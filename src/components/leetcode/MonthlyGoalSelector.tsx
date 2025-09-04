@@ -77,30 +77,33 @@ const MonthlyGoalSelector: React.FC<MonthlyGoalSelectorProps> = ({ userId }) => 
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
-        <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <Target className="h-5 w-5 text-blue-600" />
-          Monthly Goal
-          {currentGoal && (
-            <Badge variant="outline" className="ml-2">
-              {formatMonth(currentGoal.month)}
-            </Badge>
-          )}
-        </CardTitle>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm" disabled={isLoading}>
-              <Edit2 className="h-4 w-4 mr-1" />
-              Edit Goal
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Set Monthly Goal</DialogTitle>
-              <DialogDescription>
-                Choose how many LeetCode problems you want to solve this month. You can adjust this anytime.
-              </DialogDescription>
-            </DialogHeader>
+      <CardHeader className="pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="space-y-2">
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Target className="h-5 w-5 text-blue-600" />
+              Monthly Goal
+            </CardTitle>
+            {currentGoal && (
+              <Badge variant="outline" className="text-xs w-fit">
+                {formatMonth(currentGoal.month)}
+              </Badge>
+            )}
+          </div>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" disabled={isLoading} className="w-fit">
+                <Edit2 className="h-4 w-4 mr-1" />
+                Edit Goal
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Set Monthly Goal</DialogTitle>
+                <DialogDescription>
+                  Choose how many LeetCode problems you want to solve this month. You can adjust this anytime.
+                </DialogDescription>
+              </DialogHeader>
             <div className="space-y-6 pt-4">
               {/* Current Month Display */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -166,7 +169,8 @@ const MonthlyGoalSelector: React.FC<MonthlyGoalSelectorProps> = ({ userId }) => 
             </div>
           </DialogContent>
         </Dialog>
-      </CardHeader>
+      </div>
+    </CardHeader>
 
       <CardContent className="space-y-6">
         {currentGoal && (

@@ -39,6 +39,7 @@ const SettingsPage = () => {
   const [profile, setProfile] = useState<any>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   
   // Password state
   const [showPassword, setShowPassword] = useState(false);
@@ -204,6 +205,75 @@ const SettingsPage = () => {
     }));
   };
 
+  // Avatar upload function
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      setUploadingAvatar(true);
+      
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Error",
+          description: "File size must be less than 5MB",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Error",
+          description: "Please select an image file",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}/avatar.${fileExt}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      // Update profile with new avatar URL
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user?.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: "Profile picture updated successfully"
+      });
+
+      // Refresh profile data
+      loadProfile();
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive"
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const handlePasswordInputChange = (field: string, value: string) => {
     setPasswordData(prev => ({
       ...prev,
@@ -282,10 +352,29 @@ const SettingsPage = () => {
                             {formData.full_name ? formData.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'U'}
                           </AvatarFallback>
                         </Avatar>
-                        <Button variant="outline" size="sm" className="mt-2 gap-2">
-                          <Upload className="h-4 w-4" />
-                          Change Avatar
-                        </Button>
+                        <div className="relative">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="mt-2 gap-2"
+                            disabled={uploadingAvatar}
+                            onClick={() => document.getElementById('avatar-upload')?.click()}
+                          >
+                            {uploadingAvatar ? (
+                              <RefreshCw className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Upload className="h-4 w-4" />
+                            )}
+                            {uploadingAvatar ? 'Uploading...' : 'Change Avatar'}
+                          </Button>
+                          <input
+                            id="avatar-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleAvatarUpload}
+                            className="hidden"
+                          />
+                        </div>
                       </div>
 
                       <div className="flex-1 space-y-4">
@@ -399,23 +488,6 @@ const SettingsPage = () => {
                     </div>
 
                     <Separator />
-
-                    {/* Privacy Settings */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium">Privacy</h3>
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <p className="font-medium">Public Profile</p>
-                          <p className="text-sm text-muted-foreground">
-                            Make your profile visible to other users
-                          </p>
-                        </div>
-                        <Switch 
-                          checked={formData.is_profile_public}
-                          onCheckedChange={(checked) => handleInputChange('is_profile_public', checked)}
-                        />
-                      </div>
-                    </div>
 
                     <div className="flex justify-end gap-2">
                       <Button variant="outline" onClick={loadProfile}>

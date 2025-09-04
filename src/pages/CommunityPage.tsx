@@ -110,6 +110,15 @@ const CommunityPage = () => {
   }, [selectedTab, postsSortBy]);
 
   useEffect(() => {
+    // Auto-set the sort based on selected tab
+    if (selectedTab === 'popular' && postsSortBy !== 'popular') {
+      setPostsSortBy('popular');
+    } else if (selectedTab === 'recent' && postsSortBy !== 'recent') {
+      setPostsSortBy('recent');
+    }
+  }, [selectedTab]);
+
+  useEffect(() => {
     const debounce = setTimeout(() => {
       loadProfiles(true);
     }, 300);

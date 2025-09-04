@@ -45,6 +45,49 @@ export class ProfileService {
   }
 
   /**
+   * Get the GitHub username from the user's profile
+   */
+  static async getGitHubUsername(): Promise<string | null> {
+    try {
+      const profile = await this.getCurrentUserProfile();
+      return profile?.github_username || null;
+    } catch (error) {
+      console.error('Error getting GitHub username:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Update the GitHub username in the user's profile
+   */
+  static async updateGitHubUsername(githubUsername: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.error('No authenticated user found');
+        return false;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ github_username: githubUsername })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating GitHub username:', error);
+        return false;
+      }
+
+      console.log('GitHub username updated successfully');
+      return true;
+    } catch (error) {
+      console.error('Error in updateGitHubUsername:', error);
+      return false;
+    }
+  }
+
+  /**
    * Get the LeetCode username from the user's profile
    */
   static async getLeetCodeUsername(): Promise<string | null> {

@@ -80,6 +80,7 @@ export interface PostFilters {
   limit?: number;
   offset?: number;
   authorId?: string;
+  followingOnly?: boolean;
 }
 
 export interface MemberFilters {
@@ -93,7 +94,7 @@ export class CommunityService {
   // Posts methods
   static async getPosts(filters: PostFilters = {}) {
     try {
-      const { sortBy = 'recent', limit = 10, offset = 0, authorId } = filters;
+      const { sortBy = 'recent', limit = 10, offset = 0, authorId, followingOnly } = filters;
       
       let query = supabase
         .from('community_posts')
@@ -108,15 +109,37 @@ export class CommunityService {
         query = query.eq('author_id', authorId);
       }
 
-      // Apply sorting
+      // Handle following only filter
+      if (followingOnly) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Get list of users the current user is following
+          const { data: following } = await supabase
+            .from('user_follows')
+            .select('following_id')
+            .eq('follower_id', user.id);
+          
+          if (following && following.length > 0) {
+            const followingIds = following.map(f => f.following_id);
+            query = query.in('author_id', followingIds);
+          } else {
+            // If not following anyone, return empty results
+            return { posts: [], total: 0 };
+          }
+        }
+      }
+
+      // Apply sorting - make sure popular is based on likes_count
       switch (sortBy) {
         case 'popular':
-          query = query.order('likes_count', { ascending: false });
+          query = query.order('likes_count', { ascending: false })
+                      .order('created_at', { ascending: false }); // Secondary sort by date for ties
           break;
         case 'trending':
-          query = query.order('comments_count', { ascending: false });
+          query = query.order('comments_count', { ascending: false })
+                      .order('created_at', { ascending: false }); // Secondary sort by date for ties
           break;
-        default:
+        default: // 'recent'
           query = query.order('created_at', { ascending: false });
       }
 
@@ -745,28 +768,48 @@ export class CommunityService {
         .select('*', { count: 'exact', head: true })
         .eq('follower_id', userId);
 
+      // Count actual posts
+      const { count: postsCount } = await supabase
+        .from('community_posts')
+        .select('*', { count: 'exact', head: true })
+        .eq('author_id', userId);
+
+      // Count total likes received on all posts by this user
+      const { data: likesData } = await supabase
+        .from('community_posts')
+        .select('likes_count')
+        .eq('author_id', userId);
+
+      const totalLikesReceived = likesData?.reduce((sum, post) => sum + post.likes_count, 0) || 0;
+
       // Update profile with correct counts
       const { data, error } = await supabase
         .from('profiles')
         .update({
           followers_count: followersCount || 0,
           following_count: followingCount || 0,
+          posts_count: postsCount || 0,
+          total_likes_received: totalLikesReceived || 0,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId)
-        .select('followers_count, following_count')
+        .select('followers_count, following_count, posts_count, total_likes_received')
         .single();
 
       if (error) throw error;
 
       console.log(`Refreshed counts for user ${userId}:`, {
         followers: followersCount,
-        following: followingCount
+        following: followingCount,
+        posts: postsCount,
+        totalLikes: totalLikesReceived
       });
 
       return {
         followers_count: followersCount || 0,
-        following_count: followingCount || 0
+        following_count: followingCount || 0,
+        posts_count: postsCount || 0,
+        total_likes_received: totalLikesReceived || 0
       };
     } catch (error) {
       console.error('Error refreshing user counts:', error);
