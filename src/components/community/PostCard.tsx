@@ -24,7 +24,8 @@ import { CommunityPost, CommunityService } from "@/lib/communityService";
 import { useAuthSimple } from "@/hooks/useAuth.tsx";
 import { getProfileDisplayName } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
-import CommentsSection from "./CommentsSection";
+import CommentsModal from "./CommentsModal";
+import { supabase } from "@/lib/supabase";
 
 interface PostCardProps {
   post: CommunityPost;
@@ -48,22 +49,54 @@ const PostCard = ({
   const [isLiking, setIsLiking] = useState(false);
   const [currentLikesCount, setCurrentLikesCount] = useState(post.likes_count);
   const [isLiked, setIsLiked] = useState(post.is_liked || false);
-  const [showComments, setShowComments] = useState(false);
+  const [showCommentsModal, setShowCommentsModal] = useState(false);
+  const [currentCommentsCount, setCurrentCommentsCount] = useState(post.comments_count);
 
   const isAuthor = user?.id === post.author_id;
   const authorName = post.author ? getProfileDisplayName(post.author) : 'Unknown User';
 
   const handleProfileClick = () => {
     if (post.author_id === user?.id) {
-      // Navigate to own profile
       navigate('/profile');
     } else {
-      // Navigate to user's profile
       navigate(`/profile/${post.author_id}`);
     }
   };
 
-  const handleLike = async () => {
+  // VIEW POST - Navigate to full post page
+  const handleViewPost = () => {
+    navigate(`/community/post/${post.id}`);
+  };
+
+  // COMMENT BUTTON - Open comments modal
+  const handleOpenComments = () => {
+    setShowCommentsModal(true);
+  };
+
+  const handleCloseComments = () => {
+    setShowCommentsModal(false);
+  };
+
+  // Refresh post data after comment is added
+  const handleCommentAdded = async () => {
+    try {
+      const { data: updatedPost } = await supabase
+        .from('community_posts')
+        .select('comments_count')
+        .eq('id', post.id)
+        .single();
+      
+      if (updatedPost) {
+        setCurrentCommentsCount(updatedPost.comments_count);
+      }
+    } catch (error) {
+      console.error('Error refreshing post data:', error);
+    }
+  };
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (!user || isLiking) return;
 
     setIsLiking(true);
@@ -79,7 +112,8 @@ const PostCard = ({
     }
   };
 
-  const handleShare = async () => {
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (navigator.share) {
       try {
         await navigator.share({
@@ -91,7 +125,6 @@ const PostCard = ({
         console.log('Share cancelled');
       }
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href + `/posts/${post.id}`);
     }
   };
@@ -196,11 +229,11 @@ const PostCard = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setShowComments(true)}
+                  onClick={handleOpenComments}
                   className="gap-1"
                 >
                   <MessageCircle className="h-4 w-4" />
-                  <span>{post.comments_count}</span>
+                  <span>{currentCommentsCount}</span>
                 </Button>
 
                 <Button
@@ -213,7 +246,13 @@ const PostCard = ({
                 </Button>
               </div>
 
-              <Button variant="ghost" size="sm" className="gap-1 text-xs">
+              {/* VIEW POST BUTTON */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleViewPost}
+                className="gap-1"
+              >
                 <ExternalLink className="h-3 w-3" />
                 View Post
               </Button>
@@ -222,11 +261,12 @@ const PostCard = ({
         )}
       </Card>
 
-      {/* Comments Section */}
-      <CommentsSection 
-        postId={post.id} 
-        isOpen={showComments} 
-        onClose={() => setShowComments(false)} 
+      {/* Comments Modal */}
+      <CommentsModal 
+        postId={post.id}
+        isOpen={showCommentsModal}
+        onClose={handleCloseComments}
+        onCommentAdded={handleCommentAdded}
       />
     </>
   );

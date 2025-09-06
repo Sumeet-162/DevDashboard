@@ -25,7 +25,9 @@ import CommunityService, { CommunityPost, CommunityMember } from "@/lib/communit
 import { supabase } from "@/lib/supabase";
 import PostCard from "@/components/community/PostCard";
 import CreatePostDialog from "@/components/community/CreatePostDialog";
+import EditPostDialog from "@/components/community/EditPostDialog";
 import CommunityMemberCard from "@/components/community/CommunityMemberCard";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 const CommunityPage = () => {
   const { user } = useAuthSimple();
@@ -53,6 +55,11 @@ const CommunityPage = () => {
   const [profilesPage, setProfilesPage] = useState(1);
   const [hasMorePosts, setHasMorePosts] = useState(true);
   const [hasMoreProfiles, setHasMoreProfiles] = useState(true);
+
+  // Edit/Delete Dialog states
+  const [editingPost, setEditingPost] = useState<CommunityPost | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
 
   useEffect(() => {
     loadInitialData();
@@ -226,6 +233,35 @@ const CommunityPage = () => {
     ));
   };
 
+  const handleEditPost = (post: CommunityPost) => {
+    setEditingPost(post);
+  };
+
+  const handlePostUpdated = (updatedPost: CommunityPost) => {
+    setPosts(prev => prev.map(post => 
+      post.id === updatedPost.id ? updatedPost : post
+    ));
+    setEditingPost(null);
+  };
+
+  const handleDeletePost = (postId: string) => {
+    setDeletingPostId(postId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeletePost = async () => {
+    if (!deletingPostId) return;
+
+    try {
+      await CommunityService.deletePost(deletingPostId);
+      setPosts(prev => prev.filter(post => post.id !== deletingPostId));
+      setShowDeleteConfirm(false);
+      setDeletingPostId(null);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
   const handleFollowChange = (profileId: string, isFollowing: boolean, followersCount: number) => {
     console.log('handleFollowChange called:', { profileId, isFollowing, followersCount });
     
@@ -389,6 +425,8 @@ const CommunityPage = () => {
                     key={post.id}
                     post={post}
                     onLike={handlePostLike}
+                    onEdit={handleEditPost}
+                    onDelete={handleDeletePost}
                   />
                 ))}
                 
@@ -516,6 +554,31 @@ const CommunityPage = () => {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Edit Post Dialog */}
+        {editingPost && (
+          <EditPostDialog
+            post={editingPost}
+            isOpen={!!editingPost}
+            onClose={() => setEditingPost(null)}
+            onPostUpdated={handlePostUpdated}
+          />
+        )}
+
+        {/* Delete Confirmation Dialog */}
+        <ConfirmDialog
+          isOpen={showDeleteConfirm}
+          onClose={() => {
+            setShowDeleteConfirm(false);
+            setDeletingPostId(null);
+          }}
+          onConfirm={confirmDeletePost}
+          title="Delete Post"
+          description="Are you sure you want to delete this post? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="destructive"
+        />
       </div>
     </Layout>
   );

@@ -18,7 +18,6 @@ export interface CommunityPost {
     username?: string;
     full_name?: string;
     avatar_url?: string;
-    is_profile_public: boolean;
   };
   is_liked?: boolean;
 }
@@ -78,7 +77,6 @@ export interface CommunityProfile {
   following_count: number;
   posts_count: number;
   total_likes_received: number;
-  is_profile_public: boolean;
   is_following?: boolean;
   is_followed_by?: boolean;
 }
@@ -114,8 +112,7 @@ export class CommunityService {
             id,
             username,
             full_name,
-            avatar_url,
-            is_profile_public
+            avatar_url
           )
         `);
 
@@ -225,8 +222,7 @@ export class CommunityService {
             id,
             username,
             full_name,
-            avatar_url,
-            is_profile_public
+            avatar_url
           )
         `)
         .single();
@@ -256,8 +252,7 @@ export class CommunityService {
             id,
             username,
             full_name,
-            avatar_url,
-            is_profile_public
+            avatar_url
           )
         `)
         .single();
@@ -699,8 +694,8 @@ export class CommunityService {
         .from('profiles')
         .select('*');
 
-      // Filter by public profiles only for community view
-      query = query.eq('is_profile_public', true);
+      // Filter by public profiles only for community view - removing privacy features
+      // query = query.eq('is_profile_public', true);
 
       // Search filter
       if (search) {
@@ -785,7 +780,8 @@ export class CommunityService {
         { count: totalLikes },
         { count: totalComments }
       ] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('is_profile_public', true),
+        // Count all profiles since we removed privacy features
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
         supabase.from('community_posts').select('*', { count: 'exact', head: true }),
         supabase.from('post_likes').select('*', { count: 'exact', head: true }),
         supabase.from('post_comments').select('*', { count: 'exact', head: true })

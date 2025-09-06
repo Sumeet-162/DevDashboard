@@ -64,7 +64,6 @@ interface Profile {
   job_title: string | null
   company: string | null
   experience_years: number | null
-  is_profile_public: boolean | null
   twitter_username: string | null
   linkedin_url: string | null
   discord_username: string | null
@@ -231,7 +230,6 @@ const ProfilePage = () => {
             website: communityProfileData.website,
             job_title: communityProfileData.job_title,
             company: communityProfileData.company,
-            is_profile_public: communityProfileData.is_profile_public,
             twitter_username: communityProfileData.twitter_username,
             linkedin_url: communityProfileData.linkedin_url,
             discord_username: communityProfileData.discord_username,
@@ -729,24 +727,46 @@ const ProfilePage = () => {
       }
 
       const fileExt = file.name.split('.').pop()
-      const fileName = `${user?.id}/avatar.${fileExt}`
+      const timestamp = Date.now()
+      const fileName = `${user?.id}/avatar-${timestamp}.${fileExt}`
+
+      // Delete old avatar files to prevent storage bloat
+      try {
+        const { data: existingFiles } = await supabase.storage
+          .from('avatars')
+          .list(`${user?.id}/`, {
+            limit: 100,
+            search: 'avatar-'
+          })
+
+        if (existingFiles && existingFiles.length > 0) {
+          const filesToDelete = existingFiles.map(file => `${user?.id}/${file.name}`)
+          await supabase.storage
+            .from('avatars')
+            .remove(filesToDelete)
+        }
+      } catch (error) {
+        console.warn('Could not clean up old avatars:', error)
+      }
 
       // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
-        .upload(fileName, file, { upsert: true })
+        .upload(fileName, file)
 
       if (uploadError) throw uploadError
 
-      // Get public URL
+      // Get public URL with cache busting
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName)
 
+      const finalAvatarUrl = `${publicUrl}?t=${timestamp}`
+
       // Update profile with new avatar URL
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ avatar_url: publicUrl })
+        .update({ avatar_url: finalAvatarUrl })
         .eq('id', user?.id)
 
       if (updateError) throw updateError
@@ -1393,12 +1413,23 @@ const ProfilePage = () => {
                 ) : (
                   <div className="text-center py-12">
                     <Code2 className="mx-auto h-16 w-16 text-muted-foreground/50" />
-                    <h3 className="mt-4 text-lg font-medium">No projects yet</h3>
-                    <p className="text-muted-foreground mt-2">Start building and showcase your work!</p>
-                    <Button onClick={() => openProjectModal()} className="mt-4">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Your First Project
-                    </Button>
+                    {isOwnProfile ? (
+                      <>
+                        <h3 className="mt-4 text-lg font-medium">No projects yet</h3>
+                        <p className="text-muted-foreground mt-2">Start building and showcase your work!</p>
+                        <Button onClick={() => openProjectModal()} className="mt-4">
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Your First Project
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <h3 className="mt-4 text-lg font-medium">No projects added</h3>
+                        <p className="text-muted-foreground mt-2">
+                          {profile?.full_name || 'This user'} hasn't added any projects yet.
+                        </p>
+                      </>
+                    )}
                   </div>
                 )}
               </CardContent>

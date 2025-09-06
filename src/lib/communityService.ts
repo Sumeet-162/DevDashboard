@@ -9,6 +9,8 @@ export interface CommunityPost {
   updated_at: string;
   likes_count: number;
   comments_count: number;
+  tags?: string[];
+  image_url?: string;
   author?: {
     id: string;
     full_name: string;
@@ -53,7 +55,6 @@ export interface UserProfile {
   website?: string;
   job_title?: string;
   company?: string;
-  is_profile_public?: boolean;
   twitter_username?: string;
   linkedin_url?: string;
   discord_username?: string;
@@ -166,10 +167,66 @@ export class CommunityService {
         });
       }
 
-      return { posts: data || [], total: count || 0 };
+      // Filter out posts from unwanted placeholder users
+      const filteredData = data?.filter(post => {
+        if (!post.author) return false;
+        
+        const author = post.author;
+        const fullName = author.full_name?.toLowerCase() || '';
+        const username = author.username?.toLowerCase() || '';
+        
+        // Check if author has placeholder names
+        const placeholderNames = ['unknown user', 'private user', 'anonymous user', 'anonymous'];
+        const hasPlaceholderName = placeholderNames.some(name => 
+          fullName.includes(name) || username.includes(name)
+        );
+        
+        // Filter out if both full_name and username are null
+        const hasNoIdentity = !author.full_name && !author.username;
+        
+        return !hasPlaceholderName && !hasNoIdentity;
+      }) || [];
+
+      return { posts: filteredData, total: filteredData.length };
     } catch (error) {
       console.error('Error fetching posts:', error);
       return { posts: [], total: 0 };
+    }
+  }
+
+  static async getPostById(postId: string): Promise<CommunityPost> {
+    try {
+      const { data, error } = await supabase
+        .from('community_posts')
+        .select(`
+          *,
+          author:profiles!community_posts_author_id_fkey (
+            id, full_name, username, avatar_url
+          )
+        `)
+        .eq('id', postId)
+        .single();
+
+      if (error) throw error;
+      if (!data) throw new Error('Post not found');
+
+      // Check if current user has liked this post
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: like } = await supabase
+          .from('post_likes')
+          .select('post_id')
+          .eq('user_id', user.id)
+          .eq('post_id', postId)
+          .maybeSingle();
+
+        data.is_liked = !!like;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Error fetching post:', error);
+      throw error;
     }
   }
 
@@ -193,6 +250,65 @@ export class CommunityService {
       return data;
     } catch (error) {
       console.error('Error creating post:', error);
+      throw error;
+    }
+  }
+
+  static async createPostWithImage(title: string, content: string, imageUrl?: string) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('community_posts')
+        .insert({
+          title,
+          content,
+          image_url: imageUrl || null,
+          author_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    } catch (error) {
+      console.error('Error creating post:', error);
+      throw error;
+    }
+  }
+
+  static async updatePost(postId: string, title: string, content: string, tags?: string[], imageUrl?: string) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error } = await supabase
+        .from('community_posts')
+        .update({
+          title,
+          content,
+          tags: tags || null,
+          image_url: imageUrl || null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', postId)
+        .eq('author_id', user.id) // Ensure only author can update
+        .select(`
+          *,
+          author:profiles!community_posts_author_id_fkey (
+            id, full_name, username, avatar_url
+          )
+        `)
+        .single();
+
+      if (error) throw error;
+      if (!data) throw new Error('Post not found or you are not authorized to edit it');
+
+      return data;
+    } catch (error) {
+      console.error('Error updating post:', error);
       throw error;
     }
   }
@@ -549,7 +665,16 @@ export class CommunityService {
       
       let query = supabase
         .from('profiles')
-        .select('*');
+        .select('*')
+        // Filter out placeholder/test users only
+        .not('full_name', 'in', '("Unknown User","Private User","Anonymous User","Anonymous")')
+        .not('username', 'in', '("Unknown User","Private User","Anonymous User","Anonymous")')
+        .not('full_name', 'ilike', '%unknown%')
+        .not('full_name', 'ilike', '%anonymous%')
+        .not('username', 'ilike', '%unknown%')
+        .not('username', 'ilike', '%anonymous%')
+        // Ensure user has at least full_name OR username
+        .or('full_name.not.is.null,username.not.is.null');
 
       if (search) {
         query = query.or(`full_name.ilike.%${search}%, username.ilike.%${search}%`);

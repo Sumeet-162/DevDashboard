@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,23 +11,22 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { X, ImagePlus, Hash, Send, Plus, Upload, Loader2 } from "lucide-react";
+import { X, ImagePlus, Hash, Send, Upload, Loader2 } from "lucide-react";
 import { CommunityService, CommunityPost } from "@/lib/communityService";
 import { useAuthSimple } from "@/hooks/useAuth.tsx";
 import { getProfileDisplayName } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 
-interface CreatePostDialogProps {
-  onPostCreated?: (post: CommunityPost) => void;
-  trigger?: React.ReactNode;
-  //to be triggered
+interface EditPostDialogProps {
+  post: CommunityPost;
+  isOpen: boolean;
+  onClose: () => void;
+  onPostUpdated?: (updatedPost: CommunityPost) => void;
 }
 
-const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => {
+const EditPostDialog = ({ post, isOpen, onClose, onPostUpdated }: EditPostDialogProps) => {
   const { user } = useAuthSimple();
-  const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   
@@ -41,9 +40,22 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
   
   const [currentTag, setCurrentTag] = useState('');
 
+  // Initialize form data when post changes
+  useEffect(() => {
+    if (post) {
+      setFormData({
+        title: post.title || '',
+        content: post.content || '',
+        tags: post.tags || [],
+        image_url: post.image_url || '',
+        imageFile: null
+      });
+    }
+  }, [post]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || isSubmitting) return;
+    if (!user || isSubmitting || !post) return;
 
     if (!formData.title.trim() || !formData.content.trim()) {
       return;
@@ -53,7 +65,7 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
     try {
       let imageUrl = formData.image_url;
 
-      // Upload image if file is selected
+      // Upload new image if file is selected
       if (formData.imageFile) {
         setImageUploading(true);
         const fileExt = formData.imageFile.name.split('.').pop();
@@ -75,26 +87,18 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
         setImageUploading(false);
       }
 
-      const post = await CommunityService.createPostWithImage(
+      const updatedPost = await CommunityService.updatePost(
+        post.id,
         formData.title.trim(),
         formData.content.trim(),
+        formData.tags,
         imageUrl || undefined
       );
 
-      onPostCreated?.(post);
-      
-      // Reset form
-      setFormData({
-        title: '',
-        content: '',
-        tags: [],
-        image_url: '',
-        imageFile: null
-      });
-      setCurrentTag('');
-      setOpen(false);
+      onPostUpdated?.(updatedPost);
+      onClose();
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error('Error updating post:', error);
     } finally {
       setIsSubmitting(false);
       setImageUploading(false);
@@ -157,25 +161,15 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
     }));
   };
 
-  const authorName = user?.email?.split('@')[0] || 'You';
-
-  const defaultTrigger = (
-    <Button className="gap-2">
-      <Plus className="h-4 w-4" />
-      New Post
-    </Button>
-  );
+  const authorName = post?.author ? getProfileDisplayName(post.author) : 'Unknown User';
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || defaultTrigger}
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Post</DialogTitle>
+          <DialogTitle>Edit Post</DialogTitle>
           <DialogDescription>
-            Share your thoughts, ideas, or questions with the community
+            Update your post content and settings
           </DialogDescription>
         </DialogHeader>
 
@@ -183,14 +177,14 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
           {/* Author Preview */}
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.user_metadata?.avatar_url} alt={authorName} />
+              <AvatarImage src={post?.author?.avatar_url} alt={authorName} />
               <AvatarFallback>
                 {authorName.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div>
               <p className="font-medium text-sm">{authorName}</p>
-              <p className="text-xs text-muted-foreground">Posting to community</p>
+              <p className="text-xs text-muted-foreground">Editing post</p>
             </div>
           </div>
 
@@ -235,32 +229,58 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
           <div className="space-y-2">
             <label className="text-sm font-medium flex items-center gap-2">
               <ImagePlus className="h-4 w-4" />
-              Upload Image (optional)
+              Update Image (optional)
             </label>
             
             {!formData.imageFile ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label
-                  htmlFor="image-upload"
-                  className="cursor-pointer flex flex-col items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <Upload className="h-8 w-8" />
-                  <span>Click to upload image</span>
-                  <span className="text-xs">Max size: 5MB • Supports: JPG, PNG, GIF</span>
-                </label>
+              <div>
+                {/* Current image preview */}
+                {formData.image_url && (
+                  <div className="relative border rounded-lg p-2 mb-2">
+                    <img
+                      src={formData.image_url}
+                      alt="Current image"
+                      className="w-full h-32 object-cover rounded"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={removeImage}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Current image
+                    </p>
+                  </div>
+                )}
+                
+                {/* Upload new image */}
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label
+                    htmlFor="image-upload"
+                    className="cursor-pointer flex flex-col items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Upload className="h-8 w-8" />
+                    <span>{formData.image_url ? 'Replace image' : 'Upload image'}</span>
+                    <span className="text-xs">Max size: 5MB • Supports: JPG, PNG, GIF</span>
+                  </label>
+                </div>
               </div>
             ) : (
               <div className="relative border rounded-lg p-2">
                 <img
                   src={URL.createObjectURL(formData.imageFile)}
-                  alt="Preview"
+                  alt="New image preview"
                   className="w-full h-32 object-cover rounded"
                 />
                 <Button
@@ -324,67 +344,12 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
             </p>
           </div>
 
-          {/* Preview */}
-          {(formData.title || formData.content) && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Preview</label>
-              <Card>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.user_metadata?.avatar_url} alt={authorName} />
-                      <AvatarFallback>
-                        {authorName.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium text-sm">{authorName}</p>
-                      <p className="text-xs text-muted-foreground">Just now</p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {formData.title && (
-                    <h3 className="font-semibold">{formData.title}</h3>
-                  )}
-                  {formData.content && (
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                      {formData.content.substring(0, 200)}
-                      {formData.content.length > 200 && '...'}
-                    </p>
-                  )}
-                  {(formData.image_url || formData.imageFile) && (
-                    <div className="rounded border">
-                      <img 
-                        src={formData.imageFile ? URL.createObjectURL(formData.imageFile) : formData.image_url} 
-                        alt="Preview" 
-                        className="w-full h-32 object-cover rounded"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    </div>
-                  )}
-                  {formData.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {formData.tags.map((tag, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
-                          #{tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
           {/* Submit */}
           <div className="flex justify-end gap-2 pt-4">
             <Button 
               type="button" 
               variant="outline" 
-              onClick={() => setOpen(false)}
+              onClick={onClose}
               disabled={isSubmitting}
             >
               Cancel
@@ -402,7 +367,7 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
               ) : (
                 <>
                   <Send className="h-4 w-4" />
-                  {isSubmitting ? 'Publishing...' : 'Publish Post'}
+                  {isSubmitting ? 'Updating...' : 'Update Post'}
                 </>
               )}
             </Button>
@@ -413,4 +378,4 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
   );
 };
 
-export default CreatePostDialog;
+export default EditPostDialog;

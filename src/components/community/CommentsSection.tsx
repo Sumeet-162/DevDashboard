@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { 
   Heart, 
   MessageCircle, 
@@ -13,7 +14,8 @@ import {
   Edit, 
   Trash2,
   Reply,
-  Clock
+  Clock,
+  X
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,9 +32,10 @@ interface CommentsSectionProps {
   postId: string;
   isOpen: boolean;
   onClose: () => void;
+  onCommentAdded?: () => void; // Callback to refresh post data
 }
 
-const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
+const CommentsSection = ({ postId, isOpen, onClose, onCommentAdded }: CommentsSectionProps) => {
   const { user } = useAuthSimple();
   const [comments, setComments] = useState<CommunityComment[]>([]);
   const [loading, setLoading] = useState(false);
@@ -88,6 +91,10 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
       }
 
       setReplyingTo(null);
+      
+      // Notify parent component to refresh post data
+      onCommentAdded?.();
+      
     } catch (error) {
       console.error('Error creating comment:', error);
     } finally {
@@ -339,21 +346,19 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-2xl max-h-[90vh] flex flex-col">
-        <CardHeader className="flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              Comments
-            </CardTitle>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              ✕
-            </Button>
-          </div>
-        </CardHeader>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 py-4 border-b">
+          <DialogTitle className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            Comments
+          </DialogTitle>
+          <DialogDescription>
+            View and add comments for this post
+          </DialogDescription>
+        </DialogHeader>
 
-        <CardContent className="flex-1 overflow-y-auto space-y-4">
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
           {/* Add Comment Form */}
           {user && !replyingTo && (
             <div className="space-y-3 border-b pb-4">
@@ -413,9 +418,9 @@ const CommentsSection = ({ postId, isOpen, onClose }: CommentsSectionProps) => {
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

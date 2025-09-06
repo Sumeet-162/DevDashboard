@@ -14,11 +14,18 @@ import GitHubCallbackPage from "./pages/GitHubCallbackPage";
 import LeetCodePage from "./pages/LeetCodePage";
 import ProfilePage from "./pages/ProfilePage";
 import CommunityPage from "./pages/CommunityPage";
+import PostDetailPage from "./pages/PostDetailPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import PasswordResetPage from "./pages/PasswordResetPage";
+
+// Import Productivity Pages
+import TodoPage from "./pages/productivity/TodoPage";
+import QuickNotesPage from "./pages/productivity/QuickNotesPage";
+import PomodoroPage from "./pages/productivity/PomodoroPage";
+import DevCalendarPage from "./pages/productivity/DevCalendarPage";
 
 const queryClient = new QueryClient();
 
@@ -77,9 +84,36 @@ const App = () => (
                 <CommunityPage />
               </ProtectedRoute>
             } />
+            <Route path="/community/post/:postId" element={
+              <ProtectedRoute>
+                <PostDetailPage />
+              </ProtectedRoute>
+            } />
             <Route path="/settings" element={
               <ProtectedRoute>
                 <SettingsPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Productivity Routes */}
+            <Route path="/productivity/todos" element={
+              <ProtectedRoute>
+                <TodoPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/productivity/notes" element={
+              <ProtectedRoute>
+                <QuickNotesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/productivity/pomodoro" element={
+              <ProtectedRoute>
+                <PomodoroPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/productivity/calendar" element={
+              <ProtectedRoute>
+                <DevCalendarPage />
               </ProtectedRoute>
             } />
             

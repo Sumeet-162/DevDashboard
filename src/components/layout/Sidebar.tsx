@@ -9,7 +9,12 @@ import {
   Users, 
   Settings2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  CheckSquare,
+  Clock,
+  StickyNote,
+  Calendar,
+  Zap
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -39,7 +44,33 @@ const navItems = [
     title: "Community", 
     icon: Users, 
     href: "/community" 
+  }
+];
+
+const productivityItems = [
+  {
+    title: "To-Do List",
+    icon: CheckSquare,
+    href: "/productivity/todos"
   },
+  {
+    title: "Pomodoro Timer",
+    icon: Clock,
+    href: "/productivity/pomodoro"
+  },
+  {
+    title: "Quick Notes",
+    icon: StickyNote,
+    href: "/productivity/notes"
+  },
+  {
+    title: "Dev Calendar",
+    icon: Calendar,
+    href: "/productivity/calendar"
+  }
+];
+
+const settingsItems = [
   { 
     title: "Settings", 
     icon: Settings2, 
@@ -90,20 +121,68 @@ const Sidebar = () => {
       </div>
       
       <div className="flex-1 py-4 overflow-auto">
-        <nav className="space-y-1 px-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
-                window.location.pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
-              )}
-            >
-              <item.icon size={20} />
-              {!collapsed && <span>{item.title}</span>}
-            </Link>
-          ))}
+        <nav className="space-y-6 px-2">
+          {/* Main Navigation */}
+          <div className="space-y-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  window.location.pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                )}
+              >
+                <item.icon size={20} />
+                {!collapsed && <span>{item.title}</span>}
+              </Link>
+            ))}
+          </div>
+
+          {/* Productivity Section */}
+          <div className="space-y-1">
+            {!collapsed && (
+              <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                <Zap size={14} />
+                <span>Productivity</span>
+              </div>
+            )}
+            {collapsed && (
+              <div className="flex justify-center px-3 py-2">
+                <Zap size={16} className="text-muted-foreground" />
+              </div>
+            )}
+            {productivityItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  window.location.pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                )}
+              >
+                <item.icon size={20} />
+                {!collapsed && <span>{item.title}</span>}
+              </Link>
+            ))}
+          </div>
+
+          {/* Settings */}
+          <div className="space-y-1">
+            {settingsItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  window.location.pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
+                )}
+              >
+                <item.icon size={20} />
+                {!collapsed && <span>{item.title}</span>}
+              </Link>
+            ))}
+          </div>
         </nav>
       </div>
     </div>
