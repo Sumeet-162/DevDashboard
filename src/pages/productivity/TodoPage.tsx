@@ -44,6 +44,7 @@ import {
 import { TodoService, Todo } from "@/lib/productivityService";
 import { formatDistanceToNow } from "date-fns";
 import { CalendarWithTime } from "@/components/ui/calendar-with-time";
+import { CalendarWithTimeEnhanced } from "@/components/ui/calendar-with-time-enhanced";
 
 const priorityColors = {
   low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
@@ -302,54 +303,54 @@ const TodoPage = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
                   <Target className="h-5 w-5 text-blue-600 dark:text-blue-300" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Tasks</p>
+                  <p className="text-sm text-muted-foreground font-medium">Total Tasks</p>
                   <p className="text-2xl font-bold">{stats.total}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
                   <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-300" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Completed</p>
+                  <p className="text-sm text-muted-foreground font-medium">Completed</p>
                   <p className="text-2xl font-bold">{stats.completed}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
                   <Timer className="h-5 w-5 text-yellow-600 dark:text-yellow-300" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Pending</p>
+                  <p className="text-sm text-muted-foreground font-medium">Pending</p>
                   <p className="text-2xl font-bold">{stats.pending}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-red-100 dark:bg-red-900 rounded-lg">
                   <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-300" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Overdue</p>
+                  <p className="text-sm text-muted-foreground font-medium">Overdue</p>
                   <p className="text-2xl font-bold">{stats.overdue}</p>
                 </div>
               </div>
@@ -593,7 +594,7 @@ const TodoPage = () => {
               
               <div>
                 <label className="text-sm font-medium mb-2 block">Due Date (Optional)</label>
-                <CalendarWithTime
+                <CalendarWithTimeEnhanced
                   date={formData.due_date}
                   onDateSelect={(date) => setFormData(prev => ({ 
                     ...prev, 

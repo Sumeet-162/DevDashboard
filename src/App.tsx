@@ -96,7 +96,7 @@ const App = () => (
             } />
             
             {/* Productivity Routes */}
-            <Route path="/productivity/todos" element={
+            <Route path="/productivity/todo" element={
               <ProtectedRoute>
                 <TodoPage />
               </ProtectedRoute>

@@ -51,7 +51,7 @@ const productivityItems = [
   {
     title: "To-Do List",
     icon: CheckSquare,
-    href: "/productivity/todos"
+    href: "/productivity/todo"
   },
   {
     title: "Pomodoro Timer",

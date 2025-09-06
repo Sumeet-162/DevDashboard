@@ -367,34 +367,34 @@ const PomodoroPage = () => {
 
             {/* Session Type Selector */}
             <Card>
-              <CardContent className="p-4">
-                <div className="grid grid-cols-3 gap-2">
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <Button
                     variant={sessionType === 'work' ? 'default' : 'outline'}
                     onClick={() => !isRunning && setSessionType('work')}
                     disabled={isRunning}
-                    className="flex items-center gap-2"
+                    className="flex items-center justify-center gap-2 h-12"
                   >
                     <Timer className="h-4 w-4" />
-                    Work ({settings.work}m)
+                    <span>Work ({settings.work}m)</span>
                   </Button>
                   <Button
                     variant={sessionType === 'short_break' ? 'default' : 'outline'}
                     onClick={() => !isRunning && setSessionType('short_break')}
                     disabled={isRunning}
-                    className="flex items-center gap-2"
+                    className="flex items-center justify-center gap-2 h-12"
                   >
                     <Coffee className="h-4 w-4" />
-                    Short Break ({settings.short_break}m)
+                    <span>Short ({settings.short_break}m)</span>
                   </Button>
                   <Button
                     variant={sessionType === 'long_break' ? 'default' : 'outline'}
                     onClick={() => !isRunning && setSessionType('long_break')}
                     disabled={isRunning}
-                    className="flex items-center gap-2"
+                    className="flex items-center justify-center gap-2 h-12"
                   >
                     <Award className="h-4 w-4" />
-                    Long Break ({settings.long_break}m)
+                    <span>Long ({settings.long_break}m)</span>
                   </Button>
                 </div>
               </CardContent>
@@ -405,29 +405,29 @@ const PomodoroPage = () => {
           <div className="space-y-6">
             {/* Stats */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                  <TrendingUp className="h-4 w-4" />
                   Statistics
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{stats.todaysSessions}</div>
-                    <div className="text-xs text-muted-foreground">Today</div>
+                  <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.todaysSessions}</div>
+                    <div className="text-sm text-muted-foreground font-medium">Today</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{stats.totalSessions}</div>
-                    <div className="text-xs text-muted-foreground">Total</div>
+                  <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">{stats.totalSessions}</div>
+                    <div className="text-sm text-muted-foreground font-medium">Total</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">{stats.totalWorkMinutes}</div>
-                    <div className="text-xs text-muted-foreground">Work Minutes</div>
+                  <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{stats.totalWorkMinutes}</div>
+                    <div className="text-sm text-muted-foreground font-medium">Work Minutes</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">{stats.completedSessions}</div>
-                    <div className="text-xs text-muted-foreground">Completed</div>
+                  <div className="text-center p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                    <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{stats.completedSessions}</div>
+                    <div className="text-sm text-muted-foreground font-medium">Completed</div>
                   </div>
                 </div>
                 
@@ -459,9 +459,9 @@ const PomodoroPage = () => {
 
             {/* Today's Sessions */}
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                  <Calendar className="h-4 w-4" />
                   Today's Sessions
                 </CardTitle>
               </CardHeader>

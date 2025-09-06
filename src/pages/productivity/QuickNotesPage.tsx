@@ -282,53 +282,28 @@ const QuickNotesPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            {/* Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base font-semibold">Overview</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground font-medium">Total Notes</span>
-                  <Badge variant="outline" className="font-semibold">{stats.totalNotes}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground font-medium">Favorites</span>
-                  <Badge variant="outline" className="text-yellow-700 border-yellow-200 bg-yellow-50 font-semibold">
-                    <Star className="h-3 w-3 mr-1 fill-current" />
-                    {stats.favoriteNotes}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground font-medium">Archived</span>
-                  <Badge variant="outline" className="text-slate-700 border-slate-200 bg-slate-50 font-semibold">
-                    <Archive className="h-3 w-3 mr-1" />
-                    {stats.archivedNotes}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* Filters */}
             <Card>
-              <CardHeader>
+              <CardHeader className="pb-4">
                 <CardTitle className="flex items-center gap-2 text-base font-semibold">
                   <Filter className="h-4 w-4" />
                   Filters
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6">
                 <div>
-                  <label className="text-sm font-semibold text-card-foreground mb-2 block">Category</label>
+                  <label className="text-sm font-medium text-card-foreground mb-3 block">Category</label>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Categories</SelectItem>
                       {categories.map(category => (
                         <SelectItem key={category.value} value={category.value}>
-                          {category.icon} {category.label}
+                          <span className="flex items-center gap-2">
+                            {category.icon} {category.label}
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -336,17 +311,19 @@ const QuickNotesPage = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold text-card-foreground mb-2 block">Tag</label>
+                  <label className="text-sm font-medium text-card-foreground mb-3 block">Tag</label>
                   <Select value={selectedTag} onValueChange={setSelectedTag}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All Tags</SelectItem>
                       {getAllTags().map(tag => (
                         <SelectItem key={tag} value={tag}>
-                          <Hash className="h-3 w-3 mr-1" />
-                          {tag}
+                          <span className="flex items-center gap-2">
+                            <Hash className="h-3 w-3" />
+                            {tag}
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>

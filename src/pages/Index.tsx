@@ -8,6 +8,7 @@ import LeetCodeCard from "@/components/dashboard/LeetCodeCard";
 import NewsCard from "@/components/dashboard/NewsCard";
 import PostCard from "@/components/dashboard/PostCard";
 import UserInfoCard from "@/components/dashboard/UserInfoCard";
+import ProductivityCard from "@/components/dashboard/ProductivityCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +36,8 @@ import {
   Clock,
   GitBranch,
   Star,
-  RotateCcw
+  RotateCcw,
+  Timer
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { getProfileDisplayName } from "@/lib/utils";
@@ -240,10 +242,10 @@ const Index = () => {
       <div className="space-y-6">
         {/* Enhanced Welcome Card */}
         <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 relative">
-          <CardHeader className="pb-4 pr-12 md:pr-16"> {/* Responsive right padding */}
+          <CardHeader className="pb-4 pr-12 md:pr-16">
             <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-              <div className="flex-1 pr-4 md:pr-0"> {/* Add padding on mobile to avoid refresh button */}
-                <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
+              <div className="flex-1 pr-4 md:pr-0">
+                <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">
                   {getGreeting()}, {user?.user_metadata?.full_name || 'Developer'}!
                 </CardTitle>
                 <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 mt-2">
@@ -251,25 +253,23 @@ const Index = () => {
                 </p>
               </div>
               
-              {/* User Info Card - positioned with adequate spacing */}
               <div className="flex-shrink-0 mt-2 md:mt-0">
                 <UserInfoCard />
               </div>
             </div>
             
-            {/* Circular Refresh Button - responsive positioning */}
             <Button
               variant="ghost"
               size="sm"
               onClick={handleRefreshData}
               disabled={loading}
-              className="absolute top-3 right-3 h-8 w-8 md:h-9 md:w-9 p-0 rounded-full hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-200 shadow-sm hover:shadow-md backdrop-blur-sm z-10"
+              className="absolute top-4 right-4 h-9 w-9 p-0 rounded-full hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-200 shadow-sm hover:shadow-md backdrop-blur-sm z-10"
               title="Refresh dashboard data"
             >
               {loading ? (
-                <Clock className="h-3.5 w-3.5 md:h-4 md:w-4 animate-spin text-gray-600 dark:text-gray-400" />
+                <Clock className="h-4 w-4 animate-spin text-gray-600 dark:text-gray-400" />
               ) : (
-                <RotateCcw className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200" />
+                <RotateCcw className="h-4 w-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200" />
               )}
             </Button>
           </CardHeader>
@@ -321,9 +321,9 @@ const Index = () => {
 
         {/* Quick Actions */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5" />
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-base font-semibold">
+              <Zap className="h-4 w-4" />
               Quick Actions
             </CardTitle>
           </CardHeader>
@@ -356,22 +356,28 @@ const Index = () => {
               <Button 
                 variant="outline" 
                 className="h-20 flex-col gap-2"
-                onClick={() => navigate('/profile')}
+                onClick={() => navigate('/productivity/pomodoro')}
               >
-                <User className="h-6 w-6" />
-                <span>Edit Profile</span>
+                <Timer className="h-6 w-6" />
+                <span>Start Focus</span>
               </Button>
             </div>
           </CardContent>
         </Card>
         
+        {/* Productivity Section */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold">Productivity</h2>
+          <ProductivityCard />
+        </div>
+        
         {/* Detailed Cards Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Enhanced GitHub Card */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Github className="h-5 w-5" />
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                <Github className="h-4 w-4" />
                 GitHub Activity
               </CardTitle>
             </CardHeader>
@@ -386,16 +392,16 @@ const Index = () => {
                 <div className="space-y-4">
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold">{stats.github.contributions}</div>
-                      <div className="text-xs text-muted-foreground">Contributions</div>
+                      <div className="text-xl font-bold">{stats.github.contributions}</div>
+                      <div className="text-sm text-muted-foreground font-medium">Contributions</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold">{stats.github.totalRepos}</div>
-                      <div className="text-xs text-muted-foreground">Repositories</div>
+                      <div className="text-xl font-bold">{stats.github.totalRepos}</div>
+                      <div className="text-sm text-muted-foreground font-medium">Repositories</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold">{stats.github.stars}</div>
-                      <div className="text-xs text-muted-foreground">Stars</div>
+                      <div className="text-xl font-bold">{stats.github.stars}</div>
+                      <div className="text-sm text-muted-foreground font-medium">Stars</div>
                     </div>
                   </div>
                   <Button 
@@ -421,9 +427,9 @@ const Index = () => {
 
           {/* Enhanced LeetCode Card */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Code2 className="h-5 w-5" />
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                <Code2 className="h-4 w-4" />
                 LeetCode Progress
               </CardTitle>
             </CardHeader>
@@ -437,21 +443,21 @@ const Index = () => {
               ) : stats.leetcode ? (
                 <div className="space-y-4">
                   <div className="text-center">
-                    <div className="text-3xl font-bold">{stats.leetcode.totalSolved}</div>
-                    <div className="text-sm text-muted-foreground">Problems Solved</div>
+                    <div className="text-2xl font-bold">{stats.leetcode.totalSolved}</div>
+                    <div className="text-base text-muted-foreground font-medium">Problems Solved</div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-xs">
-                    <div className="bg-green-100 dark:bg-green-900 p-2 rounded text-center">
-                      <div className="font-medium">{stats.leetcode.easySolved}</div>
-                      <div className="text-green-600 dark:text-green-400">Easy</div>
+                  <div className="grid grid-cols-3 gap-2 text-sm">
+                    <div className="bg-green-100 dark:bg-green-900 p-3 rounded text-center">
+                      <div className="font-semibold">{stats.leetcode.easySolved}</div>
+                      <div className="text-green-600 dark:text-green-400 font-medium">Easy</div>
                     </div>
-                    <div className="bg-yellow-100 dark:bg-yellow-900 p-2 rounded text-center">
-                      <div className="font-medium">{stats.leetcode.mediumSolved}</div>
-                      <div className="text-yellow-600 dark:text-yellow-400">Medium</div>
+                    <div className="bg-yellow-100 dark:bg-yellow-900 p-3 rounded text-center">
+                      <div className="font-semibold">{stats.leetcode.mediumSolved}</div>
+                      <div className="text-yellow-600 dark:text-yellow-400 font-medium">Medium</div>
                     </div>
-                    <div className="bg-red-100 dark:bg-red-900 p-2 rounded text-center">
-                      <div className="font-medium">{stats.leetcode.hardSolved}</div>
-                      <div className="text-red-600 dark:text-red-400">Hard</div>
+                    <div className="bg-red-100 dark:bg-red-900 p-3 rounded text-center">
+                      <div className="font-semibold">{stats.leetcode.hardSolved}</div>
+                      <div className="text-red-600 dark:text-red-400 font-medium">Hard</div>
                     </div>
                   </div>
                   <Button 
@@ -480,10 +486,10 @@ const Index = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Community Posts */}
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                  <Activity className="h-4 w-4" />
                   Recent Community Activity
                 </CardTitle>
                 <Button 
@@ -562,9 +568,9 @@ const Index = () => {
 
           {/* News & Updates */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Star className="h-5 w-5" />
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-base font-semibold">
+                <Star className="h-4 w-4" />
                 Latest News
               </CardTitle>
             </CardHeader>

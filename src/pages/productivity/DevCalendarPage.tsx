@@ -30,6 +30,7 @@ import {
 import { CalendarService, CalendarEvent } from "@/lib/productivityService";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { CalendarWithTime } from "@/components/ui/calendar-with-time";
+import { CalendarWithTimeEnhanced } from "@/components/ui/calendar-with-time-enhanced";
 
 type EventType = 'meeting' | 'call' | 'coding' | 'break' | 'deadline' | 'personal' | 'work';
 
@@ -359,14 +360,14 @@ const DevCalendarPage = () => {
   return (
     <Layout>
       <div className="p-0 md:p-6 space-y-6">
-        <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between px-3 sm:px-0">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between px-3 sm:px-0">
           <div className="text-center sm:text-left">
-            <h1 className="text-xl sm:text-3xl font-bold text-card-foreground">Dev Calendar</h1>
-            <p className="text-muted-foreground mt-1 text-xs sm:text-base">Click any date to view events or add new ones</p>
+            <h1 className="text-3xl font-bold text-card-foreground">Dev Calendar</h1>
+            <p className="text-muted-foreground mt-1 text-base">Click any date to view events or add new ones</p>
           </div>
           <div className="flex items-center justify-center gap-2 sm:justify-end">
             <Select value={viewMode} onValueChange={(value: 'month' | 'week' | 'agenda') => setViewMode(value)}>
-              <SelectTrigger className="w-28 sm:w-32 h-8 sm:h-10 text-xs sm:text-sm">
+              <SelectTrigger className="w-32 h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -390,35 +391,10 @@ const DevCalendarPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            {/* Stats */}
+            {/* Event Types Filter */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Overview</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Today</span>
-                  <Badge variant="outline">{stats.todaysEvents}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">This Week</span>
-                  <Badge variant="outline">{stats.thisWeekEvents}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Upcoming</span>
-                  <Badge variant="outline">{stats.upcomingEvents}</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Total</span>
-                  <Badge variant="outline">{stats.totalEvents}</Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
                   <Filter className="h-4 w-4" />
                   Event Types
                 </CardTitle>
@@ -462,8 +438,8 @@ const DevCalendarPage = () => {
 
             {/* Upcoming Events */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Upcoming Events</CardTitle>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-base font-semibold">Upcoming Events</CardTitle>
               </CardHeader>
               <CardContent>
                 {getUpcomingEvents().length === 0 ? (
@@ -1019,7 +995,7 @@ const DevCalendarPage = () => {
                   {/* Date and Time Picker */}
                   <div>
                     <label className="text-sm font-medium mb-2 block">Edit Date & Time</label>
-                    <CalendarWithTime
+                    <CalendarWithTimeEnhanced
                       date={new Date(editingEvent.start_time)}
                       onDateSelect={(date) => {
                         if (!date || !editingEvent) return;
