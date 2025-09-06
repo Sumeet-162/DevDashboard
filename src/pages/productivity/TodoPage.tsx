@@ -77,9 +77,7 @@ const TodoPage = () => {
     description: '',
     priority: 'medium' as 'low' | 'medium' | 'high' | 'urgent',
     category: 'general',
-    due_date: new Date(),
-    due_time: '12:00',
-    has_due_date: false,
+    due_date: undefined as Date | undefined,
     tags: [] as string[],
     newTag: ''
   });
@@ -138,10 +136,10 @@ const TodoPage = () => {
     try {
       let finalDueDate: string | undefined;
       
-      if (formData.has_due_date && formData.due_date && formData.due_time) {
+      if (formData.due_date) {
+        // Set due date to end of day (11:59 PM) for better UX
         const dueDateTime = new Date(formData.due_date);
-        const [hours, minutes] = formData.due_time.split(':').map(Number);
-        dueDateTime.setHours(hours, minutes, 0, 0);
+        dueDateTime.setHours(23, 59, 59, 999);
         finalDueDate = dueDateTime.toISOString();
       }
 
@@ -171,10 +169,10 @@ const TodoPage = () => {
     try {
       let finalDueDate: string | undefined;
       
-      if (formData.has_due_date && formData.due_date && formData.due_time) {
+      if (formData.due_date) {
+        // Set due date to end of day (11:59 PM) for better UX
         const dueDateTime = new Date(formData.due_date);
-        const [hours, minutes] = formData.due_time.split(':').map(Number);
-        dueDateTime.setHours(hours, minutes, 0, 0);
+        dueDateTime.setHours(23, 59, 59, 999);
         finalDueDate = dueDateTime.toISOString();
       }
 
@@ -225,15 +223,10 @@ const TodoPage = () => {
   const startEdit = (todo: Todo) => {
     setEditingTodo(todo);
     
-    let dueDate = new Date();
-    let dueTime = '12:00';
-    let hasDueDate = false;
+    let dueDate: Date | undefined = undefined;
     
     if (todo.due_date) {
-      const todoDate = new Date(todo.due_date);
-      dueDate = todoDate;
-      dueTime = todoDate.toTimeString().slice(0, 5); // HH:MM format
-      hasDueDate = true;
+      dueDate = new Date(todo.due_date);
     }
     
     setFormData({
@@ -242,8 +235,6 @@ const TodoPage = () => {
       priority: todo.priority,
       category: todo.category,
       due_date: dueDate,
-      due_time: dueTime,
-      has_due_date: hasDueDate,
       tags: todo.tags,
       newTag: ''
     });
@@ -260,9 +251,7 @@ const TodoPage = () => {
       description: '',
       priority: 'medium',
       category: 'general',
-      due_date: new Date(),
-      due_time: '12:00',
-      has_due_date: false,
+      due_date: undefined,
       tags: [],
       newTag: ''
     });
@@ -300,13 +289,13 @@ const TodoPage = () => {
 
   return (
     <Layout>
-      <div className="p-6 space-y-6">
+      <div className="p-0 md:p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">To-Do List</h1>
-            <p className="text-muted-foreground">Manage your tasks and stay productive</p>
+            <h1 className="text-3xl font-bold text-card-foreground">To-Do List</h1>
+            <p className="text-muted-foreground mt-1 text-base">Manage your tasks and stay productive</p>
           </div>
-          <Button onClick={() => setShowCreateDialog(true)}>
+          <Button onClick={() => setShowCreateDialog(true)} size="lg" className="font-semibold">
             <Plus className="h-4 w-4 mr-2" />
             Add Task
           </Button>
@@ -533,42 +522,45 @@ const TodoPage = () => {
             resetForm();
           }
         }}>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="sm:max-w-[450px] max-h-[85vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingTodo ? 'Edit Task' : 'Create New Task'}</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-lg font-semibold">
+                {editingTodo ? 'Edit Task' : 'Create New Task'}
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
                 {editingTodo ? 'Update your task details.' : 'Add a new task to your to-do list.'}
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium">Title *</label>
+                <label className="text-sm font-medium mb-1 block">Title *</label>
                 <Input
                   placeholder="Enter task title..."
                   value={formData.title}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  className="h-9"
                 />
               </div>
               
               <div>
-                <label className="text-sm font-medium">Description</label>
+                <label className="text-sm font-medium mb-1 block">Description</label>
                 <Textarea
                   placeholder="Enter task description..."
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="resize-none"
-                  rows={3}
+                  className="resize-none h-16 text-sm"
+                  rows={2}
                 />
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-sm font-medium">Priority</label>
+                  <label className="text-sm font-medium mb-1 block">Priority</label>
                   <Select value={formData.priority} onValueChange={(value: 'low' | 'medium' | 'high' | 'urgent') => 
                     setFormData(prev => ({ ...prev, priority: value }))
                   }>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-9">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -581,11 +573,11 @@ const TodoPage = () => {
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium">Category</label>
+                  <label className="text-sm font-medium mb-1 block">Category</label>
                   <Select value={formData.category} onValueChange={(value) => 
                     setFormData(prev => ({ ...prev, category: value }))
                   }>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-9">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -600,64 +592,46 @@ const TodoPage = () => {
               </div>
               
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <label className="text-sm font-medium">Due Date & Time</label>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="has-due-date"
-                      checked={formData.has_due_date}
-                      onChange={(e) => setFormData(prev => ({ ...prev, has_due_date: e.target.checked }))}
-                      className="rounded border-gray-300"
-                    />
-                    <label htmlFor="has-due-date" className="text-sm text-muted-foreground">
-                      Set due date
-                    </label>
-                  </div>
-                </div>
-                
-                {formData.has_due_date && (
-                  <CalendarWithTime
-                    date={formData.due_date}
-                    onDateSelect={(date) => setFormData(prev => ({ 
-                      ...prev, 
-                      due_date: date || new Date() 
-                    }))}
-                    startTime={formData.due_time}
-                    onStartTimeChange={(time) => setFormData(prev => ({ 
-                      ...prev, 
-                      due_time: time 
-                    }))}
-                    showTimeInputs={true}
-                    showEndTime={false}
-                  />
-                )}
+                <label className="text-sm font-medium mb-2 block">Due Date (Optional)</label>
+                <CalendarWithTime
+                  date={formData.due_date}
+                  onDateSelect={(date) => setFormData(prev => ({ 
+                    ...prev, 
+                    due_date: date 
+                  }))}
+                  showTimeInputs={false}
+                  showEndTime={false}
+                  className="w-full"
+                />
               </div>
               
               <div>
-                <label className="text-sm font-medium">Tags</label>
+                <label className="text-sm font-medium mb-2 block">Tags</label>
                 <div className="flex gap-2 mb-2">
                   <Input
                     placeholder="Add a tag..."
                     value={formData.newTag}
                     onChange={(e) => setFormData(prev => ({ ...prev, newTag: e.target.value }))}
                     onKeyPress={(e) => e.key === 'Enter' && addTag()}
+                    className="h-8 flex-1"
                   />
-                  <Button type="button" onClick={addTag} size="sm">
+                  <Button type="button" onClick={addTag} size="sm" className="h-8 px-3">
                     Add
                   </Button>
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  {formData.tags.map(tag => (
-                    <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => removeTag(tag)}>
-                      {tag} ×
-                    </Badge>
-                  ))}
-                </div>
+                {formData.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {formData.tags.map(tag => (
+                      <Badge key={tag} variant="secondary" className="cursor-pointer text-xs h-5 px-2" onClick={() => removeTag(tag)}>
+                        {tag} ×
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             
-            <DialogFooter>
+            <DialogFooter className="mt-6 gap-2">
               <Button 
                 variant="outline" 
                 onClick={() => {
@@ -665,10 +639,11 @@ const TodoPage = () => {
                   setEditingTodo(null);
                   resetForm();
                 }}
+                className="h-9"
               >
                 Cancel
               </Button>
-              <Button onClick={editingTodo ? handleUpdateTodo : handleCreateTodo}>
+              <Button onClick={editingTodo ? handleUpdateTodo : handleCreateTodo} className="h-9">
                 {editingTodo ? 'Update Task' : 'Create Task'}
               </Button>
             </DialogFooter>

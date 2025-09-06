@@ -45,7 +45,6 @@ const DevCalendarPage = () => {
   const [viewMode, setViewMode] = useState<'month' | 'week' | 'agenda'>('month');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<CalendarEvent[]>([]);
-  const [showNewEventForm, setShowNewEventForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ show: boolean; eventId?: string }>({ show: false });
   const [selectedEventType, setSelectedEventType] = useState<string>('all');
@@ -191,55 +190,6 @@ const DevCalendarPage = () => {
     }
     
     setCalendarDays(days);
-  };
-
-  const handleCreateEvent = async () => {
-    if (!newEvent.title.trim() || !newEvent.date || !newEvent.start_time) return;
-    
-    try {
-      // Combine date and time into ISO string
-      const startDateTime = new Date(newEvent.date);
-      const [startHours, startMinutes] = newEvent.start_time.split(':').map(Number);
-      startDateTime.setHours(startHours, startMinutes, 0, 0);
-      
-      const endDateTime = new Date(newEvent.date);
-      const [endHours, endMinutes] = newEvent.end_time.split(':').map(Number);
-      endDateTime.setHours(endHours, endMinutes, 0, 0);
-      
-      // If end time is before start time, assume it's the next day
-      if (endDateTime <= startDateTime) {
-        endDateTime.setDate(endDateTime.getDate() + 1);
-      }
-      
-      await CalendarService.createEvent({
-        title: newEvent.title,
-        description: newEvent.description,
-        event_type: newEvent.event_type,
-        start_time: startDateTime.toISOString(),
-        end_time: endDateTime.toISOString(),
-        location: newEvent.location,
-        attendees: newEvent.attendees,
-        is_all_day: newEvent.is_all_day,
-        color: newEvent.color
-      });
-      
-      setNewEvent({
-        title: '',
-        description: '',
-        event_type: 'meeting',
-        date: new Date(),
-        start_time: '12:00',
-        end_time: '13:00',
-        location: '',
-        attendees: [],
-        is_all_day: false,
-        color: '#3b82f6'
-      });
-      setShowNewEventForm(false);
-      loadEvents();
-    } catch (error) {
-      console.error('Error creating event:', error);
-    }
   };
 
   const handleUpdateEvent = async () => {
@@ -408,15 +358,15 @@ const DevCalendarPage = () => {
 
   return (
     <Layout>
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Dev Calendar</h1>
-            <p className="text-muted-foreground">Manage your development schedule and meetings</p>
+      <div className="p-0 md:p-6 space-y-6">
+        <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between px-3 sm:px-0">
+          <div className="text-center sm:text-left">
+            <h1 className="text-xl sm:text-3xl font-bold text-card-foreground">Dev Calendar</h1>
+            <p className="text-muted-foreground mt-1 text-xs sm:text-base">Click any date to view events or add new ones</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2 sm:justify-end">
             <Select value={viewMode} onValueChange={(value: 'month' | 'week' | 'agenda') => setViewMode(value)}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-28 sm:w-32 h-8 sm:h-10 text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -434,19 +384,6 @@ const DevCalendarPage = () => {
                 </SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={() => {
-              setShowNewEventForm(true);
-              // Auto-scroll to form after a small delay
-              setTimeout(() => {
-                const formElement = document.getElementById('new-event-form');
-                if (formElement) {
-                  formElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-              }, 100);
-            }}>
-              <Plus className="h-4 w-4 mr-2" />
-              New Event
-            </Button>
           </div>
         </div>
 
@@ -567,53 +504,54 @@ const DevCalendarPage = () => {
           <div className="lg:col-span-3 space-y-6">
             {viewMode === 'month' && (
               <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
+                <CardHeader className="pb-4">
+                  <div className="flex flex-col space-y-3 lg:flex-row lg:space-y-0 lg:items-center lg:justify-between">
+                    <CardTitle className="flex items-center justify-center lg:justify-start gap-2 text-xl font-semibold">
                       <CalendarIcon className="h-5 w-5" />
                       {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
                     </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={() => navigateMonth('prev')}>
+                    <div className="flex items-center justify-center gap-2">
+                      <Button variant="outline" size="sm" onClick={() => navigateMonth('prev')} className="h-9 w-9 p-0">
                         <ChevronLeft className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())}>
+                      <Button variant="outline" size="sm" onClick={() => setCurrentDate(new Date())} className="h-9 px-4">
                         Today
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => navigateMonth('next')}>
+                      <Button variant="outline" size="sm" onClick={() => navigateMonth('next')} className="h-9 w-9 p-0">
                         <ChevronRight className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-7 gap-1 mb-4">
+                  <div className="grid grid-cols-7 gap-0.5 sm:gap-1 mb-3 sm:mb-4">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                      <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
-                        {day}
+                      <div key={day} className="p-1 sm:p-2 text-center text-xs sm:text-sm font-medium text-muted-foreground">
+                        <span className="hidden sm:inline">{day}</span>
+                        <span className="sm:hidden">{day.charAt(0)}</span>
                       </div>
                     ))}
                   </div>
                   
-                  <div className="grid grid-cols-7 gap-1">
+                  <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
                     {calendarDays.map((day, index) => (
                       <div
                         key={index}
                         className={`
-                          min-h-[100px] p-2 border rounded-lg cursor-pointer transition-colors
+                          min-h-[60px] sm:min-h-[100px] p-1 sm:p-2 border rounded cursor-pointer transition-colors
                           ${day.isCurrentMonth ? 'bg-background hover:bg-muted/50' : 'bg-muted/20 text-muted-foreground hover:bg-muted/30'}
-                          ${day.isToday ? 'ring-2 ring-primary' : ''}
+                          ${day.isToday ? 'ring-1 sm:ring-2 ring-primary' : ''}
                         `}
                         onClick={() => handleDateClick(day.date)}
                       >
-                        <div className={`text-sm mb-1 ${day.isToday ? 'font-bold text-primary' : ''}`}>
+                        <div className={`text-xs sm:text-sm mb-1 ${day.isToday ? 'font-bold text-primary' : ''}`}>
                           {day.date.getDate()}
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-0.5 sm:space-y-1">
                           {day.events.slice(0, 2).map(event => (
                             <div
                               key={event.id}
-                              className="text-xs p-1 rounded truncate cursor-pointer hover:opacity-80"
+                              className="text-xs p-0.5 sm:p-1 rounded truncate cursor-pointer hover:opacity-80"
                               style={{ 
                                 backgroundColor: event.color || getEventTypeColor(event.event_type),
                                 color: 'white'
@@ -643,8 +581,8 @@ const DevCalendarPage = () => {
             {selectedDate && showDateEvents && (
               <Card id="selected-date-events">
                 <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
+                  <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between">
+                    <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                       <CalendarDays className="h-5 w-5" />
                       Events for {selectedDate.toLocaleDateString('en-US', { 
                         weekday: 'long', 
@@ -763,11 +701,11 @@ const DevCalendarPage = () => {
                     <Card className="border-2 border-dashed border-primary/20 bg-primary/5">
                       <CardHeader className="pb-3">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <Plus className="h-5 w-5" />
-                          Quick Add Event
+                          <Plus className="h-5 w-5 text-primary" />
+                          Add Event
                         </CardTitle>
                         <p className="text-sm text-muted-foreground">
-                          Add an event for {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          Create a new event for {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
                       </CardHeader>
                       <CardContent className="space-y-4">
@@ -851,15 +789,7 @@ const DevCalendarPage = () => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex justify-between pt-2">
-                          <Button 
-                            variant="outline"
-                            onClick={() => setShowNewEventForm(true)}
-                            className="flex items-center gap-2"
-                          >
-                            <CalendarIcon className="h-4 w-4" />
-                            More Options
-                          </Button>
+                        <div className="flex justify-end pt-2">
                           <div className="flex gap-2">
                             <Button 
                               variant="outline" 
@@ -912,14 +842,10 @@ const DevCalendarPage = () => {
                       <h3 className="text-lg font-semibold mb-2">No events found</h3>
                       <p className="text-muted-foreground mb-4">
                         {selectedEventType === 'all' 
-                          ? "You don't have any events scheduled."
-                          : `No ${eventTypes.find(t => t.value === selectedEventType)?.label.toLowerCase()} events found.`
+                          ? "You don't have any events scheduled. Click on any date above to add your first event!"
+                          : `No ${eventTypes.find(t => t.value === selectedEventType)?.label.toLowerCase()} events found. Try selecting a different filter or click on a date to add events.`
                         }
                       </p>
-                      <Button onClick={() => setShowNewEventForm(true)}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create Event
-                      </Button>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -1007,98 +933,6 @@ const DevCalendarPage = () => {
                         })}
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* New Event Form */}
-            {showNewEventForm && (
-              <Card id="new-event-form">
-                <CardHeader>
-                  <CardTitle>Create New Event</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Event Details */}
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Input
-                          placeholder="Event title..."
-                          value={newEvent.title}
-                          onChange={(e) => setNewEvent(prev => ({ ...prev, title: e.target.value }))}
-                        />
-                        <Select value={newEvent.event_type} onValueChange={(value: EventType) => setNewEvent(prev => ({ ...prev, event_type: value }))}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {eventTypes.map(type => {
-                              const Icon = type.icon;
-                              return (
-                                <SelectItem key={type.value} value={type.value}>
-                                  <div className="flex items-center gap-2">
-                                    <Icon className="h-4 w-4" />
-                                    {type.label}
-                                  </div>
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <Textarea
-                        placeholder="Event description..."
-                        value={newEvent.description}
-                        onChange={(e) => setNewEvent(prev => ({ ...prev, description: e.target.value }))}
-                        rows={3}
-                      />
-                      
-                      <Input
-                        placeholder="Location (optional)..."
-                        value={newEvent.location}
-                        onChange={(e) => setNewEvent(prev => ({ ...prev, location: e.target.value }))}
-                      />
-                      
-                      <div>
-                        <label className="text-sm font-medium">Color</label>
-                        <div className="flex gap-2 mt-2">
-                          {colors.map(color => (
-                            <button
-                              key={color}
-                              className={`w-6 h-6 rounded-full border-2 ${newEvent.color === color ? 'border-foreground' : 'border-muted'}`}
-                              style={{ backgroundColor: color }}
-                              onClick={() => setNewEvent(prev => ({ ...prev, color }))}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-end gap-2">
-                        <Button variant="outline" onClick={() => setShowNewEventForm(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={handleCreateEvent} disabled={!newEvent.title.trim()}>
-                          Create Event
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    {/* Date and Time Picker */}
-                    <div>
-                      <label className="text-sm font-medium mb-2 block">Select Date & Time</label>
-                      <CalendarWithTime
-                        date={newEvent.date}
-                        onDateSelect={(date) => setNewEvent(prev => ({ ...prev, date: date || new Date() }))}
-                        startTime={newEvent.start_time}
-                        endTime={newEvent.end_time}
-                        onStartTimeChange={(time) => setNewEvent(prev => ({ ...prev, start_time: time }))}
-                        onEndTimeChange={(time) => setNewEvent(prev => ({ ...prev, end_time: time }))}
-                        showTimeInputs={true}
-                        showEndTime={true}
-                      />
-                    </div>
-                  </div>
                 </CardContent>
               </Card>
             )}

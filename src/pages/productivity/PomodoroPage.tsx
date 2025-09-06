@@ -226,6 +226,16 @@ const PomodoroPage = () => {
     if (!isRunning) {
       setTimeLeft(settings[sessionType] * 60);
     }
+    // Close settings panel after saving
+    setShowSettings(false);
+    
+    // Show success notification
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Settings saved!', {
+        body: 'Your Pomodoro timer settings have been updated.',
+        icon: '/favicon.ico'
+      });
+    }
   };
 
   useEffect(() => {
@@ -258,13 +268,13 @@ const PomodoroPage = () => {
 
   return (
     <Layout>
-      <div className="p-6 space-y-6">
+      <div className="p-0 md:p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Pomodoro Timer</h1>
-            <p className="text-muted-foreground">Focus better with the Pomodoro Technique</p>
+            <h1 className="text-3xl font-bold text-card-foreground">Pomodoro Timer</h1>
+            <p className="text-muted-foreground mt-1 text-base">Focus better with the Pomodoro Technique</p>
           </div>
-          <Button variant="outline" onClick={() => setShowSettings(!showSettings)}>
+          <Button variant="outline" onClick={() => setShowSettings(!showSettings)} className="font-semibold">
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>

@@ -72,17 +72,25 @@ const QuickNotesPage = () => {
   const loadNotes = async () => {
     try {
       console.log('Loading notes...');
-      const data = await NotesService.getNotes();
-      console.log('Loaded notes:', data);
-      console.log('Number of notes:', data.length);
       
-      setNotes(data);
+      // Load both archived and non-archived notes
+      const [activeNotes, archivedNotes] = await Promise.all([
+        NotesService.getNotes({ archived: false }),
+        NotesService.getNotes({ archived: true })
+      ]);
+      
+      const allNotes = [...activeNotes, ...archivedNotes];
+      console.log('Loaded active notes:', activeNotes.length);
+      console.log('Loaded archived notes:', archivedNotes.length);
+      console.log('Total notes:', allNotes.length);
+      
+      setNotes(allNotes);
       
       // Calculate stats
       const stats = {
-        totalNotes: data.length,
-        favoriteNotes: data.filter(n => n.is_favorite && !n.is_archived).length,
-        archivedNotes: data.filter(n => n.is_archived).length
+        totalNotes: allNotes.length,
+        favoriteNotes: allNotes.filter(n => n.is_favorite && !n.is_archived).length,
+        archivedNotes: allNotes.filter(n => n.is_archived).length
       };
       console.log('Calculated stats:', stats);
       setStats(stats);
@@ -259,13 +267,13 @@ const QuickNotesPage = () => {
 
   return (
     <Layout>
-      <div className="p-6 space-y-6">
+      <div className="p-0 md:p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Quick Notes</h1>
-            <p className="text-muted-foreground">Capture and organize your thoughts</p>
+            <h1 className="text-3xl font-bold text-card-foreground">Quick Notes</h1>
+            <p className="text-muted-foreground mt-1 text-base">Capture and organize your thoughts</p>
           </div>
-          <Button onClick={() => setShowNewNoteForm(true)}>
+          <Button onClick={() => setShowNewNoteForm(true)} size="lg" className="font-semibold">
             <Plus className="h-4 w-4 mr-2" />
             New Note
           </Button>
@@ -277,23 +285,26 @@ const QuickNotesPage = () => {
             {/* Stats */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-base">Overview</CardTitle>
+                <CardTitle className="text-base font-semibold">Overview</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Total Notes</span>
-                  <Badge variant="outline">{stats.totalNotes}</Badge>
+                  <span className="text-sm text-muted-foreground font-medium">Total Notes</span>
+                  <Badge variant="outline" className="font-semibold">{stats.totalNotes}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Favorites</span>
-                  <Badge variant="outline" className="text-yellow-600">
-                    <Star className="h-3 w-3 mr-1" />
+                  <span className="text-sm text-muted-foreground font-medium">Favorites</span>
+                  <Badge variant="outline" className="text-yellow-700 border-yellow-200 bg-yellow-50 font-semibold">
+                    <Star className="h-3 w-3 mr-1 fill-current" />
                     {stats.favoriteNotes}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Archived</span>
-                  <Badge variant="outline">{stats.archivedNotes}</Badge>
+                  <span className="text-sm text-muted-foreground font-medium">Archived</span>
+                  <Badge variant="outline" className="text-slate-700 border-slate-200 bg-slate-50 font-semibold">
+                    <Archive className="h-3 w-3 mr-1" />
+                    {stats.archivedNotes}
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
@@ -301,14 +312,14 @@ const QuickNotesPage = () => {
             {/* Filters */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
+                <CardTitle className="flex items-center gap-2 text-base font-semibold">
                   <Filter className="h-4 w-4" />
                   Filters
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium">Category</label>
+                  <label className="text-sm font-semibold text-card-foreground mb-2 block">Category</label>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                     <SelectTrigger className="mt-1">
                       <SelectValue />
@@ -325,7 +336,7 @@ const QuickNotesPage = () => {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium">Tag</label>
+                  <label className="text-sm font-semibold text-card-foreground mb-2 block">Tag</label>
                   <Select value={selectedTag} onValueChange={setSelectedTag}>
                     <SelectTrigger className="mt-1">
                       <SelectValue />
@@ -342,11 +353,11 @@ const QuickNotesPage = () => {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3 pt-2 border-t border-border/50">
                   <Button
                     variant={showArchived ? "default" : "outline"}
                     onClick={() => setShowArchived(!showArchived)}
-                    className="w-full justify-center text-sm"
+                    className="w-full justify-center text-sm font-semibold"
                   >
                     <Archive className="h-4 w-4 mr-2" />
                     {showArchived ? "Show Active Notes" : "Show Archived Notes"}
@@ -354,7 +365,7 @@ const QuickNotesPage = () => {
                   
                   {(showArchived && stats.archivedNotes > 0) || (!showArchived && stats.totalNotes > 0) ? (
                     <div className="text-center">
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-xs font-semibold">
                         {showArchived ? stats.archivedNotes : stats.totalNotes - stats.archivedNotes} notes
                       </Badge>
                     </div>
@@ -383,18 +394,18 @@ const QuickNotesPage = () => {
 
             {/* New Note Form - Enhanced */}
             {showNewNoteForm && (
-              <Card className="border-2 border-dashed border-primary/20 bg-primary/5">
+              <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10">
                 <CardHeader className="pb-4">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Plus className="h-5 w-5" />
+                    <CardTitle className="flex items-center gap-2 font-bold text-card-foreground">
+                      <Plus className="h-5 w-5 text-primary" />
                       Create New Note
                     </CardTitle>
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => setShowNewNoteForm(false)}
-                      className="h-8 w-8 p-0"
+                      className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive"
                     >
                       ✕
                     </Button>
@@ -473,18 +484,18 @@ const QuickNotesPage = () => {
                     )}
                   </div>
                   
-                  <div className="flex justify-between pt-4 border-t">
+                  <div className="flex justify-between pt-4 border-t border-border/30">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <span>Tip: Use Ctrl+Enter to save quickly</span>
+                      <span className="font-medium">Tip: Use Ctrl+Enter to save quickly</span>
                     </div>
                     <div className="flex gap-3">
-                      <Button variant="outline" onClick={() => setShowNewNoteForm(false)}>
+                      <Button variant="outline" onClick={() => setShowNewNoteForm(false)} className="font-medium">
                         Cancel
                       </Button>
                       <Button 
                         onClick={handleCreateNote} 
                         disabled={!newNote.title.trim()}
-                        className="px-6"
+                        className="px-6 font-semibold"
                       >
                         <Plus className="h-4 w-4 mr-2" />
                         Create Note
@@ -497,13 +508,13 @@ const QuickNotesPage = () => {
 
             {/* Notes Display */}
             {filteredNotes.length === 0 ? (
-              <Card>
+              <Card className="border-2 border-dashed border-border/60">
                 <CardContent className="text-center py-16">
                   <FileText className="h-20 w-20 mx-auto text-muted-foreground mb-6" />
-                  <h3 className="text-xl font-semibold mb-3">
+                  <h3 className="text-xl font-bold mb-3 text-card-foreground">
                     {showArchived ? "No archived notes" : "No notes found"}
                   </h3>
-                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  <p className="text-muted-foreground mb-6 max-w-md mx-auto leading-relaxed">
                     {showArchived 
                       ? "You don't have any archived notes yet. Archive notes to keep them organized but out of your main view."
                       : searchQuery 
@@ -512,7 +523,7 @@ const QuickNotesPage = () => {
                     }
                   </p>
                   {!showArchived && !searchQuery && (
-                    <Button onClick={() => setShowNewNoteForm(true)} size="lg">
+                    <Button onClick={() => setShowNewNoteForm(true)} size="lg" className="font-semibold">
                       <Plus className="h-4 w-4 mr-2" />
                       Create Your First Note
                     </Button>
@@ -523,52 +534,137 @@ const QuickNotesPage = () => {
               <div className="space-y-8">
                 {Object.entries(groupedNotes).map(([category, categoryNotes]) => (
                   <div key={category}>
-                    <div className="flex items-center gap-3 mb-6 pb-2 border-b">
+                    <div className="flex items-center gap-3 mb-6 pb-3 border-b border-border/60">
                       <span className="text-2xl">{getCategoryIcon(category)}</span>
-                      <h3 className="text-xl font-bold text-foreground">{getCategoryLabel(category)}</h3>
-                      <Badge variant="outline" className="text-sm px-3 py-1">
+                      <h3 className="text-xl font-bold text-card-foreground">{getCategoryLabel(category)}</h3>
+                      <Badge variant="outline" className="text-sm px-3 py-1 font-medium bg-background/50">
                         {categoryNotes.length} {categoryNotes.length === 1 ? 'note' : 'notes'}
                       </Badge>
+                      {showArchived && (
+                        <Badge variant="secondary" className="text-xs px-2 py-1 bg-slate-100 text-slate-700">
+                          <Archive className="h-3 w-3 mr-1" />
+                          Archived
+                        </Badge>
+                      )}
                     </div>
                     
-                    {/* Enhanced Notes Grid - Fixed Height Cards */}
+                    {/* Redesigned Notes Grid - Consistent Design */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {categoryNotes.map((note) => (
                         <Card 
                           key={note.id} 
-                          className={`h-80 flex flex-col transition-all duration-200 hover:shadow-lg border ${
-                            note.is_favorite ? 'ring-2 ring-yellow-200 border-yellow-300 bg-yellow-50/30' : ''
+                          className={`group relative overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-primary/5 ${
+                            note.is_favorite 
+                              ? 'border-2 border-yellow-300/50 bg-gradient-to-br from-yellow-50 to-amber-50/70 hover:shadow-yellow-200/20 dark:from-yellow-900/20 dark:to-amber-900/10 dark:border-yellow-600/30' 
+                              : 'border border-border/60 bg-card hover:bg-accent/20'
                           } ${
-                            note.is_archived ? 'opacity-75 border-gray-300 bg-gray-50/50' : ''
+                            note.is_archived 
+                              ? 'border-slate-300/60 bg-gradient-to-br from-slate-50 to-gray-100/70 dark:from-slate-900/30 dark:to-slate-800/20 dark:border-slate-600/40' 
+                              : ''
                           }`}
                         >
-                          <CardHeader className="pb-3 flex-shrink-0">
+                          {/* Card Header with Title and Meta Info */}
+                          <CardHeader className="pb-4 space-y-3">
                             <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-lg font-semibold text-foreground leading-tight mb-2 line-clamp-2">
+                              <div className="flex-1 min-w-0 space-y-2">
+                                <h4 className="text-lg font-bold leading-snug text-card-foreground line-clamp-2">
                                   {note.title}
                                 </h4>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <Calendar className="h-4 w-4" />
-                                  <span>{new Date(note.created_at).toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric'
-                                  })}</span>
-                                  {note.is_archived && (
-                                    <>
-                                      <span>•</span>
-                                      <Badge variant="secondary" className="text-xs">
-                                        <Archive className="h-3 w-3 mr-1" />
-                                        Archived
-                                      </Badge>
-                                    </>
-                                  )}
+                                <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                  <div className="flex items-center gap-1.5">
+                                    <Calendar className="h-4 w-4" />
+                                    <span className="font-medium">
+                                      {new Date(note.created_at).toLocaleDateString('en-US', {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric'
+                                      })}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-lg">{getCategoryIcon(note.category)}</span>
+                                    <span className="font-medium text-xs">{getCategoryLabel(note.category)}</span>
+                                  </div>
                                 </div>
                               </div>
                               
-                              {/* Action Buttons */}
-                              <div className="flex items-center gap-1">
+                              {/* Status Indicators */}
+                              <div className="flex items-center gap-2">
+                                {note.is_favorite && (
+                                  <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                                )}
+                                {note.is_archived && (
+                                  <Badge variant="secondary" className="text-xs px-2 py-1 bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300">
+                                    <Archive className="h-3 w-3 mr-1" />
+                                    Archived
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </CardHeader>
+                          
+                          {/* Card Content */}
+                          <CardContent className="pt-0 pb-4 space-y-4">
+                            {/* Note Content Preview */}
+                            <div className="relative">
+                              <div className="h-20 overflow-hidden">
+                                <p className="text-sm leading-relaxed text-card-foreground/80">
+                                  {note.content ? (
+                                    note.content.length > 150 ? 
+                                      note.content.substring(0, 150) + "..." : 
+                                      note.content
+                                  ) : (
+                                    <span className="text-muted-foreground italic">No content added yet...</span>
+                                  )}
+                                </p>
+                              </div>
+                              {/* Theme-adaptive fade overlay for content that might overflow */}
+                              {note.content && note.content.length > 80 && (
+                                <div className={`absolute bottom-0 left-0 right-0 h-6 pointer-events-none ${
+                                  note.is_favorite 
+                                    ? 'bg-gradient-to-t from-yellow-50 via-yellow-50/70 to-transparent dark:from-yellow-50/90 dark:via-yellow-50/50'
+                                    : note.is_archived
+                                      ? 'bg-gradient-to-t from-slate-50 via-slate-50/70 to-transparent dark:from-slate-800 dark:via-slate-800/70'
+                                      : 'bg-gradient-to-t from-card via-card/70 to-transparent dark:from-card dark:via-card/70'
+                                }`} />
+                              )}
+                            </div>
+                            
+                            {/* Tags Section */}
+                            <div className="space-y-2">
+                              {note.tags.length > 0 ? (
+                                <div className="flex flex-wrap gap-1.5">
+                                  {note.tags.slice(0, 4).map((tag, index) => (
+                                    <Badge 
+                                      key={index} 
+                                      variant="outline" 
+                                      className="text-xs px-2 py-1 hover:bg-primary/10 cursor-pointer transition-colors"
+                                      onClick={() => setSelectedTag(tag)}
+                                    >
+                                      <Hash className="h-3 w-3 mr-1" />
+                                      {tag}
+                                    </Badge>
+                                  ))}
+                                  {note.tags.length > 4 && (
+                                    <Badge 
+                                      variant="secondary" 
+                                      className="text-xs px-2 py-1"
+                                      title={`Additional tags: ${note.tags.slice(4).join(', ')}`}
+                                    >
+                                      +{note.tags.length - 4}
+                                    </Badge>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="h-6" />
+                              )}
+                            </div>
+                          </CardContent>
+                          
+                          {/* Action Buttons Footer */}
+                          <div className="border-t bg-muted/30 dark:bg-muted/20 px-6 py-3">
+                            <div className="flex items-center justify-between">
+                              <div className="flex gap-1">
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -581,26 +677,8 @@ const QuickNotesPage = () => {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => setViewingNote(note)}
-                                  className="h-8 w-8 p-0 hover:text-green-600"
-                                  title="View full note"
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => setEditingNote(note)}
-                                  className="h-8 w-8 p-0 hover:text-blue-600"
-                                  title="Edit note"
-                                >
-                                  <Edit3 className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
                                   onClick={() => handleToggleArchive(note)}
-                                  className="h-8 w-8 p-0 hover:text-purple-600"
+                                  className="h-8 w-8 p-0 hover:text-slate-600"
                                   title={note.is_archived ? "Unarchive note" : "Archive note"}
                                 >
                                   <Archive className="h-4 w-4" />
@@ -609,88 +687,35 @@ const QuickNotesPage = () => {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => setDeleteConfirm({ show: true, noteId: note.id })}
-                                  className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                                  className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
                                   title="Delete note"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
-                            </div>
-                          </CardHeader>
-                          
-                          <CardContent className="pt-0 flex-1 flex flex-col">
-                            {/* Note Content Preview - Fixed Height with Scroll */}
-                            <div className="flex-1 mb-4 overflow-hidden">
-                              <div className="h-32 overflow-hidden relative">
-                                <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
-                                  {note.content || (
-                                    <span className="text-muted-foreground italic">No content added yet...</span>
-                                  )}
-                                </p>
-                                {/* Fade overlay for long content */}
-                                {note.content && note.content.length > 200 && (
-                                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-                                )}
-                              </div>
-                            </div>
-                            
-                            {/* Tags Section - Fixed Position */}
-                            <div className="mb-3 flex-shrink-0">
-                              {note.tags.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                  {note.tags.slice(0, 3).map((tag, index) => (
-                                    <Badge 
-                                      key={index} 
-                                      variant="secondary" 
-                                      className="text-xs px-2 py-1 hover:bg-secondary/80 cursor-pointer"
-                                      onClick={() => setSelectedTag(tag)}
-                                    >
-                                      <Hash className="h-3 w-3 mr-1" />
-                                      {tag}
-                                    </Badge>
-                                  ))}
-                                  {note.tags.length > 3 && (
-                                    <Badge 
-                                      variant="outline" 
-                                      className="text-xs px-2 py-1"
-                                      title={`Additional tags: ${note.tags.slice(3).join(', ')}`}
-                                    >
-                                      +{note.tags.length - 3} more
-                                    </Badge>
-                                  )}
-                                </div>
-                              ) : (
-                                <div className="h-6" /> // Spacer to maintain consistent layout
-                              )}
-                            </div>
-                            
-                            {/* Quick Actions Footer - Fixed Position */}
-                            <div className="flex items-center justify-between pt-2 border-t border-gray-100 flex-shrink-0">
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                <span className="capitalize">{getCategoryIcon(note.category)} {getCategoryLabel(note.category)}</span>
-                              </div>
                               
                               <div className="flex gap-2">
                                 <Button
-                                  variant="ghost"
+                                  variant="outline"
                                   size="sm"
                                   onClick={() => setViewingNote(note)}
-                                  className="text-xs px-3 py-1 h-auto hover:bg-green-50 hover:text-green-700 border border-transparent hover:border-green-200"
+                                  className="text-xs px-3 py-1 h-7 font-medium hover:bg-green-50 hover:text-green-700 hover:border-green-300 dark:hover:bg-green-950 dark:hover:text-green-400 dark:hover:border-green-700"
                                 >
-                                  <Eye className="h-3 w-3 mr-1" />
+                                  <Eye className="h-3 w-3 mr-1.5" />
                                   View
                                 </Button>
                                 <Button
-                                  variant="ghost"
+                                  variant="default"
                                   size="sm"
                                   onClick={() => setEditingNote(note)}
-                                  className="text-xs px-3 py-1 h-auto hover:bg-primary hover:text-primary-foreground"
+                                  className="text-xs px-3 py-1 h-7 font-medium"
                                 >
+                                  <Edit3 className="h-3 w-3 mr-1.5" />
                                   Edit
                                 </Button>
                               </div>
                             </div>
-                          </CardContent>
+                          </div>
                         </Card>
                       ))}
                     </div>
