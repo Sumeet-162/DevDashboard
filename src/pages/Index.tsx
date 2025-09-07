@@ -241,37 +241,36 @@ const Index = () => {
     <Layout>
       <div className="space-y-6">
         {/* Enhanced Welcome Card */}
-        <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700 relative">
-          <CardHeader className="pb-4 pr-12 md:pr-16">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-              <div className="flex-1 pr-4 md:pr-0">
-                <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">
-                  {getGreeting()}, {user?.user_metadata?.full_name || 'Developer'}!
-                </CardTitle>
-                <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 mt-2">
-                  Ready to code and collaborate today?
-                </p>
+        <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700">
+          <CardHeader className="pb-4">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              {/* Left Side - Image */}
+              <div className="flex-shrink-0">
+                <img 
+                  src="https://raw.githubusercontent.com/Sumeet-162/DEVDASH-IMAGES/refs/heads/main/Open%20Peeps%20-%20Bust.png" 
+                  alt="Developer illustration"
+                  className="w-24 h-24 md:w-32 md:h-32 object-contain"
+                />
               </div>
               
-              <div className="flex-shrink-0 mt-2 md:mt-0">
-                <UserInfoCard />
+              {/* Right Side - Content */}
+              <div className="flex-1 text-center md:text-left">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="flex-1">
+                    <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                      {getGreeting()}, {user?.user_metadata?.full_name || 'Developer'}!
+                    </CardTitle>
+                    <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 mt-2">
+                      Ready to code and collaborate today?
+                    </p>
+                  </div>
+                  
+                  <div className="flex-shrink-0 mt-2 md:mt-0">
+                    <UserInfoCard />
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleRefreshData}
-              disabled={loading}
-              className="absolute top-4 right-4 h-9 w-9 p-0 rounded-full hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-200 shadow-sm hover:shadow-md backdrop-blur-sm z-10"
-              title="Refresh dashboard data"
-            >
-              {loading ? (
-                <Clock className="h-4 w-4 animate-spin text-gray-600 dark:text-gray-400" />
-              ) : (
-                <RotateCcw className="h-4 w-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200" />
-              )}
-            </Button>
           </CardHeader>
         </Card>
         
