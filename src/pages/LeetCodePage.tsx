@@ -467,19 +467,19 @@ const LeetCodePage = () => {
           </div>
 
           {/* Quick Actions */}
-          <Card className="card-hover">
-            <CardHeader className="pb-4">
+          <Card className="card-hover relative overflow-hidden">
+            <CardHeader className="pb-4 relative z-10">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Zap className="h-5 w-5 text-yellow-500" />
                 Quick Solve
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <div className="space-y-2">
                 <Button 
                   onClick={() => handleOpenProblemList('Easy')}
                   variant="outline" 
-                  className="w-full justify-start text-green-600 border-green-200 hover:bg-green-50"
+                  className="w-full justify-start text-green-600 border-green-200 hover:bg-green-50 relative z-10"
                   size="sm"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -488,7 +488,7 @@ const LeetCodePage = () => {
                 <Button 
                   onClick={() => handleOpenProblemList('Medium')}
                   variant="outline" 
-                  className="w-full justify-start text-yellow-600 border-yellow-200 hover:bg-yellow-50"
+                  className="w-full justify-start text-yellow-600 border-yellow-200 hover:bg-yellow-50 relative z-10"
                   size="sm"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -497,7 +497,7 @@ const LeetCodePage = () => {
                 <Button 
                   onClick={() => handleOpenProblemList('Hard')}
                   variant="outline" 
-                  className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
+                  className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 relative z-10"
                   size="sm"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -505,17 +505,27 @@ const LeetCodePage = () => {
                 </Button>
               </div>
             </CardContent>
+            
+            {/* Background GIF positioned at bottom */}
+            <div 
+              className="absolute bottom-0 left-0 right-0 h-40 bg-no-repeat bg-center pointer-events-none"
+              style={{
+                backgroundImage: 'url(https://raw.githubusercontent.com/Sumeet-162/Google-Resume/main/06f21a161921919.63cd7887d0a70.gif)',
+                backgroundPosition: 'center bottom',
+                backgroundSize: 'contain'
+              }}
+            />
           </Card>
 
           {/* Achievements Preview */}
-          <Card className="card-hover">
-            <CardHeader className="pb-4">
+          <Card className="card-hover relative overflow-hidden">
+            <CardHeader className="pb-4 relative z-10">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-amber-500" />
                 Recent Achievements
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <div className="space-y-3">
                 {achievements.slice(0, 3).map((achievement) => (
                   <div key={achievement.id} className="flex items-center gap-3">
@@ -533,6 +543,16 @@ const LeetCodePage = () => {
                 ))}
               </div>
             </CardContent>
+            
+            {/* Background Image positioned at bottom */}
+            <div 
+              className="absolute bottom-0 left-0 right-0 h-40 bg-no-repeat bg-center pointer-events-none"
+              style={{
+                backgroundImage: 'url(https://raw.githubusercontent.com/Sumeet-162/DEVDASH-IMAGES/refs/heads/main/pngtree-line-clap-celebration-drawing-png-image_6289512-removebg-preview.png)',
+                backgroundPosition: 'center bottom',
+                backgroundSize: 'contain'
+              }}
+            />
           </Card>
         </div>
         
