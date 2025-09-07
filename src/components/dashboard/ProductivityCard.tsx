@@ -113,11 +113,15 @@ const ProductivityCard: React.FC = () => {
     <div className="space-y-6">
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/todo')}>
+        <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/todos')}>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                <CheckSquare className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              <div className="flex items-center justify-center">
+                <lord-icon
+                  src="https://cdn.lordicon.com/eavqayps.json"
+                  trigger="hover"
+                  style={{ width: '32px', height: '32px' }}
+                />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.todos.pending}</p>
@@ -130,8 +134,12 @@ const ProductivityCard: React.FC = () => {
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/notes')}>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-                <StickyNote className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <div className="flex items-center justify-center">
+                <lord-icon
+                  src="https://cdn.lordicon.com/tbabdzcy.json"
+                  trigger="hover"
+                  style={{ width: '32px', height: '32px' }}
+                />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.notes.total}</p>
@@ -144,8 +152,12 @@ const ProductivityCard: React.FC = () => {
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/calendar')}>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                <Calendar className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <div className="flex items-center justify-center">
+                <lord-icon
+                  src="https://cdn.lordicon.com/laobovmg.json"
+                  trigger="hover"
+                  style={{ width: '32px', height: '32px' }}
+                />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.calendar.todayEvents}</p>
@@ -158,8 +170,12 @@ const ProductivityCard: React.FC = () => {
         <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/pomodoro')}>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                <Timer className="h-5 w-5 text-red-600 dark:text-red-400" />
+              <div className="flex items-center justify-center">
+                <lord-icon
+                  src="https://cdn.lordicon.com/gdowkrjt.json"
+                  trigger="hover"
+                  style={{ width: '32px', height: '32px' }}
+                />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.pomodoro.todaysSessions}</p>
@@ -177,10 +193,14 @@ const ProductivityCard: React.FC = () => {
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <Target className="h-4 w-4" />
+                <lord-icon
+                  src="https://cdn.lordicon.com/rnbuzxxk.json"
+                  trigger="hover"
+                  style={{ width: '20px', height: '20px' }}
+                />
                 Task Progress
               </CardTitle>
-              <Button variant="outline" size="sm" onClick={() => navigate('/productivity/todo')}>
+              <Button variant="outline" size="sm" onClick={() => navigate('/productivity/todos')}>
                 <Plus className="h-4 w-4 mr-1" />
                 Add Task
               </Button>
@@ -213,7 +233,7 @@ const ProductivityCard: React.FC = () => {
             <Button 
               variant="outline" 
               className="w-full justify-between" 
-              onClick={() => navigate('/productivity/todo')}
+              onClick={() => navigate('/productivity/todos')}
             >
               View All Tasks
               <ArrowRight className="h-4 w-4" />
@@ -226,7 +246,11 @@ const ProductivityCard: React.FC = () => {
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <StickyNote className="h-4 w-4" />
+                <lord-icon
+                  src="https://cdn.lordicon.com/tbabdzcy.json"
+                  trigger="hover"
+                  style={{ width: '20px', height: '20px' }}
+                />
                 Recent Notes
               </CardTitle>
               <Button variant="outline" size="sm" onClick={() => navigate('/productivity/notes')}>
@@ -271,36 +295,6 @@ const ProductivityCard: React.FC = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-base font-semibold">
-            <Play className="h-4 w-4" />
-            Quick Actions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <Button variant="outline" className="justify-start" onClick={() => navigate('/productivity/todo')}>
-              <CheckSquare className="h-4 w-4 mr-2" />
-              Add Task
-            </Button>
-            <Button variant="outline" className="justify-start" onClick={() => navigate('/productivity/notes')}>
-              <StickyNote className="h-4 w-4 mr-2" />
-              New Note
-            </Button>
-            <Button variant="outline" className="justify-start" onClick={() => navigate('/productivity/calendar')}>
-              <Calendar className="h-4 w-4 mr-2" />
-              Add Event
-            </Button>
-            <Button variant="outline" className="justify-start" onClick={() => navigate('/productivity/pomodoro')}>
-              <Timer className="h-4 w-4 mr-2" />
-              Start Focus
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

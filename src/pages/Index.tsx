@@ -294,25 +294,37 @@ const Index = () => {
                 title="GitHub Repositories" 
                 value={stats.github?.totalRepos || 0}
                 description={stats.profile?.github_username ? "Total repos" : "Connect GitHub to see data"}
-                icon={<Github size={16} />}
+                lordIcon={{
+                  src: "https://cdn.lordicon.com/lllcnxva.json",
+                  trigger: "hover"
+                }}
               />
               <StatsCard 
                 title="LeetCode Problems" 
                 value={stats.leetcode?.totalSolved || 0}
                 description={stats.profile?.leetcode_username ? "Total solved" : "Connect LeetCode to see data"}
-                icon={<Code2 size={16} />}
+                lordIcon={{
+                  src: "https://cdn.lordicon.com/xpesqpji.json",
+                  trigger: "hover"
+                }}
               />
               <StatsCard 
                 title="Community Impact" 
                 value={stats.profile?.total_likes_received || 0}
                 description="Total likes received"
-                icon={<Heart size={16} />}
+                lordIcon={{
+                  src: "https://cdn.lordicon.com/ewmfucya.json",
+                  trigger: "hover"
+                }}
               />
               <StatsCard 
                 title="Network Size" 
                 value={stats.profile?.followers_count || 0}
                 description="Followers"
-                icon={<Users size={16} />}
+                lordIcon={{
+                  src: "https://cdn.lordicon.com/xvmmqwjv.json",
+                  trigger: "hover"
+                }}
               />
             </>
           )}
@@ -322,7 +334,11 @@ const Index = () => {
         <Card>
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
-              <Zap className="h-4 w-4" />
+              <lord-icon
+                src="https://cdn.lordicon.com/vnxhpszd.json"
+                trigger="hover"
+                style={{ width: '20px', height: '20px' }}
+              />
               Quick Actions
             </CardTitle>
           </CardHeader>
@@ -333,7 +349,11 @@ const Index = () => {
                 className="h-20 flex-col gap-2"
                 onClick={() => navigate('/community')}
               >
-                <Users className="h-6 w-6" />
+                <lord-icon
+                  src="https://cdn.lordicon.com/etzspqzb.json"
+                  trigger="hover"
+                  style={{ width: '32px', height: '32px' }}
+                />
                 <span>Create Post</span>
               </Button>
               <Button 
@@ -341,7 +361,11 @@ const Index = () => {
                 className="h-20 flex-col gap-2"
                 onClick={() => navigate('/leetcode')}
               >
-                <Target className="h-6 w-6" />
+                <lord-icon
+                  src="https://cdn.lordicon.com/rkozjzdh.json"
+                  trigger="hover"
+                  style={{ width: '32px', height: '32px' }}
+                />
                 <span>Solve Problems</span>
               </Button>
               <Button 
@@ -349,7 +373,13 @@ const Index = () => {
                 className="h-20 flex-col gap-2"
                 onClick={() => navigate('/github')}
               >
-                <GitBranch className="h-6 w-6" />
+                <lord-icon
+                  src="https://cdn.lordicon.com/yxsnnbst.json"
+                  trigger="in"
+                  delay="1500"
+                  state="in-reveal"
+                  style={{ width: '32px', height: '32px' }}
+                />
                 <span>Check Repos</span>
               </Button>
               <Button 
@@ -357,7 +387,11 @@ const Index = () => {
                 className="h-20 flex-col gap-2"
                 onClick={() => navigate('/productivity/pomodoro')}
               >
-                <Timer className="h-6 w-6" />
+                <lord-icon
+                  src="https://cdn.lordicon.com/gdowkrjt.json"
+                  trigger="hover"
+                  style={{ width: '32px', height: '32px' }}
+                />
                 <span>Start Focus</span>
               </Button>
             </div>
@@ -366,7 +400,14 @@ const Index = () => {
         
         {/* Productivity Section */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold">Productivity</h2>
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <lord-icon
+              src="https://cdn.lordicon.com/cqaznhoh.json"
+              trigger="hover"
+              style={{ width: '28px', height: '28px' }}
+            />
+            Productivity
+          </h2>
           <ProductivityCard />
         </div>
         
@@ -488,7 +529,11 @@ const Index = () => {
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                  <Activity className="h-4 w-4" />
+                  <lord-icon
+                    src="https://cdn.lordicon.com/pbamwmcj.json"
+                    trigger="hover"
+                    style={{ width: '20px', height: '20px' }}
+                  />
                   Recent Community Activity
                 </CardTitle>
                 <Button 
@@ -569,7 +614,11 @@ const Index = () => {
           <Card>
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
-                <Star className="h-4 w-4" />
+                <lord-icon
+                  src="https://cdn.lordicon.com/ulgefjgj.json"
+                  trigger="hover"
+                  style={{ width: '20px', height: '20px' }}
+                />
                 Latest News
               </CardTitle>
             </CardHeader>

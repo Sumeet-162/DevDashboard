@@ -114,7 +114,12 @@ const NewsCard = () => {
     <Card className="card-hover">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-bold flex items-center">
-          <Newspaper className="mr-2" size={18} /> Latest Tech News
+          <lord-icon
+            src="https://cdn.lordicon.com/uihwbzln.json"
+            trigger="hover"
+            style={{ width: '18px', height: '18px', marginRight: '8px' }}
+          />
+          Latest Tech News
         </CardTitle>
         <div className="flex gap-2">
           <Button 
