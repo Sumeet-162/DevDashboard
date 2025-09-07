@@ -325,7 +325,7 @@ const CommunityPage = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-6 pb-56">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -578,6 +578,16 @@ const CommunityPage = () => {
           confirmText="Delete"
           cancelText="Cancel"
           variant="destructive"
+        />
+      </div>
+      
+      {/* Footer Image - Fixed to bottom of content area */}
+      <div className="fixed bottom-0 left-64 right-0 w-auto flex justify-center z-10 pointer-events-none">
+        <img 
+          src="https://raw.githubusercontent.com/Sumeet-162/DEVDASH-IMAGES/refs/heads/main/5e51cc5933d368febc351897_footer-img.png"
+          alt="Community Footer"
+          className="max-w-full h-auto opacity-80"
+          style={{ maxHeight: '200px' }}
         />
       </div>
     </Layout>

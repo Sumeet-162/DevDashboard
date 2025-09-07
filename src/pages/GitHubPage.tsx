@@ -599,11 +599,11 @@ const GitHubPage = () => {
           </Card>
           
           {/* Stats */}
-          <Card className="w-full lg:w-2/3 card-hover">
-            <CardHeader className="pb-2">
+          <Card className="w-full lg:w-2/3 card-hover relative overflow-hidden">
+            <CardHeader className="pb-2 relative z-10">
               <CardTitle className="text-lg">Statistics</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="text-center">
                   <p className="text-xl sm:text-2xl font-bold">{stats.totalRepos}</p>
@@ -617,7 +617,7 @@ const GitHubPage = () => {
               
               {/* Languages */}
               {stats.languages && Object.keys(stats.languages).length > 0 && (
-                <div className="space-y-2">
+                <div className="space-y-2 ml-44">
                   <h4 className="font-medium">Top Languages</h4>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(stats.languages)
@@ -636,6 +636,17 @@ const GitHubPage = () => {
                 </div>
               )}
             </CardContent>
+            
+            {/* Background Image positioned at left bottom corner */}
+            <div 
+              className="absolute bottom-2 left-2 w-40 h-40 bg-no-repeat pointer-events-none z-0"
+              style={{
+                backgroundImage: `url('https://raw.githubusercontent.com/Sumeet-162/DEVDASH-IMAGES/refs/heads/main/Open%20Peeps%20-%20Bust%20(1).png')`,
+                backgroundPosition: 'left bottom',
+                backgroundSize: 'contain',
+                opacity: 1
+              }}
+            />
           </Card>
         </div>
 
