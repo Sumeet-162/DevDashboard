@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import PasswordResetPage from "./pages/PasswordResetPage";
+import AuthConfirmPage from "./pages/AuthConfirmPage";
 
 // Import Productivity Pages
 import TodoPage from "./pages/productivity/TodoPage";
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<PasswordResetPage />} />
+            <Route path="/auth/confirm" element={<AuthConfirmPage />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={
