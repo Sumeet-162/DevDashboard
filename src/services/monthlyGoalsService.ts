@@ -85,7 +85,7 @@ export class MonthlyGoalsService {
         const leetcodeData = await import('./leetcodeService').then(service => service.default.getUserData());
         if (leetcodeData && leetcodeData.monthlyGoal) {
           const actualProgress = leetcodeData.monthlyGoal.completed || 0;
-          console.log('LeetCode monthly progress from service:', actualProgress);
+          console.log('✅ LeetCode monthly progress from service (includes local):', actualProgress);
           return { progress: actualProgress, isValid: true };
         }
       } catch (serviceError) {
@@ -100,18 +100,30 @@ export class MonthlyGoalsService {
         // Check if the data has monthly goal information
         if (parsed.monthlyGoal && parsed.monthlyGoal.completed !== undefined) {
           const cachedProgress = parsed.monthlyGoal.completed || 0;
-          console.log('Found LeetCode monthly progress from cache:', cachedProgress);
+          console.log('✅ Found LeetCode monthly progress from cache:', cachedProgress);
           return { progress: cachedProgress, isValid: true };
         }
         
-        console.log('LeetCode data exists but no monthly goal data found');
+        console.log('⚠️ LeetCode data exists but no monthly goal data found');
+      }
+
+      // Fallback: Check for locally completed problems from Topics Mastery
+      try {
+        const LeetCodeService = await import('./leetcodeService').then(service => service.default);
+        const localProgress = LeetCodeService.getLocallyCompletedProblemsCount();
+        if (localProgress > 0) {
+          console.log('✅ Found local progress from Topics Mastery:', localProgress);
+          return { progress: localProgress, isValid: true };
+        }
+      } catch (error) {
+        console.log('Could not get local progress:', error);
       }
       
-      console.log('LeetCode username configured (' + username + ') but no cached data available - assuming 0 progress');
+      console.log('✅ LeetCode username configured (' + username + ') but no cached data available - assuming 0 progress (correct for new month)');
       return { progress: 0, isValid: true }; // Valid connection but 0 progress (which is correct for your account)
       
     } catch (error) {
-      console.error('Error getting LeetCode progress:', error);
+      console.error('❌ Error getting LeetCode progress:', error);
       return { progress: 0, isValid: false };
     }
   }

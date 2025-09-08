@@ -196,6 +196,24 @@ const LeetCodePage = () => {
     setProblemDialogOpen(true);
   };
 
+  const handleMonthlyGoalRefresh = async () => {
+    // Force re-render of monthly goal component when local progress changes
+    console.log('🔄 Refreshing monthly goal component due to local progress update');
+    setMonthlyGoalKey(prev => prev + 1);
+    
+    // Also force refresh the LeetCode data cache to ensure consistency
+    try {
+      setLoading(true);
+      const updatedData = await LeetCodeService.getUserData();
+      setData(updatedData);
+      console.log('� Refreshed LeetCode data after local progress change');
+    } catch (error) {
+      console.error('Error refreshing data after local progress change:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRefreshData = async () => {
     setLoading(true);
     try {
@@ -613,6 +631,7 @@ const LeetCodePage = () => {
               topicDistribution={topicStats} 
               username={user.username}
               isRealData={dataSource === 'real'}
+              onProgressUpdate={handleMonthlyGoalRefresh}
             />
           </TabsContent>
 

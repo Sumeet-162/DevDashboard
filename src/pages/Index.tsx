@@ -375,9 +375,7 @@ const Index = () => {
               >
                 <lord-icon
                   src="https://cdn.lordicon.com/yxsnnbst.json"
-                  trigger="in"
-                  delay="1500"
-                  state="in-reveal"
+                  trigger="hover"
                   style={{ width: '32px', height: '32px' }}
                 />
                 <span>Check Repos</span>

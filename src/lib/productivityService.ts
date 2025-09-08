@@ -61,6 +61,20 @@ export interface CalendarEvent {
   updated_at: string;
 }
 
+export interface CalendarNote {
+  id: string;
+  user_id: string;
+  title: string;
+  content?: string;
+  note_type: 'birthday' | 'reminder' | 'work_from_home' | 'holiday' | 'appointment' | 'deadline' | 'personal' | 'other';
+  note_date: string; // Date in YYYY-MM-DD format
+  color?: string;
+  is_yearly_recurring: boolean;
+  reminder_time?: string; // Time in HH:MM format
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PomodoroStats {
   totalSessions: number;
   totalWorkMinutes: number;
@@ -460,9 +474,161 @@ export class CalendarService {
   }
 }
 
+// ===========================
+// CALENDAR NOTES SERVICE
+// ===========================
+
+export class CalendarNotesService {
+  static async getNotes(startDate?: Date, endDate?: Date): Promise<CalendarNote[]> {
+    let query = supabase
+      .from('calendar_notes')
+      .select('*');
+
+    if (startDate) {
+      query = query.gte('note_date', startDate.toISOString().split('T')[0]);
+    }
+    
+    if (endDate) {
+      query = query.lte('note_date', endDate.toISOString().split('T')[0]);
+    }
+
+    const { data, error } = await query.order('note_date', { ascending: true });
+
+    if (error) throw error;
+    
+    // Handle yearly recurring notes (like birthdays)
+    if (data) {
+      const currentYear = new Date().getFullYear();
+      const expandedNotes: CalendarNote[] = [];
+      
+      data.forEach(note => {
+        expandedNotes.push(note);
+        
+        // If it's a yearly recurring note, add entries for previous and next year within the date range
+        if (note.is_yearly_recurring) {
+          const noteDate = new Date(note.note_date);
+          
+          // Add previous year occurrence
+          const prevYear = new Date(noteDate);
+          prevYear.setFullYear(currentYear - 1);
+          if (!startDate || prevYear >= startDate) {
+            if (!endDate || prevYear <= endDate) {
+              expandedNotes.push({
+                ...note,
+                id: `${note.id}_${currentYear - 1}`,
+                note_date: prevYear.toISOString().split('T')[0]
+              });
+            }
+          }
+          
+          // Add next year occurrence
+          const nextYear = new Date(noteDate);
+          nextYear.setFullYear(currentYear + 1);
+          if (!endDate || nextYear <= endDate) {
+            if (!startDate || nextYear >= startDate) {
+              expandedNotes.push({
+                ...note,
+                id: `${note.id}_${currentYear + 1}`,
+                note_date: nextYear.toISOString().split('T')[0]
+              });
+            }
+          }
+        }
+      });
+      
+      return expandedNotes.sort((a, b) => a.note_date.localeCompare(b.note_date));
+    }
+    
+    return [];
+  }
+
+  static async createNote(note: Omit<CalendarNote, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<CalendarNote> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('calendar_notes')
+      .insert({
+        ...note,
+        user_id: user.id
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async updateNote(id: string, updates: Partial<CalendarNote>): Promise<CalendarNote> {
+    // Handle yearly recurring note IDs
+    const actualId = id.includes('_') ? id.split('_')[0] : id;
+    
+    const { data, error } = await supabase
+      .from('calendar_notes')
+      .update(updates)
+      .eq('id', actualId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  }
+
+  static async deleteNote(id: string): Promise<void> {
+    // Handle yearly recurring note IDs
+    const actualId = id.includes('_') ? id.split('_')[0] : id;
+    
+    const { error } = await supabase
+      .from('calendar_notes')
+      .delete()
+      .eq('id', actualId);
+
+    if (error) throw error;
+  }
+
+  static async getNotesForDate(date: Date): Promise<CalendarNote[]> {
+    const dateStr = date.toISOString().split('T')[0];
+    
+    const { data, error } = await supabase
+      .from('calendar_notes')
+      .select('*')
+      .eq('note_date', dateStr);
+
+    if (error) throw error;
+    
+    let notes = data || [];
+    
+    // Add yearly recurring notes for this date
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    
+    const { data: recurringData, error: recurringError } = await supabase
+      .from('calendar_notes')
+      .select('*')
+      .eq('is_yearly_recurring', true)
+      .like('note_date', `%-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`);
+    
+    if (!recurringError && recurringData) {
+      recurringData.forEach(note => {
+        // Only add if it's not already in the results (different year)
+        if (!notes.find(n => n.id === note.id)) {
+          notes.push({
+            ...note,
+            id: `${note.id}_${date.getFullYear()}`,
+            note_date: dateStr
+          });
+        }
+      });
+    }
+    
+    return notes;
+  }
+}
+
 export default {
   TodoService,
   NotesService,
   PomodoroService,
-  CalendarService
+  CalendarService,
+  CalendarNotesService
 };

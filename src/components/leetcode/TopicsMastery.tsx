@@ -38,6 +38,7 @@ interface TopicsMasteryProps {
   topicDistribution: TopicStats[];
   username?: string;
   isRealData?: boolean;
+  onProgressUpdate?: () => void; // Callback to notify parent of progress changes
 }
 
 interface Problem {
@@ -56,10 +57,9 @@ interface TopicCategory {
   description: string;
   problems: Problem[];
   color: string;
-  mastery: number;
 }
 
-const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMasteryProps) => {
+const TopicsMastery = ({ topicDistribution, username, isRealData, onProgressUpdate }: TopicsMasteryProps) => {
   const [selectedTopic, setSelectedTopic] = useState<TopicCategory | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<'All' | 'Easy' | 'Medium' | 'Hard'>('All');
@@ -74,7 +74,6 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
       icon: Database,
       description: 'Array manipulation, traversal, and optimization problems',
       color: 'bg-blue-500',
-      mastery: 75,
       problems: [
         { id: 1, title: "Two Sum", difficulty: 'Easy', url: "https://leetcode.com/problems/two-sum/", completed: false, tags: ['array', 'hash-table'] },
         { id: 26, title: "Remove Duplicates from Sorted Array", difficulty: 'Easy', url: "https://leetcode.com/problems/remove-duplicates-from-sorted-array/", completed: false, tags: ['array', 'two-pointers'] },
@@ -90,7 +89,6 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
       icon: GitBranch,
       description: 'Single, double, and circular linked list operations',
       color: 'bg-green-500',
-      mastery: 60,
       problems: [
         { id: 206, title: "Reverse Linked List", difficulty: 'Easy', url: "https://leetcode.com/problems/reverse-linked-list/", completed: false, tags: ['linked-list', 'recursion'] },
         { id: 21, title: "Merge Two Sorted Lists", difficulty: 'Easy', url: "https://leetcode.com/problems/merge-two-sorted-lists/", completed: false, tags: ['linked-list', 'recursion'] },
@@ -106,7 +104,6 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
       icon: Hash,
       description: 'Hash maps, sets, and frequency counting problems',
       color: 'bg-purple-500',
-      mastery: 85,
       problems: [
         { id: 1, title: "Two Sum", difficulty: 'Easy', url: "https://leetcode.com/problems/two-sum/", completed: false, tags: ['array', 'hash-table'] },
         { id: 242, title: "Valid Anagram", difficulty: 'Easy', url: "https://leetcode.com/problems/valid-anagram/", completed: false, tags: ['hash-table', 'string'] },
@@ -122,7 +119,6 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
       icon: TreePine,
       description: 'Tree traversal, manipulation, and search algorithms',
       color: 'bg-emerald-500',
-      mastery: 45,
       problems: [
         { id: 104, title: "Maximum Depth of Binary Tree", difficulty: 'Easy', url: "https://leetcode.com/problems/maximum-depth-of-binary-tree/", completed: false, tags: ['tree', 'depth-first-search'] },
         { id: 226, title: "Invert Binary Tree", difficulty: 'Easy', url: "https://leetcode.com/problems/invert-binary-tree/", completed: false, tags: ['tree', 'depth-first-search'] },
@@ -138,7 +134,6 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
       icon: Zap,
       description: 'Optimization problems with overlapping subproblems',
       color: 'bg-yellow-500',
-      mastery: 30,
       problems: [
         { id: 70, title: "Climbing Stairs", difficulty: 'Easy', url: "https://leetcode.com/problems/climbing-stairs/", completed: false, tags: ['math', 'dynamic-programming'] },
         { id: 198, title: "House Robber", difficulty: 'Medium', url: "https://leetcode.com/problems/house-robber/", completed: false, tags: ['array', 'dynamic-programming'] },
@@ -154,7 +149,6 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
       icon: BookOpen,
       description: 'String manipulation, pattern matching, and parsing',
       color: 'bg-pink-500',
-      mastery: 70,
       problems: [
         { id: 125, title: "Valid Palindrome", difficulty: 'Easy', url: "https://leetcode.com/problems/valid-palindrome/", completed: false, tags: ['two-pointers', 'string'] },
         { id: 242, title: "Valid Anagram", difficulty: 'Easy', url: "https://leetcode.com/problems/valid-anagram/", completed: false, tags: ['hash-table', 'string'] },
@@ -170,7 +164,6 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
       icon: Network,
       description: 'Graph traversal, shortest path, and connectivity problems',
       color: 'bg-red-500',
-      mastery: 40,
       problems: [
         { id: 733, title: "Flood Fill", difficulty: 'Easy', url: "https://leetcode.com/problems/flood-fill/", completed: false, tags: ['array', 'depth-first-search'] },
         { id: 200, title: "Number of Islands", difficulty: 'Medium', url: "https://leetcode.com/problems/number-of-islands/", completed: false, tags: ['array', 'depth-first-search'] },
@@ -186,7 +179,6 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
       icon: Search,
       description: 'Search algorithms and optimization with sorted data',
       color: 'bg-indigo-500',
-      mastery: 55,
       problems: [
         { id: 704, title: "Binary Search", difficulty: 'Easy', url: "https://leetcode.com/problems/binary-search/", completed: false, tags: ['array', 'binary-search'] },
         { id: 278, title: "First Bad Version", difficulty: 'Easy', url: "https://leetcode.com/problems/first-bad-version/", completed: false, tags: ['binary-search', 'interactive'] },
@@ -198,17 +190,34 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
     }
   ];
 
-  const handleProblemToggle = (problemId: number) => {
+  const handleProblemToggle = async (problemId: number) => {
     const newCompleted = new Set(completedProblems);
-    if (newCompleted.has(problemId)) {
+    const wasCompleted = newCompleted.has(problemId);
+    
+    if (wasCompleted) {
       newCompleted.delete(problemId);
     } else {
       newCompleted.add(problemId);
     }
+    
     setCompletedProblems(newCompleted);
     
     // Store in localStorage for persistence
     localStorage.setItem('completed_problems', JSON.stringify(Array.from(newCompleted)));
+    
+    // Notify LeetCode service about the change for monthly tracking
+    try {
+      const LeetCodeService = await import('@/services/leetcodeService').then(module => module.default);
+      LeetCodeService.trackLocalProblemCompletion(problemId, !wasCompleted);
+      console.log(`📊 Updated monthly progress tracking for problem ${problemId}`);
+      
+      // Notify parent component to refresh monthly goal
+      if (onProgressUpdate) {
+        onProgressUpdate();
+      }
+    } catch (error) {
+      console.error('Error updating monthly progress:', error);
+    }
   };
 
   // Load completed problems from localStorage on mount
@@ -217,10 +226,32 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
     if (stored) {
       try {
         const completedArray = JSON.parse(stored);
+        console.log('📊 Loaded completed problems from localStorage:', completedArray);
         setCompletedProblems(new Set(completedArray));
+        
+        // Initialize monthly tracking for existing completions
+        const initializeMonthlyTracking = async () => {
+          try {
+            const LeetCodeService = await import('@/services/leetcodeService').then(module => module.default);
+            const currentMonth = new Date().toISOString().slice(0, 7);
+            const monthlyCompletedKey = `completed_problems_monthly_${currentMonth}`;
+            
+            // If no monthly tracking exists, initialize with current completions
+            if (!localStorage.getItem(monthlyCompletedKey) && completedArray.length > 0) {
+              console.log(`📊 Initializing monthly tracking with ${completedArray.length} existing completions`);
+              localStorage.setItem(monthlyCompletedKey, JSON.stringify(completedArray));
+            }
+          } catch (error) {
+            console.error('Error initializing monthly tracking:', error);
+          }
+        };
+        
+        initializeMonthlyTracking();
       } catch (error) {
         console.error('Error loading completed problems:', error);
       }
+    } else {
+      console.log('📊 No completed problems found in localStorage');
     }
   }, []);
 
@@ -274,8 +305,8 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
               </div>
             </div>
             <div className="text-right">
-              <div className={`text-sm font-medium ${getMasteryColor(selectedTopic.mastery)}`}>
-                {selectedTopic.mastery}% Mastery
+              <div className={`text-sm font-medium ${getMasteryColor(Math.round((completedProblems.size / selectedTopic.problems.length) * 100))}`}>
+                {Math.round((completedProblems.size / selectedTopic.problems.length) * 100)}% Complete
               </div>
               <div className="text-xs text-muted-foreground">
                 {completedProblems.size} / {selectedTopic.problems.length} completed
@@ -323,10 +354,18 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
               <span>Progress</span>
               <span>{completedProblems.size} / {selectedTopic.problems.length}</span>
             </div>
-            <Progress 
-              value={(completedProblems.size / selectedTopic.problems.length) * 100} 
-              className="h-2"
-            />
+            
+            {/* Custom Progress Bar for better reliability */}
+            <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+              <div 
+                className="h-full transition-all duration-300 ease-out rounded-full"
+                style={{ 
+                  width: `${Math.min(100, Math.max(0, (completedProblems.size / selectedTopic.problems.length) * 100))}%`,
+                  backgroundColor: ((completedProblems.size / selectedTopic.problems.length) * 100) >= 100 ? '#10b981' : 
+                                 ((completedProblems.size / selectedTopic.problems.length) * 100) >= 50 ? '#3b82f6' : '#f59e0b'
+                }}
+              />
+            </div>
           </div>
 
           {/* Problems List */}
@@ -400,6 +439,11 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
             const completedCount = topic.problems.filter(p => completedProblems.has(p.id)).length;
             const progressPercentage = (completedCount / topic.problems.length) * 100;
             
+            // Debug logging for progress calculation
+            if (completedCount > 0) {
+              console.log(`📊 ${topic.name}: ${completedCount}/${topic.problems.length} = ${progressPercentage.toFixed(1)}%`);
+            }
+            
             return (
               <div
                 key={topic.id}
@@ -424,10 +468,21 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
                       {topic.description}
                     </p>
                     <div className="space-y-1">
-                      <Progress value={progressPercentage} className="h-1.5" />
+                      {/* Custom Progress Bar for better reliability */}
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                        <div 
+                          className="h-full transition-all duration-300 ease-out rounded-full"
+                          style={{ 
+                            width: `${Math.min(100, Math.max(progressPercentage > 0 ? 2 : 0, progressPercentage))}%`, // Minimum 2% width if any progress
+                            backgroundColor: progressPercentage >= 80 ? '#10b981' : 
+                                           progressPercentage >= 40 ? '#3b82f6' : 
+                                           progressPercentage > 0 ? '#f59e0b' : 'transparent'
+                          }}
+                        />
+                      </div>
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>{completedCount}/{topic.problems.length} solved</span>
-                        <span>{topic.problems.length} problems</span>
+                        <span>{Math.round(progressPercentage)}% complete</span>
                       </div>
                     </div>
                   </div>
@@ -435,15 +490,6 @@ const TopicsMastery = ({ topicDistribution, username, isRealData }: TopicsMaster
               </div>
             );
           })}
-        </div>
-        
-        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="flex items-center gap-2 text-blue-800 text-sm">
-            <Code2 className="h-4 w-4" />
-            <span className="font-medium">
-              Click on any topic to see problems and track your progress
-            </span>
-          </div>
         </div>
       </CardContent>
     </Card>

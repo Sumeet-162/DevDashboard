@@ -943,7 +943,17 @@ export class LeetCodeService {
     const daysPassed = now.getDate();
     const daysLeft = daysInMonth - daysPassed;
 
-    // For demo data, use fake values
+    // For demo data, check if user has completed any local problems
+    const localCompleted = this.getLocallyCompletedProblemsCount();
+    
+    if (localCompleted > 0) {
+      // User has local progress, use that as the base
+      console.log(`📊 Demo user has ${localCompleted} locally completed problems this month`);
+      const target = Math.max(30, localCompleted + 10); // Ensure target is reasonable
+      return { target, completed: localCompleted, daysLeft };
+    }
+
+    // For demo data without local progress, use fake values
     const target = Math.floor(this.seededRandom() * 20) + 15; // 15-35 problems per month
     const completed = Math.floor((daysPassed / daysInMonth) * target * (0.7 + this.seededRandom() * 0.4));
 
@@ -998,15 +1008,26 @@ export class LeetCodeService {
     const daysPassed = now.getDate();
     const daysLeft = daysInMonth - daysPassed;
 
-    // Get actual progress from calendar data
-    const actualCompleted = this.calculateMonthlyProgressFromCalendar(calendar);
+    // Get actual progress from calendar data (API-based problems)
+    const apiCompleted = this.calculateMonthlyProgressFromCalendar(calendar);
+    
+    // Add locally completed problems from Topics Mastery
+    const localCompleted = this.getLocallyCompletedProblemsCount();
+    
+    // Total completed is API progress + local progress
+    const totalCompleted = apiCompleted + localCompleted;
+    
+    console.log(`📊 Monthly Goal Calculation:`);
+    console.log(`   - API completed: ${apiCompleted}`);
+    console.log(`   - Local completed: ${localCompleted}`);
+    console.log(`   - Total completed: ${totalCompleted}`);
     
     // Default target (could be retrieved from MonthlyGoalsService in the future)
     const target = 30; // Default monthly goal
     
     return { 
       target, 
-      completed: actualCompleted, 
+      completed: totalCompleted, 
       daysLeft 
     };
   }
@@ -1096,6 +1117,73 @@ export class LeetCodeService {
 
     this.cache = data;
     this.saveToStorage();
+  }
+
+  // Add locally completed problems from Topics Mastery to monthly progress
+  static getLocallyCompletedProblemsCount(): number {
+    try {
+      const completedProblems = localStorage.getItem('completed_problems');
+      if (!completedProblems) return 0;
+      
+      const completedArray = JSON.parse(completedProblems);
+      const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
+      
+      // Check if we have monthly tracking data
+      const monthlyCompletedKey = `completed_problems_monthly_${currentMonth}`;
+      const monthlyCompleted = localStorage.getItem(monthlyCompletedKey);
+      
+      if (monthlyCompleted) {
+        const monthlyArray = JSON.parse(monthlyCompleted);
+        console.log(`📊 Found ${monthlyArray.length} locally completed problems this month (${currentMonth})`);
+        return monthlyArray.length;
+      }
+      
+      // If no monthly data exists, assume all current completions are from this month
+      // (This handles the case when user first starts using Topics Mastery)
+      if (completedArray.length > 0) {
+        console.log(`📊 No monthly tracking data found, assuming ${completedArray.length} problems completed this month`);
+        localStorage.setItem(monthlyCompletedKey, JSON.stringify(completedArray));
+        return completedArray.length;
+      }
+      
+      return 0;
+    } catch (error) {
+      console.error('Error getting locally completed problems count:', error);
+      return 0;
+    }
+  }
+
+  // Update monthly tracking when a problem is completed locally
+  static trackLocalProblemCompletion(problemId: number, isCompleted: boolean): void {
+    try {
+      const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
+      const monthlyCompletedKey = `completed_problems_monthly_${currentMonth}`;
+      
+      let monthlyCompleted: number[] = [];
+      const existing = localStorage.getItem(monthlyCompletedKey);
+      if (existing) {
+        monthlyCompleted = JSON.parse(existing);
+      }
+      
+      if (isCompleted && !monthlyCompleted.includes(problemId)) {
+        monthlyCompleted.push(problemId);
+        console.log(`✅ Added problem ${problemId} to monthly tracking for ${currentMonth}`);
+      } else if (!isCompleted) {
+        monthlyCompleted = monthlyCompleted.filter(id => id !== problemId);
+        console.log(`❌ Removed problem ${problemId} from monthly tracking for ${currentMonth}`);
+      }
+      
+      localStorage.setItem(monthlyCompletedKey, JSON.stringify(monthlyCompleted));
+      
+      // Update the overall completion count in the cached data if available
+      if (this.cache) {
+        this.cache.monthlyGoal.completed = monthlyCompleted.length;
+        console.log(`📊 Updated monthly goal progress to ${monthlyCompleted.length} problems`);
+      }
+      
+    } catch (error) {
+      console.error('Error tracking local problem completion:', error);
+    }
   }
 
   // Clear cache to regenerate data

@@ -32,6 +32,11 @@ const MonthlyGoalSelector: React.FC<MonthlyGoalSelectorProps> = ({ userId }) => 
     try {
       const goal = await MonthlyGoalsService.getUserMonthlyGoal(userId || 'demo-user');
       if (goal) {
+        console.log('📊 Monthly Goal Loaded:', {
+          completed: goal.completed,
+          target: goal.target,
+          progressPercentage: goal.progressPercentage
+        });
         setCurrentGoal(goal);
         setNewTarget(goal.target);
       }
@@ -188,9 +193,36 @@ const MonthlyGoalSelector: React.FC<MonthlyGoalSelectorProps> = ({ userId }) => 
 
             {/* Progress Bar */}
             <div className="space-y-3">
-              <Progress value={currentGoal.progressPercentage} className="h-3" />
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Progress: {Math.min(100, Math.max(0, currentGoal.progressPercentage))}%</span>
+                  <span className="font-medium">{currentGoal.completed}/{currentGoal.target}</span>
+                </div>
+                
+                {/* Custom Progress Bar for better reliability */}
+                <div className="w-full bg-secondary rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-300 ease-out rounded-full"
+                    style={{ 
+                      width: `${Math.min(100, Math.max(0, currentGoal.progressPercentage))}%`,
+                      backgroundColor: currentGoal.progressPercentage >= 100 ? '#10b981' : '#3b82f6'
+                    }}
+                  />
+                </div>
+                
+                {/* Fallback: Also include the original Progress component for debugging */}
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="opacity-50">
+                    <Progress 
+                      key={`progress-${currentGoal.completed}-${currentGoal.target}-${currentGoal.progressPercentage}`}
+                      value={Math.min(100, Math.max(0, currentGoal.progressPercentage))} 
+                      className="h-2"
+                    />
+                  </div>
+                )}
+              </div>
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Progress</span>
+                <span>Keep going!</span>
                 <span>{Math.max(0, currentGoal.target - currentGoal.completed)} problems remaining</span>
               </div>
             </div>

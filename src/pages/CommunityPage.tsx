@@ -280,14 +280,14 @@ const CommunityPage = () => {
 
   const StatCard = ({ icon: Icon, title, value, subtitle }: any) => (
     <Card>
-      <CardContent className="p-4">
+      <CardContent className="p-3 md:p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold">{value.toLocaleString()}</p>
-            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+            <p className="text-xs md:text-sm text-muted-foreground">{title}</p>
+            <p className="text-lg md:text-2xl font-bold">{value.toLocaleString()}</p>
+            {subtitle && <p className="text-xs text-muted-foreground hidden sm:block">{subtitle}</p>}
           </div>
-          <Icon className="h-8 w-8 text-muted-foreground" />
+          <Icon className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
         </div>
       </CardContent>
     </Card>
@@ -325,7 +325,7 @@ const CommunityPage = () => {
 
   return (
     <Layout>
-      <div className="space-y-6 pb-56">
+      <div className="space-y-6 pb-32 sm:pb-40 md:pb-56">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -339,22 +339,22 @@ const CommunityPage = () => {
         </div>
 
         {/* Community Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
           <StatCard
             icon={Users}
-            title="Total Members"
+            title="Members"
             value={communityStats.totalMembers}
             subtitle="Active developers"
           />
           <StatCard
             icon={MessageSquare}
-            title="Posts Shared"
+            title="Posts"
             value={communityStats.totalPosts}
             subtitle="Knowledge posts"
           />
           <StatCard
             icon={Heart}
-            title="Total Likes"
+            title="Likes"
             value={communityStats.totalLikes}
             subtitle="Community engagement"
           />
@@ -367,22 +367,26 @@ const CommunityPage = () => {
         </div>
         
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="popular" className="gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Popular
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 p-1 h-auto">
+            <TabsTrigger value="popular" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Popular</span>
+              <span className="xs:hidden">Pop</span>
             </TabsTrigger>
-            <TabsTrigger value="recent" className="gap-2">
-              <Calendar className="h-4 w-4" />
-              Recent
+            <TabsTrigger value="recent" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Recent</span>
+              <span className="xs:hidden">New</span>
             </TabsTrigger>
-            <TabsTrigger value="following" className="gap-2">
-              <UserPlus className="h-4 w-4" />
-              Following
+            <TabsTrigger value="following" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+              <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Following</span>
+              <span className="xs:hidden">Follow</span>
             </TabsTrigger>
-            <TabsTrigger value="members" className="gap-2">
-              <Users className="h-4 w-4" />
-              Members
+            <TabsTrigger value="members" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Members</span>
+              <span className="xs:hidden">Users</span>
             </TabsTrigger>
           </TabsList>
 
@@ -581,13 +585,13 @@ const CommunityPage = () => {
         />
       </div>
       
-      {/* Footer Image - Fixed to bottom of content area */}
-      <div className="fixed bottom-0 left-64 right-0 w-auto flex justify-center z-10 pointer-events-none">
+      {/* Footer Image - Responsive positioning */}
+      <div className="fixed bottom-0 left-0 md:left-16 lg:left-64 right-0 w-auto flex justify-center z-10 pointer-events-none">
         <img 
           src="https://raw.githubusercontent.com/Sumeet-162/DEVDASH-IMAGES/refs/heads/main/5e51cc5933d368febc351897_footer-img.png"
           alt="Community Footer"
-          className="max-w-full h-auto opacity-80"
-          style={{ maxHeight: '200px' }}
+          className="max-w-full h-auto opacity-80 scale-75 sm:scale-90 md:scale-100"
+          style={{ maxHeight: '120px' }}
         />
       </div>
     </Layout>

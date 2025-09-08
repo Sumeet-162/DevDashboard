@@ -136,12 +136,12 @@ export default function NewsPage() {
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="relative flex-1 sm:flex-initial">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search articles..." 
-                className="w-full lg:w-80 pl-9" 
+                className="w-full sm:w-64 lg:w-80 pl-9" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -152,6 +152,7 @@ export default function NewsPage() {
               onClick={handleRefresh}
               disabled={refreshing}
               title={cacheInfo ? `Last updated: ${cacheInfo.lastUpdated}` : 'Refresh news'}
+              className="flex-shrink-0"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
@@ -184,16 +185,16 @@ export default function NewsPage() {
 
         {/* Category Tabs */}
         <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-1 p-1 h-auto">
             {updatedCategories.map((category) => (
               <TabsTrigger 
                 key={category.id} 
                 value={category.id}
-                className="flex items-center gap-1"
+                className="flex flex-col sm:flex-row items-center gap-1 text-xs sm:text-sm py-2 sm:py-2.5"
               >
-                {category.label}
+                <span className="truncate">{category.label}</span>
                 {category.count > 0 && (
-                  <Badge variant="secondary" className="text-xs">
+                  <Badge variant="secondary" className="text-xs min-w-[20px] h-4 px-1">
                     {category.count}
                   </Badge>
                 )}
@@ -217,11 +218,11 @@ export default function NewsPage() {
                       <div className="flex flex-col lg:flex-row">
                         {/* Article Image */}
                         {article.imageUrl && (
-                          <div className="lg:w-64 lg:flex-shrink-0">
+                          <div className="w-full sm:w-auto lg:w-64 lg:flex-shrink-0">
                             <img 
                               src={article.imageUrl} 
                               alt={article.title}
-                              className="w-full h-48 lg:h-full object-cover"
+                              className="w-full h-48 sm:h-32 lg:h-full object-cover"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).style.display = 'none';
                               }}
@@ -230,78 +231,82 @@ export default function NewsPage() {
                         )}
                         
                         {/* Article Content */}
-                        <div className="flex-1 p-6">
-                          <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 p-4 sm:p-6">
+                          <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-3 gap-3">
                             <div className="flex items-center gap-3">
                               <Avatar className="h-8 w-8">
                                 <AvatarImage src={article.authorAvatar} alt={article.author} />
                                 <AvatarFallback>{article.author[0]}</AvatarFallback>
                               </Avatar>
-                              <div className="text-sm text-muted-foreground">
-                                <div className="font-medium">{article.author}</div>
-                                <div className="flex items-center gap-2">
+                              <div className="text-sm text-muted-foreground min-w-0 flex-1">
+                                <div className="font-medium truncate">{article.author}</div>
+                                <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-xs">
                                   {getSourceIcon(article.source)}
-                                  <span>{article.source}</span>
-                                  <span>•</span>
-                                  <Clock className="h-3 w-3" />
-                                  <span>{article.publishedAt}</span>
+                                  <span className="truncate">{article.source}</span>
+                                  <span className="hidden sm:inline">•</span>
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3" />
+                                    <span>{article.publishedAt}</span>
+                                  </div>
                                   {article.readTime && (
                                     <>
-                                      <span>•</span>
-                                      <span>{article.readTime}</span>
+                                      <span className="hidden sm:inline">•</span>
+                                      <span className="text-xs">{article.readTime}</span>
                                     </>
                                   )}
                                 </div>
                               </div>
                             </div>
-                            <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon" className="flex-shrink-0">
                               <Bookmark className="h-4 w-4" />
                             </Button>
                           </div>
 
-                          <h2 className="text-xl font-bold mb-2 line-clamp-2">
+                          <h2 className="text-lg sm:text-xl font-bold mb-2 line-clamp-2">
                             {article.title}
                           </h2>
                           
-                          <p className="text-muted-foreground mb-4 line-clamp-3">
+                          <p className="text-muted-foreground mb-4 line-clamp-2 sm:line-clamp-3 text-sm sm:text-base">
                             {article.summary}
                           </p>
 
                           {/* Tags */}
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {article.tags.slice(0, 4).map((tag) => (
+                          <div className="flex flex-wrap gap-1 sm:gap-2 mb-4">
+                            {article.tags.slice(0, 3).map((tag) => (
                               <Badge key={tag} variant="secondary" className="text-xs">
                                 #{tag}
                               </Badge>
                             ))}
-                            {article.tags.length > 4 && (
+                            {article.tags.length > 3 && (
                               <Badge variant="outline" className="text-xs">
-                                +{article.tags.length - 4} more
+                                +{article.tags.length - 3}
                               </Badge>
                             )}
                           </div>
 
                           {/* Actions */}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <Button variant="ghost" size="sm" className="gap-1">
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                            <div className="flex items-center gap-3 sm:gap-4">
+                              <Button variant="ghost" size="sm" className="gap-1 text-xs">
                                 <Heart className="h-4 w-4" />
-                                {article.likes}
+                                <span className="hidden sm:inline">{article.likes}</span>
+                                <span className="sm:hidden">{article.likes}</span>
                               </Button>
-                              <Button variant="ghost" size="sm" className="gap-1">
+                              <Button variant="ghost" size="sm" className="gap-1 text-xs">
                                 <MessageCircle className="h-4 w-4" />
-                                {article.comments}
+                                <span className="hidden sm:inline">{article.comments}</span>
+                                <span className="sm:hidden">{article.comments}</span>
                               </Button>
                             </div>
                             
                             <Button 
                               variant="outline" 
                               size="sm" 
-                              className="gap-1"
+                              className="gap-1 text-xs"
                               onClick={() => window.open(article.sourceUrl, '_blank')}
                             >
                               <ExternalLink className="h-4 w-4" />
-                              Read More
+                              <span>Read More</span>
                             </Button>
                           </div>
                         </div>
