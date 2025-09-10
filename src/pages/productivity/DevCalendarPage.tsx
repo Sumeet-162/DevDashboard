@@ -45,6 +45,7 @@ interface CalendarDay {
   date: Date;
   isCurrentMonth: boolean;
   isToday: boolean;
+  isWeekend: boolean;
   events: CalendarEvent[];
   notes: CalendarNote[];
 }
@@ -247,14 +248,15 @@ const DevCalendarPage = () => {
       });
 
       const dayNotes = notes.filter(note => {
-        const noteDate = new Date(note.note_date);
-        return noteDate.toDateString() === date.toDateString();
+        const targetDateStr = formatDateForDatabase(date);
+        return note.note_date === targetDateStr;
       });
       
       days.push({
         date,
         isCurrentMonth: date.getMonth() === month,
         isToday: date.toDateString() === today.toDateString(),
+        isWeekend: date.getDay() === 0 || date.getDay() === 6, // Sunday = 0, Saturday = 6
         events: dayEvents,
         notes: dayNotes
       });
@@ -315,6 +317,14 @@ const DevCalendarPage = () => {
     }
   };
 
+  // Helper function to format date without timezone conversion
+  const formatDateForDatabase = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleCreateNote = async () => {
     if (!newNote.title.trim() || !selectedDate) return;
 
@@ -323,7 +333,7 @@ const DevCalendarPage = () => {
         title: newNote.title,
         content: newNote.content,
         note_type: newNote.note_type,
-        note_date: selectedDate.toISOString().split('T')[0],
+        note_date: formatDateForDatabase(selectedDate),
         color: newNote.color,
         is_yearly_recurring: newNote.is_yearly_recurring,
         reminder_time: newNote.reminder_time || undefined
@@ -426,9 +436,9 @@ const DevCalendarPage = () => {
   };
 
   const getNotesForDate = (date: Date) => {
+    const targetDateStr = formatDateForDatabase(date);
     return notes.filter(note => {
-      const noteDate = new Date(note.note_date);
-      return noteDate.toDateString() === date.toDateString();
+      return note.note_date === targetDateStr;
     }).sort((a, b) => a.title.localeCompare(b.title));
   };
 
@@ -652,11 +662,26 @@ const DevCalendarPage = () => {
                       </Button>
                     </div>
                   </div>
+                  
+                  {/* Weekend Legend */}
+                  <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground mt-3 pt-3 border-t">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded bg-red-100 dark:bg-red-950/20 border border-red-200 dark:border-red-800"></div>
+                      <span>Weekend/Public Holiday</span>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-7 gap-0.5 sm:gap-1 mb-3 sm:mb-4">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                      <div key={day} className="p-1 sm:p-2 text-center text-xs sm:text-sm font-medium text-muted-foreground">
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                      <div 
+                        key={day} 
+                        className={`p-1 sm:p-2 text-center text-xs sm:text-sm font-medium ${
+                          index === 0 || index === 6 
+                            ? 'text-red-600 dark:text-red-400 font-semibold' // Weekend styling
+                            : 'text-muted-foreground'
+                        }`}
+                      >
                         <span className="hidden sm:inline">{day}</span>
                         <span className="sm:hidden">{day.charAt(0)}</span>
                       </div>
@@ -669,12 +694,27 @@ const DevCalendarPage = () => {
                         key={index}
                         className={`
                           min-h-[60px] sm:min-h-[100px] p-1 sm:p-2 border rounded cursor-pointer transition-colors
-                          ${day.isCurrentMonth ? 'bg-background hover:bg-muted/50' : 'bg-muted/20 text-muted-foreground hover:bg-muted/30'}
+                          ${day.isCurrentMonth 
+                            ? (day.isWeekend 
+                                ? 'bg-red-50 dark:bg-red-950/20 hover:bg-red-100 dark:hover:bg-red-900/30' 
+                                : 'bg-background hover:bg-muted/50'
+                              )
+                            : (day.isWeekend 
+                                ? 'bg-red-100/50 dark:bg-red-950/10 text-muted-foreground hover:bg-red-200/50 dark:hover:bg-red-900/20' 
+                                : 'bg-muted/20 text-muted-foreground hover:bg-muted/30'
+                              )
+                          }
                           ${day.isToday ? 'ring-1 sm:ring-2 ring-primary' : ''}
                         `}
                         onClick={() => handleDateClick(day.date)}
                       >
-                        <div className={`text-xs sm:text-sm mb-1 ${day.isToday ? 'font-bold text-primary' : ''}`}>
+                        <div className={`text-xs sm:text-sm mb-1 ${
+                          day.isToday 
+                            ? 'font-bold text-primary' 
+                            : day.isWeekend 
+                              ? 'font-semibold text-red-700 dark:text-red-300'
+                              : ''
+                        }`}>
                           {day.date.getDate()}
                         </div>
                         <div className="space-y-1 sm:space-y-1.5">
