@@ -44,6 +44,11 @@ const navItems = [
     title: "Community", 
     icon: Users, 
     href: "/community" 
+  },
+  { 
+    title: "Job Ready Hub", 
+    icon: Zap, 
+    href: "/job-ready" 
   }
 ];
 

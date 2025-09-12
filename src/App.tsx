@@ -27,6 +27,7 @@ import TodoPage from "./pages/productivity/TodoPage";
 import QuickNotesPage from "./pages/productivity/QuickNotesPage";
 import PomodoroPage from "./pages/productivity/PomodoroPage";
 import DevCalendarPage from "./pages/productivity/DevCalendarPage";
+import JobReadyHub from "./pages/JobReadyHub";
 
 const queryClient = new QueryClient();
 
@@ -116,6 +117,13 @@ const App = () => (
             <Route path="/productivity/calendar" element={
               <ProtectedRoute>
                 <DevCalendarPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Job Ready Hub */}
+            <Route path="/job-ready" element={
+              <ProtectedRoute>
+                <JobReadyHub />
               </ProtectedRoute>
             } />
             
