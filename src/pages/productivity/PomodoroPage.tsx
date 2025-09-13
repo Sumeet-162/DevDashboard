@@ -57,6 +57,7 @@ const PomodoroPage = () => {
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<Date | null>(null);
+  const settingsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadStats();
@@ -220,6 +221,19 @@ const PomodoroPage = () => {
     }
   };
 
+  const handleSettingsClick = () => {
+    setShowSettings(!showSettings);
+    // If showing settings, scroll to settings section after a brief delay
+    if (!showSettings) {
+      setTimeout(() => {
+        settingsRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+      }, 100);
+    }
+  };
+
   const saveSettings = () => {
     localStorage.setItem('pomodoro-settings', JSON.stringify(settings));
     // Reset timer if not running
@@ -274,7 +288,7 @@ const PomodoroPage = () => {
             <h1 className="text-3xl font-bold text-card-foreground">Pomodoro Timer</h1>
             <p className="text-muted-foreground mt-1 text-base">Focus better with the Pomodoro Technique</p>
           </div>
-          <Button variant="outline" onClick={() => setShowSettings(!showSettings)} className="font-semibold">
+          <Button variant="outline" onClick={handleSettingsClick} className="font-semibold">
             <Settings className="h-4 w-4 mr-2" />
             Settings
           </Button>
@@ -498,7 +512,7 @@ const PomodoroPage = () => {
 
             {/* Settings Panel */}
             {showSettings && (
-              <Card>
+              <Card ref={settingsRef}>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Settings className="h-5 w-5" />

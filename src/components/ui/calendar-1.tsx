@@ -58,39 +58,39 @@ export const Component = React.forwardRef<
         month: "flex flex-col gap-4",
         nav: "absolute flex h-8 w-full items-center justify-between p-0.5",
         month_caption: "flex h-8 items-center justify-center",
-        caption_label: "text-sm font-semibold text-zinc-900",
+        caption_label: "text-sm font-semibold text-foreground",
         button_previous:
-          "inline-flex h-8 w-8 items-center justify-center rounded border border-transparent bg-transparent hover:bg-zinc-100 active:bg-zinc-200",
+          "inline-flex h-8 w-8 items-center justify-center rounded border border-transparent bg-transparent hover:bg-muted active:bg-muted/80",
         button_next:
-          "inline-flex h-8 w-8 items-center justify-center rounded border border-transparent bg-transparent hover:bg-zinc-100 active:bg-zinc-200",
-        chevron: "text-[18px] font-medium leading-[18px] text-zinc-600",
+          "inline-flex h-8 w-8 items-center justify-center rounded border border-transparent bg-transparent hover:bg-muted active:bg-muted/80",
+        chevron: "text-[18px] font-medium leading-[18px] text-muted-foreground",
 
         weeks: "flex flex-col gap-2",
         weekdays: "flex pb-4",
-        weekday: "w-8 text-xs font-semibold text-zinc-500",
+        weekday: "w-8 text-xs font-semibold text-muted-foreground",
 
         week: "flex overflow-hidden rounded-lg",
 
-        day: "group flex h-8 w-8 cursor-pointer items-center justify-center text-sm text-zinc-900",
+        day: "group flex h-8 w-8 cursor-pointer items-center justify-center text-sm text-foreground",
 
         day_button:
           [
             "flex h-8 w-8 items-center justify-center rounded-lg border-none",
-            "hover:bg-zinc-100",
+            "hover:bg-muted",
             // selected
-            "group-[.selected]:bg-indigo-600 group-[.selected]:text-white",
+            "group-[.selected]:bg-primary group-[.selected]:text-primary-foreground",
             // outside days
-            "group-[.outside]:bg-transparent group-[.outside]:text-zinc-400 group-[.outside]:hover:bg-zinc-100",
+            "group-[.outside]:bg-transparent group-[.outside]:text-muted-foreground group-[.outside]:hover:bg-muted",
             // range selection states
             "group-[.range-start]:rounded-l-lg group-[.range-end]:rounded-r-lg",
-            "group-[.range-middle]:bg-indigo-50 group-[.range-middle]:text-zinc-900",
+            "group-[.range-middle]:bg-muted group-[.range-middle]:text-foreground",
           ].join(" "),
 
         selected: "selected",
         outside: "outside",
-        range_start: "range-start bg-indigo-50",
+        range_start: "range-start bg-muted",
         range_middle: "range-middle",
-        range_end: "range-end bg-indigo-50",
+        range_end: "range-end bg-muted",
       }}
     />
   );

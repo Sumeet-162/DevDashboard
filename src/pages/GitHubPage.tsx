@@ -681,13 +681,13 @@ const GitHubPage = () => {
                   <GitPullRequest size={16} /> 
                   <span className="hidden sm:inline">Pull Requests</span>
                   <span className="sm:hidden">PRs</span>
-                  ({pullRequests.totalCount})
+                  {isAuthenticated ? `(${pullRequests.totalCount})` : ''}
                 </TabsTrigger>
                 <TabsTrigger value="issues" className="flex items-center gap-2 text-sm sm:text-base">
                   <AlertCircle size={16} /> 
                   <span className="hidden sm:inline">Issues</span>
                   <span className="sm:hidden">Issues</span>
-                  ({issues.totalCount})
+                  {isAuthenticated ? `(${issues.totalCount})` : ''}
                 </TabsTrigger>
               </TabsList>
               
@@ -765,178 +765,216 @@ const GitHubPage = () => {
               </TabsContent>
               
               <TabsContent value="pullRequests">
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Total Pull Requests: {pullRequests.totalCount}
-                  </p>
-                  
-                  <ScrollArea className="h-[400px] pr-4">
-                    <div className="space-y-3">
-                      {pullRequests.pullRequests.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">
-                          No pull requests found
-                        </p>
-                      ) : (
-                        pullRequests.pullRequests.map((pr: any) => (
-                          <div key={pr.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                            <div className="flex justify-between items-start">
-                              <div className="flex-1">
-                                <h3 className="font-medium mb-1 hover:text-primary text-sm">
-                                  <a 
-                                    href={pr.url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-1"
-                                  >
-                                    {pr.title}
-                                    <ExternalLink className="h-3 w-3" />
-                                  </a>
-                                </h3>
-                                <p className="text-sm text-muted-foreground mb-2">
-                                  {pr.repository.nameWithOwner}
-                                </p>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                                  <span className={`${
-                                    pr.state === 'OPEN' ? 'text-green-600' : 
-                                    pr.state === 'MERGED' ? 'text-purple-600' : 'text-gray-600'
-                                  }`}>
-                                    #{pr.number}
-                                  </span>
-                                  <span className="text-xs">
-                                    {pr.state === 'MERGED' && pr.mergedAt
-                                      ? `merged ${new Date(pr.mergedAt).toLocaleDateString()}`
-                                      : `opened ${new Date(pr.createdAt).toLocaleDateString()}`
-                                    }
-                                  </span>
-                                  {pr.additions !== undefined && pr.deletions !== undefined && (
-                                    <span className="text-xs">
-                                      +{pr.additions} -{pr.deletions}
+                {!isAuthenticated ? (
+                  <div className="text-center py-12 space-y-4">
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+                      <GitPullRequest className="h-12 w-12 text-blue-500 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-blue-900 dark:text-blue-100 mb-2">
+                        Pull Requests Data
+                      </h3>
+                      <p className="text-blue-700 dark:text-blue-300 mb-4">
+                        Current data shown is based on your public GitHub repository activities. 
+                        To see complete pull request data and private repository activity, please complete OAuth authentication.
+                      </p>
+                      <Button onClick={handleAuthenticateGitHub} className="bg-blue-600 hover:bg-blue-700">
+                        <Github className="h-4 w-4 mr-2" />
+                        Complete OAuth
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Total Pull Requests: {pullRequests.totalCount}
+                    </p>
+                    
+                    <ScrollArea className="h-[400px] pr-4">
+                      <div className="space-y-3">
+                        {pullRequests.pullRequests.length === 0 ? (
+                          <p className="text-muted-foreground text-center py-8">
+                            No pull requests found
+                          </p>
+                        ) : (
+                          pullRequests.pullRequests.map((pr: any) => (
+                            <div key={pr.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <h3 className="font-medium mb-1 hover:text-primary text-sm">
+                                    <a 
+                                      href={pr.url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-1"
+                                    >
+                                      {pr.title}
+                                      <ExternalLink className="h-3 w-3" />
+                                    </a>
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground mb-2">
+                                    {pr.repository.nameWithOwner}
+                                  </p>
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                    <span className={`${
+                                      pr.state === 'OPEN' ? 'text-green-600' : 
+                                      pr.state === 'MERGED' ? 'text-purple-600' : 'text-gray-600'
+                                    }`}>
+                                      #{pr.number}
                                     </span>
+                                    <span className="text-xs">
+                                      {pr.state === 'MERGED' && pr.mergedAt
+                                        ? `merged ${new Date(pr.mergedAt).toLocaleDateString()}`
+                                        : `opened ${new Date(pr.createdAt).toLocaleDateString()}`
+                                      }
+                                    </span>
+                                    {pr.additions !== undefined && pr.deletions !== undefined && (
+                                      <span className="text-xs">
+                                        +{pr.additions} -{pr.deletions}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {pr.labels && pr.labels.length > 0 && (
+                                    <div className="flex flex-wrap gap-1">
+                                      {pr.labels.map((label: any) => (
+                                        <Badge 
+                                          key={label.name} 
+                                          variant="secondary" 
+                                          className="text-xs"
+                                          style={{ 
+                                            backgroundColor: `#${label.color}20`,
+                                            borderColor: `#${label.color}`,
+                                            color: `#${label.color}`
+                                          }}
+                                        >
+                                          {label.name}
+                                        </Badge>
+                                      ))}
+                                    </div>
                                   )}
                                 </div>
-                                {pr.labels && pr.labels.length > 0 && (
-                                  <div className="flex flex-wrap gap-1">
-                                    {pr.labels.map((label: any) => (
-                                      <Badge 
-                                        key={label.name} 
-                                        variant="secondary" 
-                                        className="text-xs"
-                                        style={{ 
-                                          backgroundColor: `#${label.color}20`,
-                                          borderColor: `#${label.color}`,
-                                          color: `#${label.color}`
-                                        }}
-                                      >
-                                        {label.name}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                )}
+                                <Badge 
+                                  variant="outline" 
+                                  className={`text-xs ${
+                                    pr.state === 'OPEN' ? 'bg-green-50 text-green-700 border-green-200' :
+                                    pr.state === 'MERGED' ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                                    'bg-gray-50 text-gray-700 border-gray-200'
+                                  }`}
+                                >
+                                  {pr.state === 'MERGED' ? 'Merged' : pr.state === 'OPEN' ? 'Open' : 'Closed'}
+                                </Badge>
                               </div>
-                              <Badge 
-                                variant="outline" 
-                                className={`text-xs ${
-                                  pr.state === 'OPEN' ? 'bg-green-50 text-green-700 border-green-200' :
-                                  pr.state === 'MERGED' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                                  'bg-gray-50 text-gray-700 border-gray-200'
-                                }`}
-                              >
-                                {pr.state === 'MERGED' ? 'Merged' : pr.state === 'OPEN' ? 'Open' : 'Closed'}
-                              </Badge>
                             </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
+                          ))
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                )}
               </TabsContent>
               
               <TabsContent value="issues">
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Total Issues: {issues.totalCount}
-                  </p>
-                  
-                  <ScrollArea className="h-[400px] pr-4">
-                    <div className="space-y-3">
-                      {issues.issues.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-8">
-                          No issues found
-                        </p>
-                      ) : (
-                        issues.issues.map((issue: any) => (
-                          <div key={issue.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
-                            <div className="flex justify-between items-start">
-                              <div className="flex-1">
-                                <h3 className="font-medium mb-1 hover:text-primary text-sm">
-                                  <a 
-                                    href={issue.url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="flex items-center gap-1"
-                                  >
-                                    {issue.title}
-                                    <ExternalLink className="h-3 w-3" />
-                                  </a>
-                                </h3>
-                                <p className="text-sm text-muted-foreground mb-2">
-                                  {issue.repository.nameWithOwner}
-                                </p>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                                  <span className={`${
-                                    issue.state === 'OPEN' ? 'text-green-600' : 'text-gray-600'
-                                  }`}>
-                                    #{issue.number}
-                                  </span>
-                                  <span className="text-xs">
-                                    {issue.state === 'CLOSED' && issue.closedAt
-                                      ? `closed ${new Date(issue.closedAt).toLocaleDateString()}`
-                                      : `opened ${new Date(issue.createdAt).toLocaleDateString()}`
-                                    }
-                                  </span>
-                                  {issue.commentCount > 0 && (
-                                    <span className="text-xs">{issue.commentCount} comment{issue.commentCount !== 1 ? 's' : ''}</span>
-                                  )}
-                                  {issue.assignees && issue.assignees.length > 0 && (
-                                    <span className="text-xs">assigned to {issue.assignees.join(', ')}</span>
+                {!isAuthenticated ? (
+                  <div className="text-center py-12 space-y-4">
+                    <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg p-6">
+                      <AlertCircle className="h-12 w-12 text-orange-500 mx-auto mb-4" />
+                      <h3 className="text-lg font-medium text-orange-900 dark:text-orange-100 mb-2">
+                        Issues Data
+                      </h3>
+                      <p className="text-orange-700 dark:text-orange-300 mb-4">
+                        Current data shown is based on your public GitHub repository activities. 
+                        To see complete issues data and private repository activity, please complete OAuth authentication.
+                      </p>
+                      <Button onClick={handleAuthenticateGitHub} className="bg-orange-600 hover:bg-orange-700">
+                        <Github className="h-4 w-4 mr-2" />
+                        Complete OAuth
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Total Issues: {issues.totalCount}
+                    </p>
+                    
+                    <ScrollArea className="h-[400px] pr-4">
+                      <div className="space-y-3">
+                        {issues.issues.length === 0 ? (
+                          <p className="text-muted-foreground text-center py-8">
+                            No issues found
+                          </p>
+                        ) : (
+                          issues.issues.map((issue: any) => (
+                            <div key={issue.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <h3 className="font-medium mb-1 hover:text-primary text-sm">
+                                    <a 
+                                      href={issue.url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-1"
+                                    >
+                                      {issue.title}
+                                      <ExternalLink className="h-3 w-3" />
+                                    </a>
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground mb-2">
+                                    {issue.repository.nameWithOwner}
+                                  </p>
+                                  <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+                                    <span className={`${
+                                      issue.state === 'OPEN' ? 'text-green-600' : 'text-gray-600'
+                                    }`}>
+                                      #{issue.number}
+                                    </span>
+                                    <span className="text-xs">
+                                      {issue.state === 'CLOSED' && issue.closedAt
+                                        ? `closed ${new Date(issue.closedAt).toLocaleDateString()}`
+                                        : `opened ${new Date(issue.createdAt).toLocaleDateString()}`
+                                      }
+                                    </span>
+                                    {issue.commentCount > 0 && (
+                                      <span className="text-xs">{issue.commentCount} comment{issue.commentCount !== 1 ? 's' : ''}</span>
+                                    )}
+                                    {issue.assignees && issue.assignees.length > 0 && (
+                                      <span className="text-xs">assigned to {issue.assignees.join(', ')}</span>
+                                    )}
+                                  </div>
+                                  {issue.labels && issue.labels.length > 0 && (
+                                    <div className="flex flex-wrap gap-1">
+                                      {issue.labels.map((label: any) => (
+                                        <Badge 
+                                          key={label.name} 
+                                          variant="secondary" 
+                                          className="text-xs"
+                                          style={{ 
+                                            backgroundColor: `#${label.color}20`,
+                                            borderColor: `#${label.color}`,
+                                            color: `#${label.color}`
+                                          }}
+                                        >
+                                          {label.name}
+                                        </Badge>
+                                      ))}
+                                    </div>
                                   )}
                                 </div>
-                                {issue.labels && issue.labels.length > 0 && (
-                                  <div className="flex flex-wrap gap-1">
-                                    {issue.labels.map((label: any) => (
-                                      <Badge 
-                                        key={label.name} 
-                                        variant="secondary" 
-                                        className="text-xs"
-                                        style={{ 
-                                          backgroundColor: `#${label.color}20`,
-                                          borderColor: `#${label.color}`,
-                                          color: `#${label.color}`
-                                        }}
-                                      >
-                                        {label.name}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                )}
+                                <Badge 
+                                  variant="outline" 
+                                  className={`text-xs ${
+                                    issue.state === 'OPEN' ? 'bg-green-50 text-green-700 border-green-200' :
+                                    'bg-gray-50 text-gray-700 border-gray-200'
+                                  }`}
+                                >
+                                  {issue.state === 'OPEN' ? 'Open' : 'Closed'}
+                                </Badge>
                               </div>
-                              <Badge 
-                                variant="outline" 
-                                className={`text-xs ${
-                                  issue.state === 'OPEN' ? 'bg-green-50 text-green-700 border-green-200' :
-                                  'bg-gray-50 text-gray-700 border-gray-200'
-                                }`}
-                              >
-                                {issue.state === 'OPEN' ? 'Open' : 'Closed'}
-                              </Badge>
                             </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
+                          ))
+                        )}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </CardContent>

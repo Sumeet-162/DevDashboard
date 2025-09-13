@@ -114,7 +114,7 @@ const ProductivityCard: React.FC = () => {
     <div className="space-y-6">
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="relative cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/todos')}>
+        <Card className="relative cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/todo')}>
           <BorderTrail 
             style={{
               boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
@@ -231,7 +231,7 @@ const ProductivityCard: React.FC = () => {
                 />
                 Task Progress
               </CardTitle>
-              <Button variant="outline" size="sm" onClick={() => navigate('/productivity/todos')} className="text-xs">
+              <Button variant="outline" size="sm" onClick={() => navigate('/productivity/todo')} className="text-xs">
                 <Plus className="h-3 w-3 mr-1" />
                 Add Task
               </Button>
@@ -264,7 +264,7 @@ const ProductivityCard: React.FC = () => {
             <Button 
               variant="outline" 
               className="w-full justify-between text-xs" 
-              onClick={() => navigate('/productivity/todos')}
+              onClick={() => navigate('/productivity/todo')}
             >
               View All Tasks
               <ArrowRight className="h-3 w-3" />
