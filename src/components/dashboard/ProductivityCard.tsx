@@ -121,18 +121,18 @@ const ProductivityCard: React.FC = () => {
             }}
             size={100}
           />
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-2 md:gap-3">
               <div className="flex items-center justify-center">
                 <lord-icon
                   src="https://cdn.lordicon.com/eavqayps.json"
                   trigger="hover"
-                  style={{ width: '32px', height: '32px' }}
+                  style={{ width: '24px', height: '24px' }}
                 />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats.todos.pending}</p>
-                <p className="text-sm text-muted-foreground">Tasks Left</p>
+                <p className="text-lg md:text-xl font-bold">{stats.todos.pending}</p>
+                <p className="text-xs text-muted-foreground">Tasks Left</p>
               </div>
             </div>
           </CardContent>
@@ -145,18 +145,18 @@ const ProductivityCard: React.FC = () => {
             }}
             size={100}
           />
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-2 md:gap-3">
               <div className="flex items-center justify-center">
                 <lord-icon
                   src="https://cdn.lordicon.com/tbabdzcy.json"
                   trigger="hover"
-                  style={{ width: '32px', height: '32px' }}
+                  style={{ width: '24px', height: '24px' }}
                 />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats.notes.total}</p>
-                <p className="text-sm text-muted-foreground">Active Notes</p>
+                <p className="text-lg md:text-xl font-bold">{stats.notes.total}</p>
+                <p className="text-xs text-muted-foreground">Active Notes</p>
               </div>
             </div>
           </CardContent>
@@ -169,18 +169,18 @@ const ProductivityCard: React.FC = () => {
             }}
             size={100}
           />
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-2 md:gap-3">
               <div className="flex items-center justify-center">
                 <lord-icon
                   src="https://cdn.lordicon.com/laobovmg.json"
                   trigger="hover"
-                  style={{ width: '32px', height: '32px' }}
+                  style={{ width: '24px', height: '24px' }}
                 />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats.calendar.todayEvents}</p>
-                <p className="text-sm text-muted-foreground">Today's Events</p>
+                <p className="text-lg md:text-xl font-bold">{stats.calendar.todayEvents}</p>
+                <p className="text-xs text-muted-foreground">Today's Events</p>
               </div>
             </div>
           </CardContent>
@@ -193,18 +193,18 @@ const ProductivityCard: React.FC = () => {
             }}
             size={100}
           />
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex items-center gap-2 md:gap-3">
               <div className="flex items-center justify-center">
                 <lord-icon
                   src="https://cdn.lordicon.com/gdowkrjt.json"
                   trigger="hover"
-                  style={{ width: '32px', height: '32px' }}
+                  style={{ width: '24px', height: '24px' }}
                 />
               </div>
               <div>
-                <p className="text-2xl font-bold">{stats.pomodoro.todaysSessions}</p>
-                <p className="text-sm text-muted-foreground">Sessions Today</p>
+                <p className="text-lg md:text-xl font-bold">{stats.pomodoro.todaysSessions}</p>
+                <p className="text-xs text-muted-foreground">Sessions Today</p>
               </div>
             </div>
           </CardContent>
@@ -221,7 +221,7 @@ const ProductivityCard: React.FC = () => {
             }}
             size={100}
           />
-          <CardHeader className="pb-4">
+          <CardHeader className="p-4 pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <lord-icon
@@ -231,43 +231,43 @@ const ProductivityCard: React.FC = () => {
                 />
                 Task Progress
               </CardTitle>
-              <Button variant="outline" size="sm" onClick={() => navigate('/productivity/todos')}>
-                <Plus className="h-4 w-4 mr-1" />
+              <Button variant="outline" size="sm" onClick={() => navigate('/productivity/todos')} className="text-xs">
+                <Plus className="h-3 w-3 mr-1" />
                 Add Task
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-4 pt-0 space-y-4">
             <div>
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span>Completion Rate</span>
-                <span className="font-medium">{getCompletionPercentage()}%</span>
+              <div className="flex items-center justify-between text-xs mb-2">
+                <span className="font-medium">Completion Rate</span>
+                <span className="font-semibold">{getCompletionPercentage()}%</span>
               </div>
               <Progress value={getCompletionPercentage()} className="h-2" />
             </div>
             
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-3 gap-3 text-center">
               <div>
-                <p className="text-lg font-bold text-green-600">{stats.todos.completed}</p>
+                <p className="text-base font-bold text-green-600">{stats.todos.completed}</p>
                 <p className="text-xs text-muted-foreground">Completed</p>
               </div>
               <div>
-                <p className="text-lg font-bold text-blue-600">{stats.todos.pending}</p>
+                <p className="text-base font-bold text-blue-600">{stats.todos.pending}</p>
                 <p className="text-xs text-muted-foreground">Pending</p>
               </div>
               <div>
-                <p className="text-lg font-bold text-red-600">{stats.todos.overdue}</p>
+                <p className="text-base font-bold text-red-600">{stats.todos.overdue}</p>
                 <p className="text-xs text-muted-foreground">Overdue</p>
               </div>
             </div>
 
             <Button 
               variant="outline" 
-              className="w-full justify-between" 
+              className="w-full justify-between text-xs" 
               onClick={() => navigate('/productivity/todos')}
             >
               View All Tasks
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-3 w-3" />
             </Button>
           </CardContent>
         </Card>
@@ -280,7 +280,7 @@ const ProductivityCard: React.FC = () => {
             }}
             size={100}
           />
-          <CardHeader className="pb-4">
+          <CardHeader className="p-4 pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <lord-icon
@@ -290,13 +290,13 @@ const ProductivityCard: React.FC = () => {
                 />
                 Recent Notes
               </CardTitle>
-              <Button variant="outline" size="sm" onClick={() => navigate('/productivity/notes')}>
-                <Plus className="h-4 w-4 mr-1" />
+              <Button variant="outline" size="sm" onClick={() => navigate('/productivity/notes')} className="text-xs">
+                <Plus className="h-3 w-3 mr-1" />
                 New Note
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 pt-0">
             {stats.notes.recent.length > 0 ? (
               <div className="space-y-3">
                 {stats.notes.recent.map((note) => (
@@ -322,9 +322,9 @@ const ProductivityCard: React.FC = () => {
               </div>
             ) : (
               <div className="text-center py-6">
-                <StickyNote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">No notes yet</p>
-                <Button onClick={() => navigate('/productivity/notes')}>
+                <StickyNote className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                <p className="text-sm text-muted-foreground mb-3">No notes yet</p>
+                <Button onClick={() => navigate('/productivity/notes')} className="text-xs">
                   Create First Note
                 </Button>
               </div>

@@ -267,30 +267,30 @@ const QuickNotesPage = () => {
 
   return (
     <Layout>
-      <div className="p-0 md:p-6 space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-card-foreground">Quick Notes</h1>
-            <p className="text-muted-foreground mt-1 text-base">Capture and organize your thoughts</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-card-foreground">Quick Notes</h1>
+            <p className="text-muted-foreground mt-1 text-sm md:text-base">Capture and organize your thoughts</p>
           </div>
-          <Button onClick={() => setShowNewNoteForm(true)} size="lg" className="font-semibold">
+          <Button onClick={() => setShowNewNoteForm(true)} size="default" className="w-full sm:w-auto font-semibold">
             <Plus className="h-4 w-4 mr-2" />
             New Note
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 md:gap-6">
           {/* Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="xl:col-span-1 space-y-4 md:space-y-6">
             {/* Filters */}
             <Card>
-              <CardHeader className="pb-4">
+              <CardHeader className="p-4 pb-3 md:pb-4">
                 <CardTitle className="flex items-center gap-2 text-base font-semibold">
                   <Filter className="h-4 w-4" />
                   Filters
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="p-4 pt-0 space-y-4 md:space-y-6">
                 <div>
                   <label className="text-sm font-medium text-card-foreground mb-3 block">Category</label>
                   <Select value={selectedCategory} onValueChange={setSelectedCategory}>

@@ -449,12 +449,12 @@ const Index = () => {
         </Card>
         
         {/* Productivity Section */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold flex items-center gap-2">
+        <div className="space-y-4 md:space-y-6">
+          <h2 className="text-xl md:text-2xl font-bold flex items-center gap-2">
             <lord-icon
               src="https://cdn.lordicon.com/cqaznhoh.json"
               trigger="hover"
-              style={{ width: '28px', height: '28px' }}
+              style={{ width: '24px', height: '24px' }}
             />
             Productivity
           </h2>
@@ -462,7 +462,7 @@ const Index = () => {
         </div>
         
         {/* Detailed Cards Row 1 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {/* Enhanced GitHub Card */}
           <Card className="relative">
             <BorderTrail 
@@ -471,13 +471,13 @@ const Index = () => {
               }}
               size={100}
             />
-            <CardHeader className="pb-4">
+            <CardHeader className="p-4 md:pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <Github className="h-4 w-4" />
                 GitHub Activity
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-0">
               {loading ? (
                 <div className="space-y-3">
                   <Skeleton className="h-4 w-full" />
@@ -486,23 +486,23 @@ const Index = () => {
                 </div>
               ) : stats.github ? (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4 text-center">
+                  <div className="grid grid-cols-3 gap-2 md:gap-4 text-center">
                     <div>
-                      <div className="text-xl font-bold">{stats.github.contributions}</div>
-                      <div className="text-base text-muted-foreground font-medium">Contributions</div>
+                      <div className="text-lg font-bold">{stats.github.contributions}</div>
+                      <div className="text-xs text-muted-foreground font-medium">Contributions</div>
                     </div>
                     <div>
-                      <div className="text-xl font-bold">{stats.github.totalRepos}</div>
-                      <div className="text-base text-muted-foreground font-medium">Repositories</div>
+                      <div className="text-lg font-bold">{stats.github.totalRepos}</div>
+                      <div className="text-xs text-muted-foreground font-medium">Repositories</div>
                     </div>
                     <div>
-                      <div className="text-xl font-bold">{stats.github.stars}</div>
-                      <div className="text-base text-muted-foreground font-medium">Stars</div>
+                      <div className="text-lg font-bold">{stats.github.stars}</div>
+                      <div className="text-xs text-muted-foreground font-medium">Stars</div>
                     </div>
                   </div>
                   <Button 
                     variant="outline" 
-                    className="w-full" 
+                    className="w-full text-sm" 
                     onClick={() => navigate('/github')}
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />
@@ -529,13 +529,13 @@ const Index = () => {
               }}
               size={100}
             />
-            <CardHeader className="pb-4">
+            <CardHeader className="p-4 md:pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <Code2 className="h-4 w-4" />
                 LeetCode Progress
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-0">
               {loading ? (
                 <div className="space-y-3">
                   <Skeleton className="h-4 w-full" />
@@ -545,26 +545,26 @@ const Index = () => {
               ) : stats.leetcode ? (
                 <div className="space-y-4">
                   <div className="text-center">
-                    <div className="text-2xl font-bold">{stats.leetcode.totalSolved}</div>
-                    <div className="text-base text-muted-foreground font-medium">Problems Solved</div>
+                    <div className="text-lg font-bold">{stats.leetcode.totalSolved}</div>
+                    <div className="text-xs text-muted-foreground font-medium">Problems Solved</div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-base">
-                    <div className="bg-green-100 dark:bg-green-900 p-3 rounded text-center">
-                      <div className="font-semibold">{stats.leetcode.easySolved}</div>
-                      <div className="text-green-600 dark:text-green-400 font-medium">Easy</div>
+                  <div className="grid grid-cols-3 gap-1 md:gap-2">
+                    <div className="bg-green-100 dark:bg-green-900 p-2 md:p-3 rounded text-center">
+                      <div className="text-sm font-semibold">{stats.leetcode.easySolved}</div>
+                      <div className="text-green-600 dark:text-green-400 font-medium text-xs">Easy</div>
                     </div>
-                    <div className="bg-yellow-100 dark:bg-yellow-900 p-3 rounded text-center">
-                      <div className="font-semibold">{stats.leetcode.mediumSolved}</div>
-                      <div className="text-yellow-600 dark:text-yellow-400 font-medium">Medium</div>
+                    <div className="bg-yellow-100 dark:bg-yellow-900 p-2 md:p-3 rounded text-center">
+                      <div className="text-sm font-semibold">{stats.leetcode.mediumSolved}</div>
+                      <div className="text-yellow-600 dark:text-yellow-400 font-medium text-xs">Medium</div>
                     </div>
-                    <div className="bg-red-100 dark:bg-red-900 p-3 rounded text-center">
-                      <div className="font-semibold">{stats.leetcode.hardSolved}</div>
-                      <div className="text-red-600 dark:text-red-400 font-medium">Hard</div>
+                    <div className="bg-red-100 dark:bg-red-900 p-2 md:p-3 rounded text-center">
+                      <div className="text-sm font-semibold">{stats.leetcode.hardSolved}</div>
+                      <div className="text-red-600 dark:text-red-400 font-medium text-xs">Hard</div>
                     </div>
                   </div>
                   <Button 
                     variant="outline" 
-                    className="w-full" 
+                    className="w-full text-sm" 
                     onClick={() => navigate('/leetcode')}
                   >
                     <Trophy className="h-4 w-4 mr-2" />
@@ -574,8 +574,8 @@ const Index = () => {
               ) : (
                 <div className="text-center py-6">
                   <Code2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground mb-4">Connect your LeetCode account to track progress</p>
-                  <Button onClick={() => navigate('/leetcode')}>
+                  <p className="text-sm text-muted-foreground mb-4">Connect your LeetCode account to track progress</p>
+                  <Button onClick={() => navigate('/leetcode')} className="text-sm">
                     Connect LeetCode
                   </Button>
                 </div>
@@ -585,7 +585,7 @@ const Index = () => {
         </div>
         
         {/* Recent Activity & Community */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {/* Recent Community Posts */}
           <Card className="relative">
             <BorderTrail 
@@ -594,7 +594,7 @@ const Index = () => {
               }}
               size={100}
             />
-            <CardHeader className="pb-4">
+            <CardHeader className="p-4 md:pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-base font-semibold">
                   <lord-icon
@@ -608,17 +608,18 @@ const Index = () => {
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate('/community')}
+                  className="text-xs md:text-sm"
                 >
                   View All
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-0">
               {loading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="flex gap-3">
-                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <Skeleton className="h-8 w-8 md:h-10 md:w-10 rounded-full" />
                       <div className="space-y-2 flex-1">
                         <Skeleton className="h-4 w-3/4" />
                         <Skeleton className="h-3 w-1/2" />
@@ -627,32 +628,32 @@ const Index = () => {
                   ))}
                 </div>
               ) : stats.recentPosts.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {stats.recentPosts.slice(0, 3).map((post) => (
                     <div 
                       key={post.id} 
-                      className="flex gap-3 p-3 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                      className="flex gap-2 md:gap-3 p-2 md:p-3 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
                       onClick={() => navigate('/community')}
                     >
-                      <Avatar className="h-10 w-10">
+                      <Avatar className="h-8 w-8 md:h-10 md:w-10 flex-shrink-0">
                         <AvatarImage src={post.author?.avatar_url} />
-                        <AvatarFallback>
+                        <AvatarFallback className="text-xs md:text-sm">
                           {getProfileDisplayName(post.author).split(' ').map(n => n[0]).join('').substring(0, 2)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-base">
+                          <span className="font-medium text-sm md:text-base truncate">
                             {getProfileDisplayName(post.author)}
                           </span>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-xs md:text-sm text-muted-foreground hidden sm:inline">
                             {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                           </span>
                         </div>
-                        <p className="text-base text-muted-foreground line-clamp-2">
+                        <p className="text-sm md:text-base text-muted-foreground line-clamp-2">
                           {post.title}
                         </p>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-3 md:gap-4 mt-2 text-xs md:text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Heart className="h-3 w-3" />
                             {post.likes_count}
@@ -660,6 +661,9 @@ const Index = () => {
                           <span className="flex items-center gap-1">
                             <MessageSquare className="h-3 w-3" />
                             {post.comments_count}
+                          </span>
+                          <span className="text-xs text-muted-foreground sm:hidden">
+                            {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                           </span>
                         </div>
                       </div>
@@ -686,7 +690,7 @@ const Index = () => {
               }}
               size={100}
             />
-            <CardHeader className="pb-4">
+            <CardHeader className="p-4 pb-3">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <lord-icon
                   src="https://cdn.lordicon.com/ulgefjgj.json"
@@ -696,7 +700,7 @@ const Index = () => {
                 Latest News
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 pt-0">
               <NewsCard />
             </CardContent>
           </Card>

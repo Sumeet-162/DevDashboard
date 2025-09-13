@@ -29,29 +29,29 @@ const StatsCard = ({ title, value, description, icon, lordIcon, trend }: StatsCa
         }}
         size={100}
       />
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-base font-medium">{title}</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
         <div className="flex items-center justify-center">
           {lordIcon ? (
             <lord-icon
               src={lordIcon.src}
               trigger={lordIcon.trigger || 'hover'}
               colors={lordIcon.colors}
-              style={{ width: '32px', height: '32px' }}
+              style={{ width: '24px', height: '24px' }}
             />
           ) : (
-            <div className="p-1 bg-secondary rounded-md">{icon}</div>
+            <div className="p-1.5 bg-secondary rounded-md">{icon}</div>
           )}
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
+      <CardContent className="pt-0">
+        <div className="text-2xl font-bold tracking-tight">{value}</div>
+        {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
         
         {trend && (
-          <div className={`flex items-center mt-2 text-sm ${trend.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+          <div className={`flex items-center mt-2 text-xs font-medium ${trend.isPositive ? 'text-green-600' : 'text-red-600'}`}>
             <span>
-              {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
+              {trend.isPositive ? '↗' : '↘'} {Math.abs(trend.value)}%
             </span>
             <span className="ml-1 text-muted-foreground">vs last week</span>
           </div>

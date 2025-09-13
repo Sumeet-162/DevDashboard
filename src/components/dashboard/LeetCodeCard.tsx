@@ -25,29 +25,30 @@ const LeetCodeCard = () => {
         }}
         size={100}
       />
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-bold flex items-center">
-          <Code2 className="mr-2" size={18} /> LeetCode Progress
+      <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <CardTitle className="text-base font-semibold flex items-center gap-2">
+          <Code2 className="h-4 w-4" />
+          LeetCode Progress
         </CardTitle>
-        <Button variant="outline" size="sm">View Profile</Button>
+        <Button variant="outline" size="sm" className="text-xs">View Profile</Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <p className="text-base text-muted-foreground">Problems Solved</p>
-            <p className="text-2xl font-bold">{leetCodeData.solved}</p>
+            <p className="text-xs text-muted-foreground mb-1">Problems Solved</p>
+            <p className="text-xl font-bold">{leetCodeData.solved}</p>
           </div>
           <div>
-            <p className="text-base text-muted-foreground">Current Streak</p>
-            <p className="text-2xl font-bold">{leetCodeData.streak} days</p>
+            <p className="text-xs text-muted-foreground mb-1">Current Streak</p>
+            <p className="text-xl font-bold">{leetCodeData.streak} days</p>
           </div>
         </div>
         
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div>
-            <div className="flex justify-between mb-1 text-base">
-              <span className="text-green-500">Easy ({leetCodeData.easy.solved}/{leetCodeData.easy.total})</span>
-              <span>{Math.round((leetCodeData.easy.solved / leetCodeData.easy.total) * 100)}%</span>
+            <div className="flex justify-between mb-1 text-xs">
+              <span className="text-green-600 font-medium">Easy ({leetCodeData.easy.solved}/{leetCodeData.easy.total})</span>
+              <span className="font-medium">{Math.round((leetCodeData.easy.solved / leetCodeData.easy.total) * 100)}%</span>
             </div>
             <Progress 
               value={(leetCodeData.easy.solved / leetCodeData.easy.total) * 100} 
@@ -56,9 +57,9 @@ const LeetCodeCard = () => {
           </div>
           
           <div>
-            <div className="flex justify-between mb-1 text-base">
-              <span className="text-yellow-500">Medium ({leetCodeData.medium.solved}/{leetCodeData.medium.total})</span>
-              <span>{Math.round((leetCodeData.medium.solved / leetCodeData.medium.total) * 100)}%</span>
+            <div className="flex justify-between mb-1 text-xs">
+              <span className="text-yellow-600 font-medium">Medium ({leetCodeData.medium.solved}/{leetCodeData.medium.total})</span>
+              <span className="font-medium">{Math.round((leetCodeData.medium.solved / leetCodeData.medium.total) * 100)}%</span>
             </div>
             <Progress 
               value={(leetCodeData.medium.solved / leetCodeData.medium.total) * 100} 
@@ -67,9 +68,9 @@ const LeetCodeCard = () => {
           </div>
           
           <div>
-            <div className="flex justify-between mb-1 text-base">
-              <span className="text-red-500">Hard ({leetCodeData.hard.solved}/{leetCodeData.hard.total})</span>
-              <span>{Math.round((leetCodeData.hard.solved / leetCodeData.hard.total) * 100)}%</span>
+            <div className="flex justify-between mb-1 text-xs">
+              <span className="text-red-600 font-medium">Hard ({leetCodeData.hard.solved}/{leetCodeData.hard.total})</span>
+              <span className="font-medium">{Math.round((leetCodeData.hard.solved / leetCodeData.hard.total) * 100)}%</span>
             </div>
             <Progress 
               value={(leetCodeData.hard.solved / leetCodeData.hard.total) * 100} 

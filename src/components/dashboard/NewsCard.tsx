@@ -80,170 +80,140 @@ const NewsCard = () => {
 
   if (loading) {
     return (
-      <Card className="card-hover">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-lg font-bold flex items-center">
-            <Newspaper className="mr-2" size={18} /> Latest Tech News
-          </CardTitle>
-          <Skeleton className="h-8 w-20" />
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[300px] pr-4">
-            <div className="space-y-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="border-b pb-3 last:border-0">
-                  <Skeleton className="h-4 w-full mb-2" />
-                  <Skeleton className="h-4 w-3/4 mb-2" />
-                  <div className="flex justify-between items-center">
-                    <Skeleton className="h-3 w-24" />
-                    <div className="flex gap-2">
-                      <Skeleton className="h-8 w-8" />
-                      <Skeleton className="h-8 w-8" />
-                      <Skeleton className="h-8 w-8" />
-                    </div>
-                  </div>
-                </div>
-              ))}
+      <div className="space-y-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="border-b pb-3 last:border-0">
+            <Skeleton className="h-4 w-full mb-2" />
+            <Skeleton className="h-3 w-3/4 mb-2" />
+            <div className="flex justify-between items-center">
+              <Skeleton className="h-3 w-20" />
+              <div className="flex gap-1">
+                <Skeleton className="h-6 w-6" />
+                <Skeleton className="h-6 w-6" />
+                <Skeleton className="h-6 w-6" />
+              </div>
             </div>
-          </ScrollArea>
-        </CardContent>
-      </Card>
+          </div>
+        ))}
+      </div>
     );
   }
 
   return (
-    <Card className="card-hover relative">
-      <BorderTrail 
-        style={{
-          boxShadow:
-            "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
-        }}
-        size={100}
-      />
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-bold flex items-center">
-          <lord-icon
-            src="https://cdn.lordicon.com/uihwbzln.json"
-            trigger="hover"
-            style={{ width: '18px', height: '18px', marginRight: '8px' }}
-          />
-          Latest Tech News
-        </CardTitle>
+    <div>
+      <div className="flex items-center justify-between mb-4">
         <div className="flex gap-2">
           <Button 
             variant="outline" 
             size="sm"
             onClick={handleRefresh}
             disabled={refreshing}
-            className="h-8"
+            className="h-8 text-xs"
           >
             <RefreshCw className={`h-3 w-3 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
-          <Button variant="outline" size="sm" className="h-8">
+          <Button variant="outline" size="sm" className="h-8 text-xs">
             View All
           </Button>
         </div>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px] pr-4">
-          <div className="space-y-4">
-            {news.map((article) => (
-              <div key={article.id} className="border-b pb-3 last:border-0 group">
-                <div className="flex items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge 
-                        variant="secondary" 
-                        className={`text-sm ${getCategoryColor(article.category)}`}
-                      >
-                        {article.category}
-                      </Badge>
-                      <span className="text-sm text-muted-foreground">
-                        {article.readTime}
-                      </span>
-                    </div>
-                    <h3 
-                      className="font-medium mb-1 cursor-pointer hover:text-primary transition-colors line-clamp-2 text-sm leading-relaxed"
-                      onClick={() => openArticle(article.sourceUrl)}
-                    >
-                      {article.title}
-                    </h3>
-                    <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
-                      {article.summary}
-                    </p>
-                    <div className="flex justify-between items-center text-xs">
-                      <div className="text-muted-foreground">
-                        <span className="font-medium">{article.source}</span> • {article.publishedAt}
-                      </div>
-                      <div className="flex items-center gap-3 text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          ❤️ {article.likes}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          💬 {article.comments}
-                        </span>
-                      </div>
-                    </div>
+      </div>
+      
+      <div className="space-y-3 max-h-[280px] overflow-y-auto pr-2">
+        {news.map((article) => (
+          <div key={article.id} className="border-b pb-3 last:border-0 group">
+            <div className="flex items-start gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge 
+                    variant="secondary" 
+                    className={`text-xs ${getCategoryColor(article.category)}`}
+                  >
+                    {article.category}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {article.readTime}
+                  </span>
+                </div>
+                <h3 
+                  className="font-medium mb-1 cursor-pointer hover:text-primary transition-colors line-clamp-2 text-sm leading-relaxed"
+                  onClick={() => openArticle(article.sourceUrl)}
+                >
+                  {article.title}
+                </h3>
+                <p className="text-xs text-muted-foreground line-clamp-2 mb-2">
+                  {article.summary}
+                </p>
+                <div className="flex justify-between items-center text-xs">
+                  <div className="text-muted-foreground">
+                    <span className="font-medium">{article.source}</span> • {article.publishedAt}
+                  </div>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      ❤️ {article.likes}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      💬 {article.comments}
+                    </span>
                   </div>
                 </div>
-                <div className="flex justify-end items-center gap-1 mt-2">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className={`h-7 w-7 ${savedArticles.has(article.id) ? "text-primary" : ""}`}
-                    onClick={() => toggleSave(article.id)}
-                    title="Save article"
-                  >
-                    <Bookmark size={14} />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-7 w-7"
-                    onClick={() => {
-                      navigator.share?.({
-                        title: article.title,
-                        url: article.sourceUrl
-                      }).catch(() => {
-                        navigator.clipboard.writeText(article.sourceUrl);
-                      });
-                    }}
-                    title="Share article"
-                  >
-                    <Share2 size={14} />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-7 w-7"
-                    onClick={() => openArticle(article.sourceUrl)}
-                    title="Open article"
-                  >
-                    <ExternalLink size={14} />
-                  </Button>
-                </div>
               </div>
-            ))}
+            </div>
+            <div className="flex justify-end items-center gap-1 mt-2">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`h-6 w-6 ${savedArticles.has(article.id) ? "text-primary" : ""}`}
+                onClick={() => toggleSave(article.id)}
+                title="Save article"
+              >
+                <Bookmark size={12} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6"
+                onClick={() => {
+                  navigator.share?.({
+                    title: article.title,
+                    url: article.sourceUrl
+                  }).catch(() => {
+                    navigator.clipboard.writeText(article.sourceUrl);
+                  });
+                }}
+                title="Share article"
+              >
+                <Share2 size={12} />
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6"
+                onClick={() => openArticle(article.sourceUrl)}
+                title="Open article"
+              >
+                <ExternalLink size={12} />
+              </Button>
+            </div>
           </div>
-        </ScrollArea>
+        ))}
         
         {news.length === 0 && !loading && (
-          <div className="text-center py-8 text-muted-foreground">
-            <Newspaper className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>No news articles available</p>
+          <div className="text-center py-6 text-muted-foreground">
+            <Newspaper className="h-10 w-10 mx-auto mb-3 opacity-50" />
+            <p className="text-sm">No news articles available</p>
             <Button 
               variant="outline" 
               size="sm" 
-              className="mt-2"
+              className="mt-2 text-xs"
               onClick={() => fetchNews(true)}
             >
               Try Again
             </Button>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
