@@ -46,7 +46,7 @@ const CommunityPage = () => {
   
   const [searchTerm, setSearchTerm] = useState('');
   const [profileSearchTerm, setProfileSearchTerm] = useState('');
-  const [postsSortBy, setPostsSortBy] = useState<'recent' | 'popular' | 'featured'>('recent');
+  const [postsSortBy, setPostsSortBy] = useState<'recent' | 'popular' | 'featured'>('popular');
   const [profilesSortBy, setProfilesSortBy] = useState<'newest' | 'popular' | 'active'>('newest');
   const [selectedTab, setSelectedTab] = useState('popular');
 
@@ -67,6 +67,7 @@ const CommunityPage = () => {
     // Add debugging for testing
     (window as any).testFollow = {
       fixAllCounts: () => CommunityService.fixAllUserCounts(),
+      fixPostCounts: () => CommunityService.fixAllPostCounts(),
       refreshCounts: (userId: string) => CommunityService.refreshUserCounts(userId),
       getCurrentUser: async () => {
         const { data: { user } } = await supabase.auth.getUser();
@@ -135,6 +136,10 @@ const CommunityPage = () => {
   const loadInitialData = async () => {
     setLoading(true);
     try {
+      // Fix post counts first to ensure accurate data
+      console.log('🔧 Fixing post counts before loading...');
+      await CommunityService.fixAllPostCounts();
+      
       const [postsResult, profilesResult, stats] = await Promise.all([
         loadPosts(true),
         loadProfiles(true),
@@ -233,6 +238,14 @@ const CommunityPage = () => {
     ));
   };
 
+  const handlePostComment = (postId: string, commentsCount: number) => {
+    setPosts(prev => prev.map(post => 
+      post.id === postId 
+        ? { ...post, comments_count: commentsCount }
+        : post
+    ));
+  };
+
   const handleEditPost = (post: CommunityPost) => {
     setEditingPost(post);
   };
@@ -279,15 +292,19 @@ const CommunityPage = () => {
   };
 
   const StatCard = ({ icon: Icon, title, value, subtitle }: any) => (
-    <Card>
-      <CardContent className="p-3 md:p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs md:text-sm text-muted-foreground">{title}</p>
-            <p className="text-lg md:text-2xl font-bold">{value.toLocaleString()}</p>
-            {subtitle && <p className="text-xs text-muted-foreground hidden sm:block">{subtitle}</p>}
+    <Card className="overflow-hidden">
+      <CardContent className="p-2 sm:p-3 md:p-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">{title}</p>
+            <p className="text-sm sm:text-lg md:text-2xl font-bold truncate">{value.toLocaleString()}</p>
+            {subtitle && (
+              <p className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block truncate">
+                {subtitle}
+              </p>
+            )}
           </div>
-          <Icon className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
+          <Icon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-muted-foreground flex-shrink-0" />
         </div>
       </CardContent>
     </Card>
@@ -325,21 +342,25 @@ const CommunityPage = () => {
 
   return (
     <Layout>
-      <div className="space-y-6 pb-32 sm:pb-40 md:pb-56">
+      <div className="space-y-4 md:space-y-6 pb-32 sm:pb-40 md:pb-56 px-2 sm:px-4 md:px-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">Community</h1>
-            <p className="text-muted-foreground">Connect with fellow developers and share knowledge</p>
+        <div className="flex flex-col space-y-3 md:flex-row md:items-center md:justify-between md:space-y-0 gap-2 md:gap-4">
+          <div className="space-y-1">
+            <h1 className="text-2xl sm:text-3xl font-bold">Community</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Connect with fellow developers and share knowledge
+            </p>
           </div>
           
           {user && (
-            <CreatePostDialog onPostCreated={handlePostCreated} />
+            <div className="flex justify-start md:justify-end">
+              <CreatePostDialog onPostCreated={handlePostCreated} />
+            </div>
           )}
         </div>
 
         {/* Community Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
           <StatCard
             icon={Users}
             title="Members"
@@ -367,50 +388,50 @@ const CommunityPage = () => {
         </div>
         
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 p-1 h-auto">
-            <TabsTrigger value="popular" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-0.5 sm:gap-1 p-0.5 sm:p-1 h-auto">
+            <TabsTrigger value="popular" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 md:gap-2 text-xs sm:text-sm py-1.5 sm:py-2 md:py-2.5 px-1 sm:px-3">
               <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Popular</span>
-              <span className="xs:hidden">Pop</span>
+              <span className="hidden sm:inline">Popular</span>
+              <span className="sm:hidden text-[10px]">Pop</span>
             </TabsTrigger>
-            <TabsTrigger value="recent" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+            <TabsTrigger value="recent" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 md:gap-2 text-xs sm:text-sm py-1.5 sm:py-2 md:py-2.5 px-1 sm:px-3">
               <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Recent</span>
-              <span className="xs:hidden">New</span>
+              <span className="hidden sm:inline">Recent</span>
+              <span className="sm:hidden text-[10px]">New</span>
             </TabsTrigger>
-            <TabsTrigger value="following" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+            <TabsTrigger value="following" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 md:gap-2 text-xs sm:text-sm py-1.5 sm:py-2 md:py-2.5 px-1 sm:px-3">
               <UserPlus className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Following</span>
-              <span className="xs:hidden">Follow</span>
+              <span className="hidden sm:inline">Following</span>
+              <span className="sm:hidden text-[10px]">Follow</span>
             </TabsTrigger>
-            <TabsTrigger value="members" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm py-2 sm:py-2.5">
+            <TabsTrigger value="members" className="flex flex-col sm:flex-row items-center gap-0.5 sm:gap-1 md:gap-2 text-xs sm:text-sm py-1.5 sm:py-2 md:py-2.5 px-1 sm:px-3">
               <Users className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden xs:inline">Members</span>
-              <span className="xs:hidden">Users</span>
+              <span className="hidden sm:inline">Members</span>
+              <span className="sm:hidden text-[10px]">Users</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Posts Tabs */}
           {['popular', 'recent', 'following'].includes(selectedTab) && (
-            <TabsContent value={selectedTab} className="mt-6 space-y-6">
+            <TabsContent value={selectedTab} className="mt-4 md:mt-6 space-y-4 md:space-y-6">
               {/* Posts Controls */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-between">
-                <div className="flex gap-2">
-                  <div className="relative flex-1 sm:w-80">
+              <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 gap-2 sm:gap-4 justify-between">
+                <div className="flex gap-2 flex-1">
+                  <div className="relative flex-1 max-w-full sm:max-w-80">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input 
                       type="search" 
                       placeholder="Search posts..." 
-                      className="pl-8"
+                      className="pl-8 text-sm"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-2 justify-end">
                   <Select value={postsSortBy} onValueChange={(value: any) => setPostsSortBy(value)}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-32 sm:w-40 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -423,12 +444,13 @@ const CommunityPage = () => {
               </div>
 
               {/* Posts List */}
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {posts.map((post) => (
                   <PostCard
                     key={post.id}
                     post={post}
                     onLike={handlePostLike}
+                    onComment={handlePostComment}
                     onEdit={handleEditPost}
                     onDelete={handleDeletePost}
                   />
@@ -437,17 +459,17 @@ const CommunityPage = () => {
                 {postsLoading && (
                   <div className="space-y-4">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <Skeleton key={i} className="h-48" />
+                      <Skeleton key={i} className="h-40 sm:h-48" />
                     ))}
                   </div>
                 )}
                 
                 {posts.length === 0 && !postsLoading && (
                   <Card>
-                    <CardContent className="p-12 text-center">
-                      <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium mb-2">No posts yet</h3>
-                      <p className="text-muted-foreground mb-4">
+                    <CardContent className="p-6 sm:p-8 md:p-12 text-center">
+                      <MessageSquare className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
+                      <h3 className="text-base sm:text-lg font-medium mb-2">No posts yet</h3>
+                      <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">
                         {selectedTab === 'following' 
                           ? "Posts from people you follow will appear here"
                           : "Be the first to share something with the community!"
@@ -466,6 +488,7 @@ const CommunityPage = () => {
                       variant="outline" 
                       onClick={() => loadPosts(false)}
                       disabled={postsLoading}
+                      className="w-full sm:w-auto"
                     >
                       {postsLoading ? 'Loading...' : 'Load More Posts'}
                     </Button>
@@ -476,25 +499,25 @@ const CommunityPage = () => {
           )}
 
           {/* Members Tab */}
-          <TabsContent value="members" className="mt-6 space-y-6">
+          <TabsContent value="members" className="mt-4 md:mt-6 space-y-4 md:space-y-6">
             {/* Members Controls */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-between">
-              <div className="flex gap-2">
-                <div className="relative flex-1 sm:w-80">
+            <div className="flex flex-col space-y-3 sm:flex-row sm:space-y-0 gap-2 sm:gap-4 justify-between">
+              <div className="flex gap-2 flex-1">
+                <div className="relative flex-1 max-w-full sm:max-w-80">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input 
                     type="search" 
                     placeholder="Search members..." 
-                    className="pl-8"
+                    className="pl-8 text-sm"
                     value={profileSearchTerm}
                     onChange={(e) => setProfileSearchTerm(e.target.value)}
                   />
                 </div>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-2 justify-end">
                 <Select value={profilesSortBy} onValueChange={(value: any) => setProfilesSortBy(value)}>
-                  <SelectTrigger className="w-40">
+                  <SelectTrigger className="w-32 sm:w-40 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -508,14 +531,14 @@ const CommunityPage = () => {
 
             {/* Members Grid */}
             {profilesLoading && profiles.length === 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <Skeleton key={i} className="h-80" />
+                  <Skeleton key={i} className="h-64 sm:h-80" />
                 ))}
               </div>
             ) : profiles.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {profiles.map((profile) => (
                     <CommunityMemberCard
                       key={profile.id}
@@ -526,9 +549,9 @@ const CommunityPage = () => {
                 </div>
                 
                 {profilesLoading && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <Skeleton key={i} className="h-80" />
+                      <Skeleton key={i} className="h-64 sm:h-80" />
                     ))}
                   </div>
                 )}
@@ -539,6 +562,7 @@ const CommunityPage = () => {
                       variant="outline" 
                       onClick={() => loadProfiles(false)}
                       disabled={profilesLoading}
+                      className="w-full sm:w-auto"
                     >
                       {profilesLoading ? 'Loading...' : 'Load More Members'}
                     </Button>
@@ -547,10 +571,10 @@ const CommunityPage = () => {
               </>
             ) : (
               <Card>
-                <CardContent className="p-12 text-center">
-                  <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No members found</h3>
-                  <p className="text-muted-foreground">
+                <CardContent className="p-6 sm:p-8 md:p-12 text-center">
+                  <Users className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-muted-foreground mb-3 sm:mb-4" />
+                  <h3 className="text-base sm:text-lg font-medium mb-2">No members found</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     {profileSearchTerm ? 'Try adjusting your search terms' : 'Be the first to join our community!'}
                   </p>
                 </CardContent>

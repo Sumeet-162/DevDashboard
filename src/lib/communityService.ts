@@ -194,6 +194,63 @@ export class CommunityService {
     }
   }
 
+  // Fix all post counts by recalculating from actual data
+  static async fixAllPostCounts() {
+    try {
+      console.log('🔧 Fixing all post counts...');
+      
+      // Get all posts
+      const { data: posts, error: postsError } = await supabase
+        .from('community_posts')
+        .select('id, likes_count, comments_count');
+
+      if (postsError) throw postsError;
+
+      let fixedCount = 0;
+      for (const post of posts || []) {
+        // Count actual likes
+        const { count: actualLikes } = await supabase
+          .from('post_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id);
+
+        // Count actual comments
+        const { count: actualComments } = await supabase
+          .from('post_comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id);
+
+        const correctLikesCount = actualLikes || 0;
+        const correctCommentsCount = actualComments || 0;
+
+        // Update if counts don't match
+        if (post.likes_count !== correctLikesCount || post.comments_count !== correctCommentsCount) {
+          console.log(`📊 Fixing post ${post.id}: likes ${post.likes_count} → ${correctLikesCount}, comments ${post.comments_count} → ${correctCommentsCount}`);
+          
+          const { error: updateError } = await supabase
+            .from('community_posts')
+            .update({ 
+              likes_count: correctLikesCount,
+              comments_count: correctCommentsCount 
+            })
+            .eq('id', post.id);
+
+          if (updateError) {
+            console.error(`❌ Error updating post ${post.id}:`, updateError);
+          } else {
+            fixedCount++;
+          }
+        }
+      }
+
+      console.log(`✅ Fixed ${fixedCount} post counts`);
+      return fixedCount;
+    } catch (error) {
+      console.error('Error fixing post counts:', error);
+      throw error;
+    }
+  }
+
   static async getPostById(postId: string): Promise<CommunityPost> {
     try {
       const { data, error } = await supabase
@@ -336,13 +393,18 @@ export class CommunityService {
       console.log('Toggle post like for:', postId, 'by user:', user.id);
 
       // Check if already liked
-      const { data: existingLike } = await supabase
+      const { data: existingLikes, error: checkError } = await supabase
         .from('post_likes')
         .select('id')
         .eq('post_id', postId)
-        .eq('user_id', user.id)
-        .single();
+        .eq('user_id', user.id);
 
+      if (checkError) {
+        console.error('Error checking existing like:', checkError);
+        throw checkError;
+      }
+
+      const existingLike = existingLikes && existingLikes.length > 0 ? existingLikes[0] : null;
       console.log('Existing like:', existingLike);
 
       if (existingLike) {
@@ -415,10 +477,19 @@ export class CommunityService {
       // If counts don't match, update manually
       if (dbCount !== actualCount) {
         console.log('Count mismatch detected! DB:', dbCount, 'Actual:', actualCount);
-        await supabase
+        const { error: updateError } = await supabase
           .from('community_posts')
           .update({ likes_count: actualCount || 0 })
           .eq('id', postId);
+        
+        if (updateError) {
+          console.error('Error updating likes count manually:', updateError);
+        } else {
+          console.log('✅ Likes count updated manually to:', actualCount);
+        }
+        
+        // Wait a moment for the update to complete
+        await new Promise(resolve => setTimeout(resolve, 50));
       }
 
       const result = {
@@ -594,6 +665,8 @@ export class CommunityService {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      console.log('📝 CommunityService: Creating comment for post', postId);
+
       const { data: comment, error } = await supabase
         .from('post_comments')
         .insert({
@@ -606,6 +679,36 @@ export class CommunityService {
         .single();
 
       if (error) throw error;
+      console.log('✅ CommunityService: Comment inserted successfully');
+
+      // Update the post's comments count - Use direct database update instead of RPC
+      console.log('🔄 CommunityService: Updating comments count for post', postId);
+      
+      // Get current count and increment it
+      const { data: currentPost, error: fetchError } = await supabase
+        .from('community_posts')
+        .select('comments_count')
+        .eq('id', postId)
+        .single();
+
+      let newCommentsCount = 1; // Default fallback
+      if (fetchError) {
+        console.error('❌ CommunityService: Error fetching current post:', fetchError);
+      } else {
+        newCommentsCount = (currentPost.comments_count || 0) + 1;
+        console.log('📊 CommunityService: Current count:', currentPost.comments_count, '-> New count:', newCommentsCount);
+        
+        const { error: updateError } = await supabase
+          .from('community_posts')
+          .update({ comments_count: newCommentsCount })
+          .eq('id', postId);
+          
+        if (updateError) {
+          console.error('❌ CommunityService: Error updating comments count:', updateError);
+        } else {
+          console.log('✅ CommunityService: Comments count updated successfully');
+        }
+      }
 
       // Fetch the author details separately
       const { data: profile, error: profileError } = await supabase
@@ -617,8 +720,11 @@ export class CommunityService {
       if (profileError) throw profileError;
 
       return {
-        ...comment,
-        author: profile
+        comment: {
+          ...comment,
+          author: profile
+        },
+        newCommentsCount
       };
     } catch (error) {
       console.error('Error creating comment:', error);
@@ -646,12 +752,49 @@ export class CommunityService {
 
   static async deleteComment(commentId: string) {
     try {
+      // First get the comment to know which post to update
+      const { data: comment } = await supabase
+        .from('post_comments')
+        .select('post_id')
+        .eq('id', commentId)
+        .single();
+
       const { error } = await supabase
         .from('post_comments')
         .delete()
         .eq('id', commentId);
 
       if (error) throw error;
+
+      // Update the post's comments count if we have the post_id
+      if (comment?.post_id) {
+        console.log('🔄 CommunityService: Decrementing comments count for post', comment.post_id);
+        
+        // Get current count and decrement it
+        const { data: currentPost, error: fetchError } = await supabase
+          .from('community_posts')
+          .select('comments_count')
+          .eq('id', comment.post_id)
+          .single();
+
+        if (fetchError) {
+          console.error('❌ CommunityService: Error fetching current post for decrement:', fetchError);
+        } else if (currentPost && currentPost.comments_count > 0) {
+          const newCount = currentPost.comments_count - 1;
+          console.log('📊 CommunityService: Current count:', currentPost.comments_count, '-> New count:', newCount);
+          
+          const { error: updateError } = await supabase
+            .from('community_posts')
+            .update({ comments_count: newCount })
+            .eq('id', comment.post_id);
+            
+          if (updateError) {
+            console.error('❌ CommunityService: Error decrementing comments count:', updateError);
+          } else {
+            console.log('✅ CommunityService: Comments count decremented successfully');
+          }
+        }
+      }
     } catch (error) {
       console.error('Error deleting comment:', error);
       throw error;

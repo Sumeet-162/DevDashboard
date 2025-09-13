@@ -28,6 +28,7 @@ import { useAuthSimple } from "@/hooks/useAuth.tsx";
 import { getProfileDisplayName } from "@/lib/utils";
 import { formatDistanceToNow } from "date-fns";
 import InlineComments from "@/components/community/InlineComments";
+import { supabase } from "@/lib/supabase";
 
 const PostDetailPage = () => {
   const { postId } = useParams<{ postId: string }>();
@@ -37,6 +38,8 @@ const PostDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiking, setIsLiking] = useState(false);
+  const [actualLikesCount, setActualLikesCount] = useState<number | null>(null);
+  const [actualCommentsCount, setActualCommentsCount] = useState<number | null>(null);
 
   useEffect(() => {
     if (postId) {
@@ -53,11 +56,39 @@ const PostDetailPage = () => {
     try {
       const postData = await CommunityService.getPostById(postId);
       setPost(postData);
+      
+      // Fetch actual counts after loading the post
+      fetchActualCounts();
     } catch (error) {
       console.error('Error loading post:', error);
       setError('Failed to load post. It may have been deleted or you may not have permission to view it.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchActualCounts = async () => {
+    if (!postId) return;
+    
+    try {
+      // Get actual likes count
+      const { count: likesCount } = await supabase
+        .from('post_likes')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_id', postId);
+
+      // Get actual comments count  
+      const { count: commentsCount } = await supabase
+        .from('post_comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_id', postId);
+
+      setActualLikesCount(likesCount || 0);
+      setActualCommentsCount(commentsCount || 0);
+      
+      console.log('📊 PostDetailPage: Fetched actual counts - likes:', likesCount, 'comments:', commentsCount);
+    } catch (error) {
+      console.error('Error fetching actual counts:', error);
     }
   };
 
@@ -77,16 +108,27 @@ const PostDetailPage = () => {
     setIsLiking(true);
     try {
       const { isLiked, likesCount } = await CommunityService.togglePostLike(post.id);
+      
+      // Update both post state and actual count
       setPost(prev => prev ? {
         ...prev,
         is_liked: isLiked,
         likes_count: likesCount
       } : null);
+      setActualLikesCount(likesCount);
+      
+      console.log('📊 PostDetailPage: Updated like count to:', likesCount);
     } catch (error) {
       console.error('Error liking post:', error);
     } finally {
       setIsLiking(false);
     }
+  };
+
+  const handleCommentAdded = () => {
+    console.log('📝 PostDetailPage: Comment added, refreshing counts...');
+    // Refresh the actual counts when a comment is added
+    fetchActualCounts();
   };
 
   const handleShare = async () => {
@@ -161,47 +203,48 @@ const PostDetailPage = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto p-4 space-y-6">
+      <div className="max-w-4xl mx-auto p-2 sm:p-4 md:p-6 space-y-4 md:space-y-6">
         {/* Back Button */}
-        <Button variant="ghost" onClick={() => navigate('/community')} className="mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Community
+        <Button variant="ghost" onClick={() => navigate('/community')} className="mb-3 sm:mb-4 text-xs sm:text-sm h-8 sm:h-10">
+          <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Back to Community</span>
+          <span className="sm:hidden">Back</span>
         </Button>
 
         {/* Main Post Card */}
         <Card className="w-full">
-          <CardHeader className="pb-4">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
+          <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-6">
+            <div className="flex items-start justify-between gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 <Avatar 
-                  className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-primary transition-all" 
+                  className="h-8 w-8 sm:h-12 sm:w-12 cursor-pointer hover:ring-2 hover:ring-primary transition-all flex-shrink-0" 
                   onClick={handleProfileClick}
                 >
                   <AvatarImage src={post.author?.avatar_url} alt={authorName} />
-                  <AvatarFallback>
-                    <User className="h-6 w-6" />
+                  <AvatarFallback className="text-xs sm:text-sm">
+                    <User className="h-4 w-4 sm:h-6 sm:w-6" />
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                     <h4 
-                      className="font-medium cursor-pointer hover:text-primary transition-colors" 
+                      className="font-medium text-xs sm:text-sm cursor-pointer hover:text-primary transition-colors truncate" 
                       onClick={handleProfileClick}
                     >
                       {authorName}
                     </h4>
                     {post.author?.username && (
                       <span 
-                        className="text-sm text-muted-foreground cursor-pointer hover:text-primary transition-colors"
+                        className="text-[10px] sm:text-sm text-muted-foreground cursor-pointer hover:text-primary transition-colors truncate"
                         onClick={handleProfileClick}
                       >
                         @{post.author.username}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    <time title={new Date(post.created_at).toLocaleString()}>
+                  <div className="flex items-center gap-1 text-[10px] sm:text-sm text-muted-foreground">
+                    <Clock className="h-2.5 w-2.5 sm:h-4 sm:w-4" />
+                    <time title={new Date(post.created_at).toLocaleString()} className="truncate">
                       {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                     </time>
                   </div>
@@ -211,8 +254,8 @@ const PostDetailPage = () => {
               {isAuthor && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <MoreHorizontal className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" className="h-6 w-6 sm:h-8 sm:w-8 p-0 flex-shrink-0">
+                      <MoreHorizontal className="h-3 w-3 sm:h-4 sm:w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
@@ -233,13 +276,13 @@ const PostDetailPage = () => {
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4 sm:space-y-6 p-3 sm:p-6 pt-0">
             {/* Title */}
-            <h1 className="text-2xl font-bold leading-tight">{post.title}</h1>
+            <h1 className="text-lg sm:text-2xl font-bold leading-tight break-words">{post.title}</h1>
 
             {/* Content */}
             <div className="prose prose-sm max-w-none">
-              <p className="text-muted-foreground whitespace-pre-wrap leading-relaxed">
+              <p className="text-xs sm:text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed break-words">
                 {post.content}
               </p>
             </div>
@@ -250,7 +293,7 @@ const PostDetailPage = () => {
                 <img 
                   src={post.image_url} 
                   alt="Post image" 
-                  className="w-full max-h-96 object-cover"
+                  className="w-full max-h-48 sm:max-h-96 object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
                   }}
@@ -260,9 +303,9 @@ const PostDetailPage = () => {
 
             {/* Tags */}
             {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1 sm:gap-2">
                 {post.tags.map((tag, index) => (
-                  <Badge key={index} variant="outline" className="text-xs">
+                  <Badge key={index} variant="outline" className="text-[10px] sm:text-xs">
                     #{tag}
                   </Badge>
                 ))}
@@ -272,40 +315,51 @@ const PostDetailPage = () => {
             <Separator />
 
             {/* Actions */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+              <div className="flex items-center gap-3 sm:gap-6">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleLike}
                   disabled={!user || isLiking}
-                  className={`gap-2 ${post.is_liked ? 'text-red-500 hover:text-red-600' : ''}`}
+                  className={`gap-1 sm:gap-2 h-8 sm:h-10 px-2 sm:px-3 text-xs sm:text-sm ${post.is_liked ? 'text-red-500 hover:text-red-600' : ''}`}
                 >
-                  <Heart className={`h-5 w-5 ${post.is_liked ? 'fill-current' : ''}`} />
-                  <span>{post.likes_count} {post.likes_count === 1 ? 'like' : 'likes'}</span>
+                  <Heart className={`h-3 w-3 sm:h-5 sm:w-5 ${post.is_liked ? 'fill-current' : ''}`} />
+                  <span>
+                    {actualLikesCount !== null ? actualLikesCount : post.likes_count}
+                    <span className="hidden sm:inline"> {' '}
+                      {(actualLikesCount !== null ? actualLikesCount : post.likes_count) === 1 ? 'like' : 'likes'}
+                    </span>
+                  </span>
                 </Button>
 
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MessageCircle className="h-5 w-5" />
-                  <span>{post.comments_count} {post.comments_count === 1 ? 'comment' : 'comments'}</span>
+                <div className="flex items-center gap-1 sm:gap-2 text-muted-foreground text-xs sm:text-sm">
+                  <MessageCircle className="h-3 w-3 sm:h-5 sm:w-5" />
+                  <span>
+                    {actualCommentsCount !== null ? actualCommentsCount : post.comments_count}
+                    <span className="hidden sm:inline"> {' '}
+                      {(actualCommentsCount !== null ? actualCommentsCount : post.comments_count) === 1 ? 'comment' : 'comments'}
+                    </span>
+                  </span>
                 </div>
               </div>
 
               <Button
                 variant="ghost"
                 size="sm"
+                className="gap-1 sm:gap-2 h-8 sm:h-10 px-2 sm:px-3 text-xs sm:text-sm w-full sm:w-auto"
                 onClick={handleShare}
-                className="gap-2"
               >
-                <Share2 className="h-4 w-4" />
-                Share
+                <Share2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Share</span>
+                <span className="sm:hidden">Share</span>
               </Button>
             </div>
           </CardContent>
         </Card>
 
         {/* Comments Section */}
-        <InlineComments postId={post.id} />
+        <InlineComments postId={post.id} onCommentAdded={handleCommentAdded} />
       </div>
     </Layout>
   );

@@ -107,19 +107,10 @@ export class MonthlyGoalsService {
         console.log('⚠️ LeetCode data exists but no monthly goal data found');
       }
 
-      // Fallback: Check for locally completed problems from Topics Mastery
-      try {
-        const LeetCodeService = await import('./leetcodeService').then(service => service.default);
-        const localProgress = LeetCodeService.getLocallyCompletedProblemsCount();
-        if (localProgress > 0) {
-          console.log('✅ Found local progress from Topics Mastery:', localProgress);
-          return { progress: localProgress, isValid: true };
-        }
-      } catch (error) {
-        console.log('Could not get local progress:', error);
-      }
+      // Note: We intentionally do NOT use local practice data from Topics Mastery
+      // because monthly goals should only reflect actual LeetCode submissions, not local checkboxes
       
-      console.log('✅ LeetCode username configured (' + username + ') but no cached data available - assuming 0 progress (correct for new month)');
+      console.log('✅ LeetCode username configured (' + username + ') but no cached API data available - assuming 0 progress (correct for new month or until next API refresh)');
       return { progress: 0, isValid: true }; // Valid connection but 0 progress (which is correct for your account)
       
     } catch (error) {

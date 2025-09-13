@@ -631,7 +631,6 @@ const LeetCodePage = () => {
               topicDistribution={topicStats} 
               username={user.username}
               isRealData={dataSource === 'real'}
-              onProgressUpdate={handleMonthlyGoalRefresh}
             />
           </TabsContent>
 

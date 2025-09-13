@@ -86,6 +86,42 @@ const Index = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  // Function to fetch actual counts for recent posts
+  const fetchActualCounts = async (posts: CommunityPost[]) => {
+    console.log('🔄 Dashboard: Fetching actual counts for recent posts...');
+    
+    const postsWithActualCounts = await Promise.all(
+      posts.map(async (post) => {
+        try {
+          // Get actual likes count
+          const { count: actualLikesCount } = await supabase
+            .from('post_likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id);
+
+          // Get actual comments count  
+          const { count: actualCommentsCount } = await supabase
+            .from('post_comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id);
+
+          return {
+            ...post,
+            likes_count: actualLikesCount || 0,
+            comments_count: actualCommentsCount || 0
+          };
+        } catch (error) {
+          console.error(`Error fetching counts for post ${post.id}:`, error);
+          // Return original post with existing counts on error
+          return post;
+        }
+      })
+    );
+
+    console.log('✅ Dashboard: Updated posts with actual counts:', postsWithActualCounts);
+    return postsWithActualCounts;
+  };
+
   useEffect(() => {
     if (user) {
       fetchDashboardData();
@@ -205,10 +241,19 @@ const Index = () => {
         })()
       ]);
 
+      // Get recent posts with actual counts
+      const recentPostsData = recentPosts.status === 'fulfilled' ? recentPosts.value.posts : [];
+      console.log('📊 Dashboard: Initial recent posts:', recentPostsData);
+      
+      // Fetch actual counts for recent posts
+      const recentPostsWithActualCounts = recentPostsData.length > 0 
+        ? await fetchActualCounts(recentPostsData)
+        : [];
+
       setStats({
         profile: profileData || null,
         community: communityStats.status === 'fulfilled' ? communityStats.value : null,
-        recentPosts: recentPosts.status === 'fulfilled' ? recentPosts.value.posts : [],
+        recentPosts: recentPostsWithActualCounts,
         github: githubData.status === 'fulfilled' ? githubData.value : null,
         leetcode: leetcodeData.status === 'fulfilled' ? leetcodeData.value : null
       });
@@ -240,28 +285,28 @@ const Index = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="p-4 md:p-6 space-y-6">
         {/* Enhanced Welcome Card */}
         <Card className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-gray-200 dark:border-gray-700">
-          <CardHeader className="pb-4">
-            <div className="flex flex-col md:flex-row items-center gap-6">
+          <CardHeader className="p-4 md:pb-4">
+            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6">
               {/* Left Side - Image */}
               <div className="flex-shrink-0">
                 <img 
                   src="https://raw.githubusercontent.com/Sumeet-162/DEVDASH-IMAGES/refs/heads/main/Open%20Peeps%20-%20Bust.png" 
                   alt="Developer illustration"
-                  className="w-24 h-24 md:w-32 md:h-32 object-contain"
+                  className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 object-contain"
                 />
               </div>
               
               {/* Right Side - Content */}
               <div className="flex-1 text-center md:text-left">
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4">
                   <div className="flex-1">
-                    <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100">
+                    <CardTitle className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">
                       {getGreeting()}, {user?.user_metadata?.full_name || 'Developer'}!
                     </CardTitle>
-                    <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 mt-2">
+                    <p className="text-sm md:text-base lg:text-lg text-gray-700 dark:text-gray-300 mt-1 md:mt-2">
                       Ready to code and collaborate today?
                     </p>
                   </div>
@@ -276,16 +321,16 @@ const Index = () => {
         </Card>
         
         {/* Key Statistics */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-3 md:gap-6">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => (
               <Card key={i}>
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-4 w-24" />
+                <CardHeader className="p-3 md:pb-2">
+                  <Skeleton className="h-4 w-20" />
                 </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-16 mb-2" />
-                  <Skeleton className="h-3 w-20" />
+                <CardContent className="p-3 pt-0">
+                  <Skeleton className="h-6 md:h-8 w-12 md:w-16 mb-2" />
+                  <Skeleton className="h-3 w-16 md:w-20" />
                 </CardContent>
               </Card>
             ))

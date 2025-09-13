@@ -160,9 +160,10 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
   const authorName = user?.email?.split('@')[0] || 'You';
 
   const defaultTrigger = (
-    <Button className="gap-2">
-      <Plus className="h-4 w-4" />
-      New Post
+    <Button className="gap-1 sm:gap-2 text-xs sm:text-sm h-8 sm:h-10 px-3 sm:px-4">
+      <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+      <span className="hidden sm:inline">Create Post</span>
+      <span className="sm:hidden">Post</span>
     </Button>
   );
 
@@ -171,32 +172,32 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create New Post</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-full sm:max-w-2xl w-[95vw] sm:w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto p-3 sm:p-6">
+        <DialogHeader className="pb-2 sm:pb-4">
+          <DialogTitle className="text-base sm:text-lg">Create New Post</DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm">
             Share your thoughts, ideas, or questions with the community
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {/* Author Preview */}
-          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-            <Avatar className="h-8 w-8">
+          <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-muted/50 rounded-lg">
+            <Avatar className="h-6 w-6 sm:h-8 sm:w-8">
               <AvatarImage src={user?.user_metadata?.avatar_url} alt={authorName} />
-              <AvatarFallback>
+              <AvatarFallback className="text-[10px] sm:text-xs">
                 {authorName.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <p className="font-medium text-sm">{authorName}</p>
-              <p className="text-xs text-muted-foreground">Posting to community</p>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-xs sm:text-sm truncate">{authorName}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">Posting to community</p>
             </div>
           </div>
 
           {/* Title */}
-          <div className="space-y-2">
-            <label htmlFor="title" className="text-sm font-medium">
+          <div className="space-y-1 sm:space-y-2">
+            <label htmlFor="title" className="text-xs sm:text-sm font-medium">
               Title *
             </label>
             <Input
@@ -206,15 +207,16 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               maxLength={200}
               required
+              className="text-xs sm:text-sm"
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               {formData.title.length}/200 characters
             </p>
           </div>
 
           {/* Content */}
-          <div className="space-y-2">
-            <label htmlFor="content" className="text-sm font-medium">
+          <div className="space-y-1 sm:space-y-2">
+            <label htmlFor="content" className="text-xs sm:text-sm font-medium">
               Content *
             </label>
             <Textarea
@@ -222,24 +224,24 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
               placeholder="Share your thoughts, code snippets, questions, or insights..."
               value={formData.content}
               onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-              className="min-h-[120px] resize-none"
+              className="min-h-[100px] sm:min-h-[120px] resize-none text-xs sm:text-sm"
               maxLength={10000}
               required
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               {formData.content.length}/10,000 characters
             </p>
           </div>
 
           {/* Image Upload */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium flex items-center gap-2">
-              <ImagePlus className="h-4 w-4" />
+          <div className="space-y-1 sm:space-y-2">
+            <label className="text-xs sm:text-sm font-medium flex items-center gap-1 sm:gap-2">
+              <ImagePlus className="h-3 w-3 sm:h-4 sm:w-4" />
               Upload Image (optional)
             </label>
             
             {!formData.imageFile ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-3 sm:p-6">
                 <input
                   type="file"
                   accept="image/*"
@@ -380,29 +382,32 @@ const CreatePostDialog = ({ onPostCreated, trigger }: CreatePostDialogProps) => 
           )}
 
           {/* Submit */}
-          <div className="flex justify-end gap-2 pt-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-2 pt-3 sm:pt-4">
             <Button 
               type="button" 
               variant="outline" 
               onClick={() => setOpen(false)}
               disabled={isSubmitting}
+              className="order-2 sm:order-1 w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-10"
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
               disabled={!formData.title.trim() || !formData.content.trim() || isSubmitting || imageUploading}
-              className="gap-2"
+              className="gap-1 sm:gap-2 order-1 sm:order-2 w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-10"
             >
               {imageUploading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Uploading Image...
+                  <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                  <span className="hidden sm:inline">Uploading Image...</span>
+                  <span className="sm:hidden">Uploading...</span>
                 </>
               ) : (
                 <>
-                  <Send className="h-4 w-4" />
-                  {isSubmitting ? 'Publishing...' : 'Publish Post'}
+                  <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">{isSubmitting ? 'Publishing...' : 'Publish Post'}</span>
+                  <span className="sm:hidden">{isSubmitting ? 'Publishing...' : 'Publish'}</span>
                 </>
               )}
             </Button>

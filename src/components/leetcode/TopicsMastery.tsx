@@ -38,7 +38,7 @@ interface TopicsMasteryProps {
   topicDistribution: TopicStats[];
   username?: string;
   isRealData?: boolean;
-  onProgressUpdate?: () => void; // Callback to notify parent of progress changes
+  onProgressUpdate?: () => void; // Callback for actual LeetCode API data updates only (not local practice)
 }
 
 interface Problem {
@@ -190,7 +190,9 @@ const TopicsMastery = ({ topicDistribution, username, isRealData, onProgressUpda
     }
   ];
 
-  const handleProblemToggle = async (problemId: number) => {
+  const handleProblemToggle = (problemId: number) => {
+    console.log(`🚀 NEW CODE: TopicsMastery handleProblemToggle called for problem ${problemId}`);
+    
     const newCompleted = new Set(completedProblems);
     const wasCompleted = newCompleted.has(problemId);
     
@@ -202,22 +204,33 @@ const TopicsMastery = ({ topicDistribution, username, isRealData, onProgressUpda
     
     setCompletedProblems(newCompleted);
     
-    // Store in localStorage for persistence
+    // Store in localStorage for persistence - NO LEETCODE SERVICE CALLS
     localStorage.setItem('completed_problems', JSON.stringify(Array.from(newCompleted)));
     
-    // Notify LeetCode service about the change for monthly tracking
-    try {
-      const LeetCodeService = await import('@/services/leetcodeService').then(module => module.default);
-      LeetCodeService.trackLocalProblemCompletion(problemId, !wasCompleted);
-      console.log(`📊 Updated monthly progress tracking for problem ${problemId}`);
-      
-      // Notify parent component to refresh monthly goal
-      if (onProgressUpdate) {
-        onProgressUpdate();
+    // Store monthly tracking separately for local practice only (COMPLETELY INDEPENDENT)
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
+    const monthlyCompletedKey = `local_practice_monthly_${currentMonth}`;
+    
+    let monthlyCompleted: number[] = [];
+    const existing = localStorage.getItem(monthlyCompletedKey);
+    if (existing) {
+      try {
+        monthlyCompleted = JSON.parse(existing);
+      } catch (e) {
+        monthlyCompleted = [];
       }
-    } catch (error) {
-      console.error('Error updating monthly progress:', error);
     }
+    
+    if (!wasCompleted && !monthlyCompleted.includes(problemId)) {
+      monthlyCompleted.push(problemId);
+      console.log(`✅ NEW CODE: Added problem ${problemId} to LOCAL practice tracking only`);
+    } else if (wasCompleted) {
+      monthlyCompleted = monthlyCompleted.filter(id => id !== problemId);
+      console.log(`❌ NEW CODE: Removed problem ${problemId} from LOCAL practice tracking only`);
+    }
+    
+    localStorage.setItem(monthlyCompletedKey, JSON.stringify(monthlyCompleted));
+    console.log(`📊 NEW CODE: Local practice tracking ONLY - NO monthly goal connection - Total: ${monthlyCompleted.length}`);
   };
 
   // Load completed problems from localStorage on mount
@@ -229,24 +242,15 @@ const TopicsMastery = ({ topicDistribution, username, isRealData, onProgressUpda
         console.log('📊 Loaded completed problems from localStorage:', completedArray);
         setCompletedProblems(new Set(completedArray));
         
-        // Initialize monthly tracking for existing completions
-        const initializeMonthlyTracking = async () => {
-          try {
-            const LeetCodeService = await import('@/services/leetcodeService').then(module => module.default);
-            const currentMonth = new Date().toISOString().slice(0, 7);
-            const monthlyCompletedKey = `completed_problems_monthly_${currentMonth}`;
-            
-            // If no monthly tracking exists, initialize with current completions
-            if (!localStorage.getItem(monthlyCompletedKey) && completedArray.length > 0) {
-              console.log(`📊 Initializing monthly tracking with ${completedArray.length} existing completions`);
-              localStorage.setItem(monthlyCompletedKey, JSON.stringify(completedArray));
-            }
-          } catch (error) {
-            console.error('Error initializing monthly tracking:', error);
-          }
-        };
+        // Initialize local practice monthly tracking (completely separate from LeetCode service)
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        const localPracticeKey = `local_practice_monthly_${currentMonth}`;
         
-        initializeMonthlyTracking();
+        // If no local practice tracking exists, initialize with current completions
+        if (!localStorage.getItem(localPracticeKey) && completedArray.length > 0) {
+          console.log(`📊 Initializing local practice tracking with ${completedArray.length} existing completions`);
+          localStorage.setItem(localPracticeKey, JSON.stringify(completedArray));
+        }
       } catch (error) {
         console.error('Error loading completed problems:', error);
       }
@@ -330,7 +334,7 @@ const TopicsMastery = ({ topicDistribution, username, isRealData, onProgressUpda
               <select 
                 value={difficultyFilter}
                 onChange={(e) => setDifficultyFilter(e.target.value as any)}
-                className="px-3 py-2 border rounded-md text-sm"
+                className="px-3 py-2 border rounded-md text-sm bg-background text-foreground border-border"
               >
                 <option value="All">All Levels</option>
                 <option value="Easy">Easy</option>

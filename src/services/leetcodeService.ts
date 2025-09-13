@@ -934,7 +934,7 @@ export class LeetCodeService {
     return achievements;
   }
 
-  // Generate monthly goal
+    // Generate monthly goal
   private static generateMonthlyGoal(user: LeetCodeUser): { target: number; completed: number; daysLeft: number } {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -943,19 +943,17 @@ export class LeetCodeService {
     const daysPassed = now.getDate();
     const daysLeft = daysInMonth - daysPassed;
 
-    // For demo data, check if user has completed any local problems
-    const localCompleted = this.getLocallyCompletedProblemsCount();
+    // For demo data, we don't use local practice progress because it should be separate
+    // Monthly goals should only reflect actual LeetCode submissions from the API
     
-    if (localCompleted > 0) {
-      // User has local progress, use that as the base
-      console.log(`📊 Demo user has ${localCompleted} locally completed problems this month`);
-      const target = Math.max(30, localCompleted + 10); // Ensure target is reasonable
-      return { target, completed: localCompleted, daysLeft };
-    }
-
-    // For demo data without local progress, use fake values
-    const target = Math.floor(this.seededRandom() * 20) + 15; // 15-35 problems per month
-    const completed = Math.floor((daysPassed / daysInMonth) * target * (0.7 + this.seededRandom() * 0.4));
+    // Generate realistic demo values based on user's actual stats
+    const totalSolved = user.totalSolved || 0;
+    const baseTarget = Math.max(10, Math.min(50, Math.floor(totalSolved / 12))); // Reasonable monthly target
+    const target = baseTarget + Math.floor(this.seededRandom() * 10); // Add some variation
+    
+    // Simulate progress through the month
+    const progressRatio = (daysPassed / daysInMonth) * (0.7 + this.seededRandom() * 0.4);
+    const completed = Math.floor(target * progressRatio);
 
     return { target, completed, daysLeft };
   }
@@ -1011,23 +1009,19 @@ export class LeetCodeService {
     // Get actual progress from calendar data (API-based problems)
     const apiCompleted = this.calculateMonthlyProgressFromCalendar(calendar);
     
-    // Add locally completed problems from Topics Mastery
-    const localCompleted = this.getLocallyCompletedProblemsCount();
+    // Monthly goals should only count actual LeetCode submissions from the API
+    // Local practice problems from Topics Mastery should not be included
     
-    // Total completed is API progress + local progress
-    const totalCompleted = apiCompleted + localCompleted;
-    
-    console.log(`📊 Monthly Goal Calculation:`);
+    console.log(`📊 Monthly Goal Calculation (API only):`);
     console.log(`   - API completed: ${apiCompleted}`);
-    console.log(`   - Local completed: ${localCompleted}`);
-    console.log(`   - Total completed: ${totalCompleted}`);
+    console.log(`   - Local practice: excluded from monthly goal`);
     
     // Default target (could be retrieved from MonthlyGoalsService in the future)
     const target = 30; // Default monthly goal
     
     return { 
       target, 
-      completed: totalCompleted, 
+      completed: apiCompleted, // Only count API-based progress
       daysLeft 
     };
   }
@@ -1175,11 +1169,11 @@ export class LeetCodeService {
       
       localStorage.setItem(monthlyCompletedKey, JSON.stringify(monthlyCompleted));
       
-      // Update the overall completion count in the cached data if available
-      if (this.cache) {
-        this.cache.monthlyGoal.completed = monthlyCompleted.length;
-        console.log(`📊 Updated monthly goal progress to ${monthlyCompleted.length} problems`);
-      }
+      // NOTE: We intentionally DO NOT update this.cache here because:
+      // 1. this.cache should only contain actual LeetCode API data
+      // 2. Local practice tracking should be separate from real LeetCode progress
+      // 3. Monthly goals should reflect actual LeetCode submissions, not local checkboxes
+      console.log(`📊 Local practice tracking updated: ${monthlyCompleted.length} problems (does not affect monthly goal)`);
       
     } catch (error) {
       console.error('Error tracking local problem completion:', error);
