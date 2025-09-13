@@ -23,16 +23,16 @@ const RecentSubmissions = ({ submissions, username, isRealData }: RecentSubmissi
             <div key={index} className="border rounded-lg p-3">
               <div className="flex justify-between">
                 <div>
-                  <h3 className="font-medium">{submission.title}</h3>
+                  <h3 className="font-medium text-sm">{submission.title}</h3>
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                    <span className={`px-1.5 py-0.5 rounded ${
+                    <span className={`px-1.5 py-0.5 rounded text-xs ${
                       submission.difficulty === 'Easy' ? 'bg-green-100 text-green-600' :
                       submission.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-600' :
                       'bg-red-100 text-red-600'
                     }`}>
                       {submission.difficulty}
                     </span>
-                    <span>{submission.language}</span>
+                    <span className="text-xs">{submission.language}</span>
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
@@ -59,7 +59,7 @@ const RecentSubmissions = ({ submissions, username, isRealData }: RecentSubmissi
         
         <Button 
           variant="outline" 
-          className="w-full mt-4"
+          className="w-full mt-4 text-sm"
           onClick={() => {
             if (username && username !== 'demo-user' && username !== 'developer_coder') {
               window.open(`https://leetcode.com/${username}/`, '_blank');

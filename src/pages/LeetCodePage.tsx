@@ -406,9 +406,9 @@ const LeetCodePage = () => {
           <div className="space-y-2">
             <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
               <h1 className="text-2xl sm:text-3xl font-bold">LeetCode Dashboard</h1>
-              <Badge variant="outline" className="text-xs break-all">
-                @{user.username}
-              </Badge>
+              <span className="text-sm text-green-600 font-medium">
+                • showing stats for {user.username}
+              </span>
             </div>
           </div>
           
@@ -497,7 +497,7 @@ const LeetCodePage = () => {
                 <Button 
                   onClick={() => handleOpenProblemList('Easy')}
                   variant="outline" 
-                  className="w-full justify-start text-green-600 border-green-200 hover:bg-green-50 relative z-10"
+                  className="w-full justify-start text-green-600 border-green-200 hover:bg-green-50 dark:hover:bg-green-950/50 hover:text-green-700 dark:hover:text-green-300 relative z-10"
                   size="sm"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -506,7 +506,7 @@ const LeetCodePage = () => {
                 <Button 
                   onClick={() => handleOpenProblemList('Medium')}
                   variant="outline" 
-                  className="w-full justify-start text-yellow-600 border-yellow-200 hover:bg-yellow-50 relative z-10"
+                  className="w-full justify-start text-yellow-600 border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/50 hover:text-yellow-700 dark:hover:text-yellow-300 relative z-10"
                   size="sm"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -515,7 +515,7 @@ const LeetCodePage = () => {
                 <Button 
                   onClick={() => handleOpenProblemList('Hard')}
                   variant="outline" 
-                  className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 relative z-10"
+                  className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 dark:hover:bg-red-950/50 hover:text-red-700 dark:hover:text-red-300 relative z-10"
                   size="sm"
                 >
                   <CheckCircle className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -645,18 +645,18 @@ const LeetCodePage = () => {
                     <div 
                       key={achievement.id} 
                       className={`border rounded-lg p-4 ${
-                        achievement.unlockedDate ? 'bg-green-50 border-green-200' : 'bg-muted/30'
+                        achievement.unlockedDate ? 'bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-800' : 'bg-muted/30'
                       }`}
                     >
                       <div className="flex items-start gap-3">
                         <span className="text-2xl">{achievement.icon}</span>
                         <div className="flex-1">
-                          <h3 className="font-medium">{achievement.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">
+                          <h3 className={`font-medium ${achievement.unlockedDate ? 'text-green-800 dark:text-green-200' : ''}`}>{achievement.title}</h3>
+                          <p className={`text-sm mb-2 ${achievement.unlockedDate ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground'}`}>
                             {achievement.description}
                           </p>
                           {achievement.unlockedDate ? (
-                            <Badge variant="secondary" className="text-xs">
+                            <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
                               <CheckCircle className="h-3 w-3 mr-1" />
                               Unlocked {achievement.unlockedDate}
                             </Badge>

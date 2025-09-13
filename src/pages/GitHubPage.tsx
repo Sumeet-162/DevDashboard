@@ -781,7 +781,7 @@ const GitHubPage = () => {
                           <div key={pr.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
-                                <h3 className="font-medium mb-1 hover:text-primary">
+                                <h3 className="font-medium mb-1 hover:text-primary text-sm">
                                   <a 
                                     href={pr.url} 
                                     target="_blank" 
@@ -802,14 +802,14 @@ const GitHubPage = () => {
                                   }`}>
                                     #{pr.number}
                                   </span>
-                                  <span>
+                                  <span className="text-xs">
                                     {pr.state === 'MERGED' && pr.mergedAt
                                       ? `merged ${new Date(pr.mergedAt).toLocaleDateString()}`
                                       : `opened ${new Date(pr.createdAt).toLocaleDateString()}`
                                     }
                                   </span>
                                   {pr.additions !== undefined && pr.deletions !== undefined && (
-                                    <span>
+                                    <span className="text-xs">
                                       +{pr.additions} -{pr.deletions}
                                     </span>
                                   )}
@@ -835,7 +835,7 @@ const GitHubPage = () => {
                               </div>
                               <Badge 
                                 variant="outline" 
-                                className={`${
+                                className={`text-xs ${
                                   pr.state === 'OPEN' ? 'bg-green-50 text-green-700 border-green-200' :
                                   pr.state === 'MERGED' ? 'bg-purple-50 text-purple-700 border-purple-200' :
                                   'bg-gray-50 text-gray-700 border-gray-200'
@@ -869,7 +869,7 @@ const GitHubPage = () => {
                           <div key={issue.id} className="border rounded-lg p-4 hover:bg-muted/50 transition-colors">
                             <div className="flex justify-between items-start">
                               <div className="flex-1">
-                                <h3 className="font-medium mb-1 hover:text-primary">
+                                <h3 className="font-medium mb-1 hover:text-primary text-sm">
                                   <a 
                                     href={issue.url} 
                                     target="_blank" 
@@ -889,17 +889,17 @@ const GitHubPage = () => {
                                   }`}>
                                     #{issue.number}
                                   </span>
-                                  <span>
+                                  <span className="text-xs">
                                     {issue.state === 'CLOSED' && issue.closedAt
                                       ? `closed ${new Date(issue.closedAt).toLocaleDateString()}`
                                       : `opened ${new Date(issue.createdAt).toLocaleDateString()}`
                                     }
                                   </span>
                                   {issue.commentCount > 0 && (
-                                    <span>{issue.commentCount} comment{issue.commentCount !== 1 ? 's' : ''}</span>
+                                    <span className="text-xs">{issue.commentCount} comment{issue.commentCount !== 1 ? 's' : ''}</span>
                                   )}
                                   {issue.assignees && issue.assignees.length > 0 && (
-                                    <span>assigned to {issue.assignees.join(', ')}</span>
+                                    <span className="text-xs">assigned to {issue.assignees.join(', ')}</span>
                                   )}
                                 </div>
                                 {issue.labels && issue.labels.length > 0 && (
@@ -923,7 +923,7 @@ const GitHubPage = () => {
                               </div>
                               <Badge 
                                 variant="outline" 
-                                className={`${
+                                className={`text-xs ${
                                   issue.state === 'OPEN' ? 'bg-green-50 text-green-700 border-green-200' :
                                   'bg-gray-50 text-gray-700 border-gray-200'
                                 }`}
