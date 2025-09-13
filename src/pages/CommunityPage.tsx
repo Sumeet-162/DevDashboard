@@ -586,7 +586,7 @@ const CommunityPage = () => {
       </div>
       
       {/* Footer Image - Responsive positioning */}
-      <div className="fixed bottom-0 left-0 md:left-16 lg:left-64 right-0 w-auto flex justify-center z-10 pointer-events-none">
+      <div className="fixed bottom-0 left-16 lg:left-64 right-0 w-auto flex justify-center z-10 pointer-events-none">
         <img 
           src="https://raw.githubusercontent.com/Sumeet-162/DEVDASH-IMAGES/refs/heads/main/5e51cc5933d368febc351897_footer-img.png"
           alt="Community Footer"

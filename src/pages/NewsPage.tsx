@@ -126,7 +126,7 @@ export default function NewsPage() {
                 Stay updated with the latest in technology and development
               </p>
               {cacheInfo && (
-                <div className="hidden lg:flex items-center gap-2 text-xs text-muted-foreground">
+                <div className="hidden lg:flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="h-3 w-3" />
                   <span>Updated: {cacheInfo.lastUpdated}</span>
                   <span>•</span>
@@ -161,7 +161,7 @@ export default function NewsPage() {
 
         {/* Mobile Cache Info */}
         {cacheInfo && (
-          <div className="lg:hidden flex items-center justify-center gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg p-2">
+          <div className="lg:hidden flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/30 rounded-lg p-2">
             <Clock className="h-3 w-3" />
             <span>Updated: {cacheInfo.lastUpdated}</span>
             <span>•</span>
@@ -190,11 +190,11 @@ export default function NewsPage() {
               <TabsTrigger 
                 key={category.id} 
                 value={category.id}
-                className="flex flex-col sm:flex-row items-center gap-1 text-xs sm:text-sm py-2 sm:py-2.5"
+                className="flex flex-col sm:flex-row items-center gap-1 text-sm sm:text-base py-2 sm:py-2.5"
               >
                 <span className="truncate">{category.label}</span>
                 {category.count > 0 && (
-                  <Badge variant="secondary" className="text-xs min-w-[20px] h-4 px-1">
+                  <Badge variant="secondary" className="text-sm min-w-[20px] h-4 px-1">
                     {category.count}
                   </Badge>
                 )}
@@ -204,7 +204,7 @@ export default function NewsPage() {
 
           <TabsContent value={selectedCategory} className="mt-6">
             {/* Stats */}
-            <div className="mb-6 text-sm text-muted-foreground">
+            <div className="mb-6 text-base text-muted-foreground">
               Showing {filteredNews.length} articles
               {selectedCategory !== 'all' && ` in ${updatedCategories.find(c => c.id === selectedCategory)?.label}`}
             </div>

@@ -365,7 +365,7 @@ const GitHubPage = () => {
                 Configure GitHub Integration
               </CardTitle>
               {!userIsLoggedIn && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-base text-muted-foreground">
                   Sign in to save your GitHub username to your profile, or continue without an account.
                 </p>
               )}
@@ -469,15 +469,15 @@ const GitHubPage = () => {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold">GitHub Profile</h1>
             {isAuthenticated ? (
-              <p className="text-sm text-green-600 mt-1">
+              <p className="text-base text-green-600 mt-1">
                 ✓ Authenticated - Showing real contribution data
               </p>
             ) : stats?.isRealData ? (
-              <p className="text-sm text-blue-600 mt-1">
+              <p className="text-base text-blue-600 mt-1">
                 ✓ Showing real GitHub data via public API
               </p>
             ) : (
-              <p className="text-sm text-orange-600 mt-1">
+              <p className="text-base text-orange-600 mt-1">
                 ⚠️ Showing demo data - authenticate for real data
               </p>
             )}
@@ -525,7 +525,7 @@ const GitHubPage = () => {
                 <AlertDescription>
                   <div className="space-y-2">
                     <p><strong>Alternative to OAuth:</strong> Use a GitHub Personal Access Token for real data access.</p>
-                    <details className="text-xs">
+                    <details className="text-sm">
                       <summary className="cursor-pointer font-medium">How to create a Personal Access Token</summary>
                       <div className="mt-2 space-y-1 text-muted-foreground">
                         <p>1. Go to <a href="https://github.com/settings/tokens" target="_blank" className="text-primary">GitHub Settings → Developer settings → Personal access tokens</a></p>
@@ -607,11 +607,11 @@ const GitHubPage = () => {
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="text-center">
                   <p className="text-xl sm:text-2xl font-bold">{stats.totalRepos}</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Repositories</p>
+                  <p className="text-sm sm:text-base text-muted-foreground">Repositories</p>
                 </div>
                 <div className="text-center">
                   <p className="text-xl sm:text-2xl font-bold">{stats.totalStars}</p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Stars Received</p>
+                  <p className="text-sm sm:text-base text-muted-foreground">Stars Received</p>
                 </div>
               </div>
               
@@ -671,19 +671,19 @@ const GitHubPage = () => {
           <CardContent className="pt-4">
             <Tabs defaultValue="repositories">
               <TabsList className="mb-4 flex-wrap h-auto">
-                <TabsTrigger value="repositories" className="flex items-center gap-2 text-xs sm:text-sm">
+                <TabsTrigger value="repositories" className="flex items-center gap-2 text-sm sm:text-base">
                   <FileCode size={16} /> 
                   <span className="hidden sm:inline">Repositories</span>
                   <span className="sm:hidden">Repos</span>
                   ({repositories.length})
                 </TabsTrigger>
-                <TabsTrigger value="pullRequests" className="flex items-center gap-2 text-xs sm:text-sm">
+                <TabsTrigger value="pullRequests" className="flex items-center gap-2 text-sm sm:text-base">
                   <GitPullRequest size={16} /> 
                   <span className="hidden sm:inline">Pull Requests</span>
                   <span className="sm:hidden">PRs</span>
                   ({pullRequests.totalCount})
                 </TabsTrigger>
-                <TabsTrigger value="issues" className="flex items-center gap-2 text-xs sm:text-sm">
+                <TabsTrigger value="issues" className="flex items-center gap-2 text-sm sm:text-base">
                   <AlertCircle size={16} /> 
                   <span className="hidden sm:inline">Issues</span>
                   <span className="sm:hidden">Issues</span>
@@ -714,22 +714,22 @@ const GitHubPage = () => {
                               </a>
                             </h3>
                             {repo.isPrivate && (
-                              <Badge variant="secondary" className="text-xs">
+                              <Badge variant="secondary" className="text-sm">
                                 Private
                               </Badge>
                             )}
                             {repo.isFork && (
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-sm">
                                 Fork
                               </Badge>
                             )}
                           </div>
                           {repo.description && (
-                            <p className="text-sm text-muted-foreground mb-3 break-words">
+                            <p className="text-base text-muted-foreground mb-3 break-words">
                               {repo.description}
                             </p>
                           )}
-                          <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground flex-wrap">
+                          <div className="flex items-center gap-2 sm:gap-4 text-sm sm:text-base text-muted-foreground flex-wrap">
                             {repo.language && (
                               <div className="flex items-center gap-1">
                                 <span 

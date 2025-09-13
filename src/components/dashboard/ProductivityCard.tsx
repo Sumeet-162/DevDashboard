@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { BorderTrail } from "@/components/ui/border-trail";
 import { 
   CheckSquare, 
   StickyNote, 
@@ -113,7 +114,13 @@ const ProductivityCard: React.FC = () => {
     <div className="space-y-6">
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/todos')}>
+        <Card className="relative cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/todos')}>
+          <BorderTrail 
+            style={{
+              boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+            }}
+            size={100}
+          />
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center">
@@ -131,7 +138,13 @@ const ProductivityCard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/notes')}>
+        <Card className="relative cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/notes')}>
+          <BorderTrail 
+            style={{
+              boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+            }}
+            size={100}
+          />
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center">
@@ -149,7 +162,13 @@ const ProductivityCard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/calendar')}>
+        <Card className="relative cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/calendar')}>
+          <BorderTrail 
+            style={{
+              boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+            }}
+            size={100}
+          />
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center">
@@ -167,7 +186,13 @@ const ProductivityCard: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/pomodoro')}>
+        <Card className="relative cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/productivity/pomodoro')}>
+          <BorderTrail 
+            style={{
+              boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+            }}
+            size={100}
+          />
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center">
@@ -189,7 +214,13 @@ const ProductivityCard: React.FC = () => {
       {/* Detailed Productivity Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Tasks Progress */}
-        <Card>
+        <Card className="relative">
+          <BorderTrail 
+            style={{
+              boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+            }}
+            size={100}
+          />
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
@@ -242,7 +273,13 @@ const ProductivityCard: React.FC = () => {
         </Card>
 
         {/* Recent Notes */}
-        <Card>
+        <Card className="relative">
+          <BorderTrail 
+            style={{
+              boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+            }}
+            size={100}
+          />
           <CardHeader className="pb-4">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">

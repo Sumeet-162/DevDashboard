@@ -25,9 +25,14 @@ const DevDashLogo: React.FC<DevDashLogoProps> = ({
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      {/* DevDash Logo - Code Symbol */}
+      {/* DevDash Logo - Custom SVG */}
       <div className={`${sizeClasses[size]} flex items-center justify-center font-bold text-foreground`}>
-        <span className="text-xl font-mono">&lt;/&gt;</span>
+        <svg width="24" height="24" viewBox="0 0 1 1" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          <path
+            d="M0.751042 0.5V0.251042H0.5V0H0V0.5H0.251042V0.751042H0.5V1H1V0.5H0.751042Z"
+            fill="currentColor"
+          />
+        </svg>
       </div>
       
       {showText && (

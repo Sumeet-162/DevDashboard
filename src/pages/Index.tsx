@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BorderTrail } from "@/components/ui/border-trail";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { CommunityService, CommunityPost } from "@/lib/communityService";
@@ -331,7 +332,13 @@ const Index = () => {
         </div>
 
         {/* Quick Actions */}
-        <Card>
+        <Card className="relative">
+          <BorderTrail 
+            style={{
+              boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+            }}
+            size={100}
+          />
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-base font-semibold">
               <lord-icon
@@ -412,7 +419,13 @@ const Index = () => {
         {/* Detailed Cards Row 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Enhanced GitHub Card */}
-          <Card>
+          <Card className="relative">
+            <BorderTrail 
+              style={{
+                boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+              }}
+              size={100}
+            />
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <Github className="h-4 w-4" />
@@ -431,15 +444,15 @@ const Index = () => {
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
                       <div className="text-xl font-bold">{stats.github.contributions}</div>
-                      <div className="text-sm text-muted-foreground font-medium">Contributions</div>
+                      <div className="text-base text-muted-foreground font-medium">Contributions</div>
                     </div>
                     <div>
                       <div className="text-xl font-bold">{stats.github.totalRepos}</div>
-                      <div className="text-sm text-muted-foreground font-medium">Repositories</div>
+                      <div className="text-base text-muted-foreground font-medium">Repositories</div>
                     </div>
                     <div>
                       <div className="text-xl font-bold">{stats.github.stars}</div>
-                      <div className="text-sm text-muted-foreground font-medium">Stars</div>
+                      <div className="text-base text-muted-foreground font-medium">Stars</div>
                     </div>
                   </div>
                   <Button 
@@ -464,7 +477,13 @@ const Index = () => {
           </Card>
 
           {/* Enhanced LeetCode Card */}
-          <Card>
+          <Card className="relative">
+            <BorderTrail 
+              style={{
+                boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+              }}
+              size={100}
+            />
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <Code2 className="h-4 w-4" />
@@ -484,7 +503,7 @@ const Index = () => {
                     <div className="text-2xl font-bold">{stats.leetcode.totalSolved}</div>
                     <div className="text-base text-muted-foreground font-medium">Problems Solved</div>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-sm">
+                  <div className="grid grid-cols-3 gap-2 text-base">
                     <div className="bg-green-100 dark:bg-green-900 p-3 rounded text-center">
                       <div className="font-semibold">{stats.leetcode.easySolved}</div>
                       <div className="text-green-600 dark:text-green-400 font-medium">Easy</div>
@@ -523,7 +542,13 @@ const Index = () => {
         {/* Recent Activity & Community */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Community Posts */}
-          <Card>
+          <Card className="relative">
+            <BorderTrail 
+              style={{
+                boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+              }}
+              size={100}
+            />
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-base font-semibold">
@@ -572,17 +597,17 @@ const Index = () => {
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-sm">
+                          <span className="font-medium text-base">
                             {getProfileDisplayName(post.author)}
                           </span>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-sm text-muted-foreground">
                             {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                           </span>
                         </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
+                        <p className="text-base text-muted-foreground line-clamp-2">
                           {post.title}
                         </p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Heart className="h-3 w-3" />
                             {post.likes_count}
@@ -609,7 +634,13 @@ const Index = () => {
           </Card>
 
           {/* News & Updates */}
-          <Card>
+          <Card className="relative">
+            <BorderTrail 
+              style={{
+                boxShadow: "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+              }}
+              size={100}
+            />
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <lord-icon

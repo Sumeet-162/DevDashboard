@@ -842,8 +842,8 @@ const DevCalendarPage = () => {
                               <CardContent className="p-4">
                                 <div className="flex items-start justify-between">
                                   <div className="flex items-start gap-3 flex-1">
-                                    <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-muted">
-                                      <Icon className="h-5 w-5" style={{ color: event.color || getEventTypeColor(event.event_type) }} />
+                                    <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-muted" style={{ color: event.color || getEventTypeColor(event.event_type) }}>
+                                      <Icon className="h-5 w-5" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <h4 className="font-semibold text-base text-foreground leading-tight">{event.title}</h4>
@@ -948,8 +948,8 @@ const DevCalendarPage = () => {
                               <CardContent className="p-4">
                                 <div className="flex items-start justify-between">
                                   <div className="flex items-start gap-3 flex-1">
-                                    <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-muted">
-                                      <Icon className="h-5 w-5" style={{ color: note.color || getNoteTypeColor(note.note_type) }} />
+                                    <div className="p-2 rounded-lg bg-muted/50 group-hover:bg-muted" style={{ color: note.color || getNoteTypeColor(note.note_type) }}>
+                                      <Icon className="h-5 w-5" />
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <h4 className="font-semibold text-base text-foreground leading-tight">{note.title}</h4>
@@ -1075,8 +1075,8 @@ const DevCalendarPage = () => {
                                       return (
                                         <SelectItem key={type.value} value={type.value}>
                                           <div className="flex items-center gap-3">
-                                            <div className="p-1 rounded" style={{ backgroundColor: `${type.color}20` }}>
-                                              <Icon className="h-4 w-4" style={{ color: type.color }} />
+                                            <div className="p-1 rounded" style={{ backgroundColor: `${type.color}20`, color: type.color }}>
+                                              <Icon className="h-4 w-4" />
                                             </div>
                                             <span className="font-medium">{type.label}</span>
                                           </div>
@@ -1240,8 +1240,8 @@ const DevCalendarPage = () => {
                                     return (
                                       <SelectItem key={type.value} value={type.value}>
                                         <div className="flex items-center gap-3">
-                                          <div className="p-1 rounded" style={{ backgroundColor: `${type.color}20` }}>
-                                            <Icon className="h-4 w-4" style={{ color: type.color }} />
+                                          <div className="p-1 rounded" style={{ backgroundColor: `${type.color}20`, color: type.color }}>
+                                            <Icon className="h-4 w-4" />
                                           </div>
                                           <span className="font-medium">{type.label}</span>
                                         </div>

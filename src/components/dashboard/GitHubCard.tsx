@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { BorderTrail } from "@/components/ui/border-trail";
 import { useEffect, useState } from "react";
 import { githubService } from "@/services/githubService";
 import { useAuth } from "@/contexts/AuthContext";
@@ -106,7 +107,14 @@ const GitHubCard = () => {
   const progress = Math.round((githubData.totalContributions / githubData.contributionGoal) * 100);
   
   return (
-    <Card className="card-hover">
+    <Card className="card-hover relative">
+      <BorderTrail 
+        style={{
+          boxShadow:
+            "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+        }}
+        size={100}
+      />
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-bold flex items-center">
           <Github className="mr-2" size={18} /> GitHub Activity
@@ -119,19 +127,19 @@ const GitHubCard = () => {
         {loading ? (
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <p className="text-sm text-muted-foreground">Contributions</p>
+              <p className="text-base text-muted-foreground">Contributions</p>
               <div className="h-8 bg-muted animate-pulse rounded"></div>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Current Streak</p>
+              <p className="text-base text-muted-foreground">Current Streak</p>
               <div className="h-8 bg-muted animate-pulse rounded"></div>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Repositories</p>
+              <p className="text-base text-muted-foreground">Repositories</p>
               <div className="h-8 bg-muted animate-pulse rounded"></div>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Pull Requests</p>
+              <p className="text-base text-muted-foreground">Pull Requests</p>
               <div className="h-8 bg-muted animate-pulse rounded"></div>
             </div>
           </div>
@@ -139,36 +147,36 @@ const GitHubCard = () => {
           <>
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <p className="text-sm text-muted-foreground">Contributions</p>
+                <p className="text-base text-muted-foreground">Contributions</p>
                 <p className="text-2xl font-bold">{githubData.totalContributions}</p>
-                <p className="text-xs text-muted-foreground">This year</p>
+                <p className="text-sm text-muted-foreground">This year</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Current Streak</p>
+                <p className="text-base text-muted-foreground">Current Streak</p>
                 <p className="text-2xl font-bold">{githubData.currentStreak}</p>
-                <p className="text-xs text-muted-foreground">days</p>
+                <p className="text-sm text-muted-foreground">days</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Repositories</p>
+                <p className="text-base text-muted-foreground">Repositories</p>
                 <p className="text-2xl font-bold">{githubData.repositories}</p>
-                <p className="text-xs text-muted-foreground">public repos</p>
+                <p className="text-sm text-muted-foreground">public repos</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Pull Requests</p>
+                <p className="text-base text-muted-foreground">Pull Requests</p>
                 <p className="text-2xl font-bold">{githubData.pullRequests}</p>
-                <p className="text-xs text-muted-foreground">recent</p>
+                <p className="text-sm text-muted-foreground">recent</p>
               </div>
             </div>
             
             <div className="mt-4">
-              <div className="flex justify-between mb-1 text-sm">
+              <div className="flex justify-between mb-1 text-base">
                 <span>Year Goal: {githubData.totalContributions}/{githubData.contributionGoal}</span>
                 <span>{progress}%</span>
               </div>
               <Progress value={progress} className="h-2" />
               
               {githubUsername && (
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="text-sm text-muted-foreground mt-2">
                   Showing data for: <span className="font-medium">@{githubUsername}</span>
                   {isRealData ? (
                     <span className="text-green-600 ml-2">• Real Data</span>

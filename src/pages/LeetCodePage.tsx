@@ -322,20 +322,20 @@ const LeetCodePage = () => {
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle className="h-5 w-5 text-red-600" />
-                    <p className="text-red-800 text-sm font-medium">
+                    <p className="text-red-800 text-base font-medium">
                       {error.includes('rate-limited') || error.includes('429') ? 
                         '🚫 API Rate Limited' : 
                         '❌ Error Loading Data'
                       }
                     </p>
                   </div>
-                  <p className="text-red-600 text-xs mb-3">{error}</p>
+                  <p className="text-red-600 text-sm mb-3">{error}</p>
                   
                   {(error.includes('rate-limited') || error.includes('429')) && (
                     <div className="space-y-3">
                       <div className="flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                         <Info className="h-4 w-4 text-yellow-600 mt-0.5" />
-                        <div className="text-sm text-yellow-800">
+                        <div className="text-base text-yellow-800">
                           <p className="font-medium">Rate Limit Information</p>
                           <p className="mt-1">
                             LeetCode APIs have usage limits to ensure fair access. This is normal and temporary.
@@ -375,7 +375,7 @@ const LeetCodePage = () => {
             {/* API Status Display */}
             {apiStatus && !error && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-blue-800 text-sm">{apiStatus}</p>
+                <p className="text-blue-800 text-base">{apiStatus}</p>
               </div>
             )}
 
@@ -601,18 +601,18 @@ const LeetCodePage = () => {
         {/* Detailed Stats */}
         <Tabs defaultValue="submissions" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto">
-            <TabsTrigger value="submissions" className="text-xs sm:text-sm">
+            <TabsTrigger value="submissions" className="text-sm sm:text-base">
               <span className="hidden sm:inline">Recent Submissions</span>
               <span className="sm:hidden">Submissions</span>
             </TabsTrigger>
-            <TabsTrigger value="topics" className="text-xs sm:text-sm">
+            <TabsTrigger value="topics" className="text-sm sm:text-base">
               <span className="hidden sm:inline">Topics Mastery</span>
               <span className="sm:hidden">Topics</span>
             </TabsTrigger>
-            <TabsTrigger value="achievements" className="text-xs sm:text-sm">
+            <TabsTrigger value="achievements" className="text-sm sm:text-base">
               Achievements
             </TabsTrigger>
-            <TabsTrigger value="stats" className="text-xs sm:text-sm">
+            <TabsTrigger value="stats" className="text-sm sm:text-base">
               <span className="hidden sm:inline">Detailed Stats</span>
               <span className="sm:hidden">Stats</span>
             </TabsTrigger>

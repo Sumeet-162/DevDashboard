@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { BorderTrail } from "@/components/ui/border-trail";
 import { NewsService, type NewsArticle } from "@/services/newsService";
 
 const NewsCard = () => {
@@ -111,7 +112,14 @@ const NewsCard = () => {
   }
 
   return (
-    <Card className="card-hover">
+    <Card className="card-hover relative">
+      <BorderTrail 
+        style={{
+          boxShadow:
+            "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+        }}
+        size={100}
+      />
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-bold flex items-center">
           <lord-icon
@@ -147,11 +155,11 @@ const NewsCard = () => {
                     <div className="flex items-center gap-2 mb-1">
                       <Badge 
                         variant="secondary" 
-                        className={`text-xs ${getCategoryColor(article.category)}`}
+                        className={`text-sm ${getCategoryColor(article.category)}`}
                       >
                         {article.category}
                       </Badge>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-sm text-muted-foreground">
                         {article.readTime}
                       </span>
                     </div>

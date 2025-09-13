@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BorderTrail } from "@/components/ui/border-trail";
 import { Users, Link } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -30,7 +31,14 @@ const PostCard = () => {
   };
 
   return (
-    <Card className="card-hover">
+    <Card className="card-hover relative">
+      <BorderTrail 
+        style={{
+          boxShadow:
+            "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+        }}
+        size={100}
+      />
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-bold flex items-center">
           <Users className="mr-2" size={18} /> Share with Community

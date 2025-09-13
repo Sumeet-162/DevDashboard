@@ -393,7 +393,7 @@ const SettingsPage = () => {
                       />
                       <label
                         htmlFor="avatar-upload"
-                        className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-input rounded-md text-sm font-medium hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-input rounded-md text-base font-medium hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{ pointerEvents: avatarUploading ? 'none' : 'auto', opacity: avatarUploading ? 0.5 : 1 }}
                       >
                         {avatarUploading ? (
@@ -408,7 +408,7 @@ const SettingsPage = () => {
                           </>
                         )}
                       </label>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-sm text-muted-foreground">
                         Max 2MB • JPG, PNG, GIF
                       </p>
                     </div>
@@ -638,7 +638,7 @@ const SettingsPage = () => {
                       Email Address
                     </Label>
                     <div className="p-2 bg-muted rounded-md">
-                      <p className="text-sm">{user?.email || 'Not available'}</p>
+                      <p className="text-base">{user?.email || 'Not available'}</p>
                     </div>
                   </div>
                   
@@ -649,7 +649,7 @@ const SettingsPage = () => {
                     </Label>
                     <div className="flex items-center gap-2">
                       <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">Active</span>
+                      <span className="text-base">Active</span>
                     </div>
                   </div>
                   
@@ -659,7 +659,7 @@ const SettingsPage = () => {
                       Member Since
                     </Label>
                     <div className="p-2 bg-muted rounded-md">
-                      <p className="text-sm">
+                      <p className="text-base">
                         {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Not available'}
                       </p>
                     </div>
@@ -671,7 +671,7 @@ const SettingsPage = () => {
                       Last Updated
                     </Label>
                     <div className="p-2 bg-muted rounded-md">
-                      <p className="text-sm">
+                      <p className="text-base">
                         {user?.updated_at ? new Date(user.updated_at).toLocaleDateString() : 'Not available'}
                       </p>
                     </div>

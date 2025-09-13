@@ -1,5 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BorderTrail } from "@/components/ui/border-trail";
 import { ReactNode } from "react";
 
 interface StatsCardProps {
@@ -20,9 +21,16 @@ interface StatsCardProps {
 
 const StatsCard = ({ title, value, description, icon, lordIcon, trend }: StatsCardProps) => {
   return (
-    <Card className="card-hover">
+    <Card className="card-hover relative">
+      <BorderTrail 
+        style={{
+          boxShadow:
+            "0px 0px 60px 30px rgb(255 255 255 / 50%), 0 0 100px 60px rgb(0 0 0 / 50%), 0 0 140px 90px rgb(0 0 0 / 50%)",
+        }}
+        size={100}
+      />
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        <CardTitle className="text-base font-medium">{title}</CardTitle>
         <div className="flex items-center justify-center">
           {lordIcon ? (
             <lord-icon
@@ -38,10 +46,10 @@ const StatsCard = ({ title, value, description, icon, lordIcon, trend }: StatsCa
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
+        {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
         
         {trend && (
-          <div className={`flex items-center mt-2 text-xs ${trend.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+          <div className={`flex items-center mt-2 text-sm ${trend.isPositive ? 'text-green-500' : 'text-red-500'}`}>
             <span>
               {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
             </span>

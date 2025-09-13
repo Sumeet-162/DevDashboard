@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { StaticBorderTrail } from "@/components/ui/static-border-trail";
 
 const navItems = [
   { 
@@ -103,24 +104,33 @@ const Sidebar = () => {
   
   return (
     <div className={cn(
-      "flex flex-col h-screen border-r bg-background transition-all duration-300",
+      "flex flex-col h-screen border-r bg-background transition-all duration-300 relative",
       collapsed ? "w-16" : "w-64"
     )}>
-      <div className="flex items-center justify-between p-4 border-b h-16">
-        {!collapsed && <h2 className="font-bold">DevDash</h2>}
+      <StaticBorderTrail 
+        style={{
+          boxShadow: "0px 0px 20px 10px rgb(255 255 255 / 20%), 0 0 40px 20px rgb(0 0 0 / 30%)",
+          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)"
+        }}
+      />
+      <div className="flex items-center justify-end p-4 border-b h-16 relative z-10">
         {!isMobile && (
           <Button 
             variant="ghost" 
             size="icon" 
-            className="ml-auto" 
-            onClick={() => setCollapsed(prev => !prev)}
+            onClick={() => {
+              console.log('Sidebar toggle clicked, current state:', collapsed);
+              setCollapsed(prev => !prev);
+            }}
+            className="relative z-20 hover:bg-accent"
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </Button>
         )}
       </div>
       
-      <div className="flex-1 py-4 overflow-auto">
+      <div className="flex-1 py-4 overflow-auto relative z-10">
         <nav className="space-y-6 px-2">
           {/* Main Navigation */}
           <div className="space-y-1">
@@ -129,7 +139,7 @@ const Sidebar = () => {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium transition-all hover:bg-accent",
                   window.location.pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
                 )}
               >
@@ -142,7 +152,7 @@ const Sidebar = () => {
           {/* Productivity Section */}
           <div className="space-y-1">
             {!collapsed && (
-              <div className="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              <div className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
                 <Zap size={14} />
                 <span>Productivity</span>
               </div>
@@ -157,7 +167,7 @@ const Sidebar = () => {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium transition-all hover:bg-accent",
                   window.location.pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
                 )}
               >
@@ -174,7 +184,7 @@ const Sidebar = () => {
                 key={item.href}
                 to={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-all hover:bg-accent",
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium transition-all hover:bg-accent",
                   window.location.pathname === item.href ? "bg-primary/10 text-primary" : "text-muted-foreground"
                 )}
               >

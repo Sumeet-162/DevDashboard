@@ -16,6 +16,7 @@ import DevDashLogo from "@/components/ui/DevDashLogo";
 import { toast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { StaticBorderTrail } from "@/components/ui/static-border-trail";
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -113,7 +114,14 @@ const Navbar = () => {
   };
   
   return (
-    <header className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur">
+    <StaticBorderTrail 
+      className="sticky top-0 z-30 w-full border-b bg-background/95 backdrop-blur"
+      style={{
+        boxShadow: "0px 0px 20px 10px rgb(255 255 255 / 20%), 0 0 40px 20px rgb(0 0 0 / 30%)",
+        background: "linear-gradient(180deg, transparent, rgba(255,255,255,0.1), transparent)"
+      }}
+    >
+      <header>
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link to="/dashboard" className="flex items-center">
@@ -145,10 +153,10 @@ const Navbar = () => {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">
+                  <p className="text-base font-medium leading-none">
                     {getDisplayName()}
                   </p>
-                  <p className="text-xs leading-none text-muted-foreground">
+                  <p className="text-sm leading-none text-muted-foreground">
                     {user?.email}
                   </p>
                 </div>
@@ -175,7 +183,8 @@ const Navbar = () => {
           </DropdownMenu>
         </div>
       </div>
-    </header>
+      </header>
+    </StaticBorderTrail>
   );
 };
 
